@@ -35,4 +35,4 @@ class MockTestCase(mocktestcase.MockTestCase):
     def set_parent(self, context, parent_context):
         expect(aq_parent(aq_inner(context))).result(
             parent_context).count(0, None)
-        return parent_context
+        return context
