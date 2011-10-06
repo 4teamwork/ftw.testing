@@ -25,3 +25,6 @@ The following additional methos are available:
     self.providing_stub(interfaces, *args, **kwargs)
       Creates a stub which provides `interfaces`.
 
+    self.set_parent(context, parent_context)
+      Stubs the `context` so that its acquision parent is `parent_context`.
+      Expects at least context to be a mock or a stub.
