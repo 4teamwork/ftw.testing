@@ -3,9 +3,10 @@ from mocker import expect
 from plone import mocktestcase
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
+import unittest2
 
 
-class MockTestCase(mocktestcase.MockTestCase):
+class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
     """Advanced mock test case.
     """
 
@@ -36,3 +37,6 @@ class MockTestCase(mocktestcase.MockTestCase):
         expect(aq_parent(aq_inner(context))).result(
             parent_context).count(0, None)
         return context
+
+    def assertRaises(self, *args, **kwargs):
+        return unittest2.TestCase.assertRaises(self, *args, **kwargs)

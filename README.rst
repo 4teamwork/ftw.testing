@@ -28,3 +28,7 @@ The following additional methos are available:
     self.set_parent(context, parent_context)
       Stubs the `context` so that its acquision parent is `parent_context`.
       Expects at least context to be a mock or a stub. Returns the `context`.
+
+    self.assertRaises(*args, **kwargs):
+      Uses `unittest2` implementation of assertRaises instead of
+      `unittest` implementation.
