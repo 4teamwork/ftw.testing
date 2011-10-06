@@ -22,9 +22,7 @@ class MockTestCase(mocktestcase.MockTestCase):
         for iface in interfaces:
             alsoProvides(dummy, iface)
 
-        kwargs['type'] = dummy
-
-        return self.mocker.mock(*args, **kwargs)
+        return self.mocker.proxy(dummy, False, *args, **kwargs)
 
     def stub(self, *args, **kwargs):
         kwargs['count'] = False
