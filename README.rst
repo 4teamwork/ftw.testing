@@ -27,4 +27,4 @@ The following additional methos are available:
 
     self.set_parent(context, parent_context)
       Stubs the `context` so that its acquision parent is `parent_context`.
-      Expects at least context to be a mock or a stub.
+      Expects at least context to be a mock or a stub. Returns the `parent_context`.

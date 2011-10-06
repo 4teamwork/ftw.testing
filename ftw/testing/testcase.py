@@ -33,5 +33,6 @@ class MockTestCase(mocktestcase.MockTestCase):
         return self.providing_mock(interfaces, *args, **kwargs)
 
     def set_parent(self, context, parent_context):
-        expect(aq_parent(aq_inner(expect))).result(
+        expect(aq_parent(aq_inner(context))).result(
             parent_context).count(0, None)
+        return parent_context
