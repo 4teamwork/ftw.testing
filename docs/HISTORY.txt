@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.1 (unreleased)
+1.1 (2011-11-16)
 ----------------
 
 - Patch mock_tool: do not count, so that it can be used multiple times.
