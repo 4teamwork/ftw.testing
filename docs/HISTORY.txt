@@ -5,7 +5,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Patch mock_tool: do not count, so that it can be used multiple times.
+  [jone]
 
 
 1.0 (2011-10-12)

@@ -1,5 +1,5 @@
 from Acquisition import aq_inner, aq_parent
-from mocker import expect
+from mocker import expect, ANY
 from plone import mocktestcase
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
@@ -40,3 +40,14 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
 
     def assertRaises(self, *args, **kwargs):
         return unittest2.TestCase.assertRaises(self, *args, **kwargs)
+
+    def mock_tool(self, mock, name):
+        """Register a mock tool that will be returned when getToolByName()
+        is called.
+        """
+
+        if self._getToolByName_mock is None:
+            self._getToolByName_mock = self.mocker.replace('Products.CMFCore.utils.getToolByName')
+
+        # patch: do not count.
+        self.expect(self._getToolByName_mock(ANY, name)).result(mock).count(0, None)
