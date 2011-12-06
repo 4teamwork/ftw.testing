@@ -5,7 +5,9 @@ Changelog
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Accept also interfaces directly rather than lists of interfaces when
+  creating mocks or stubs which provides the interfaces.
+  [jone]
 
 
 1.1 (2011-11-16)
