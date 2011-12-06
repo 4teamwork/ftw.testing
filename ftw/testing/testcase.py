@@ -1,6 +1,7 @@
 from Acquisition import aq_inner, aq_parent
 from mocker import expect, ANY
 from plone import mocktestcase
+from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 import unittest2
@@ -17,7 +18,12 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """
         dummy = self.create_dummy()
 
-        first_interface = interfaces.pop(0)
+        if isinstance(interfaces, Interface):
+            first_interface = interfaces
+            interfaces = []
+        else:
+            first_interface = interfaces.pop(0)
+
         directlyProvides(dummy, first_interface)
 
         for iface in interfaces:
