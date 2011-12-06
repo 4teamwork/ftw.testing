@@ -32,19 +32,35 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         return self.mocker.proxy(dummy, False, *args, **kwargs)
 
     def stub(self, *args, **kwargs):
+        """Creates a stub object, which does not assert the applied
+        expectations.
+        """
         kwargs['count'] = False
         return self.mocker.mock(*args, **kwargs)
 
     def providing_stub(self, interfaces, *args, **kwargs):
+        """Creates a stub object providing a list of interfaces.
+        """
         kwargs['count'] = False
         return self.providing_mock(interfaces, *args, **kwargs)
 
     def set_parent(self, context, parent_context):
+        """Set the acquisition parent of `context` to `parent_context`.
+        """
         expect(aq_parent(aq_inner(context))).result(
             parent_context).count(0, None)
         return context
 
     def assertRaises(self, *args, **kwargs):
+        """Use assertRaises from unittest2. This allows us to use it
+        with python (>=2.6) `with` statement.
+
+        >>> with self.assertRaises(TypeError) as cm:
+        ...     1 + 'foo'
+        >>> self.assertEqual(
+        ...     str(cm.exception),
+        ...     "unsupported operand type(s) for +: 'int' and 'str'")
+        """
         return unittest2.TestCase.assertRaises(self, *args, **kwargs)
 
     def mock_tool(self, mock, name):
