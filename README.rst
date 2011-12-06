@@ -1,5 +1,5 @@
-Introduction
-============
+ftw.testing
+===========
 
 
 This package provides helpers for writing tests.
@@ -32,6 +32,49 @@ The following additional methos are available:
     ``self.assertRaises(*args, **kwargs)``
       Uses ``unittest2`` implementation of assertRaises instead of
       ``unittest`` implementation.
+
+It also fixes a problem in ``mock_tool``, where the ``getToolByName`` mock
+had assertions which is not very useful in some cases.
+
+
+Mocking vs. stubbing
+--------------------
+
+A **mock** is used for testing the communication between two objects. It
+asserts *method calls*. This is used when a test should not test if
+a object has a specific state after doing something (e.g. it has it's
+attribute *xy* set to something), but if the object *does* something
+with another object when. If for example a object `Foo` sends a email
+when method `bar` is called, we could mock the sendmail object and
+assert on the send-email method call.
+
+On the other hand we often have to test the state of a object (attribute
+values) after doing something. This can be done without mocks by just
+calling the method and asserting the attribute values. But then we have
+to set up an integration test and install plone, which takes very long.
+For testing an object with dependencies to other parts of plone in a
+unit test, we can use **stubs** for faking other (seperately tested) parts
+of plone. Stubs work like mocks: you can "expect" a method call and
+define a result. The difference between **stubs** and **mocks** is that
+stubs do not assert the expectations, so there will be no errors if
+something expected does not happen. So when using stubs we can assert
+the state without asserting the communcation between objects.
+
+
+Links
+-----
+
+- Main github project repository: https://github.com/4teamwork/ftw.testing
+- Issue tracker: https://github.com/4teamwork/ftw.testing/issues
+- Package on pypi: http://pypi.python.org/pypi/ftw.testing
+
+
+Maintainer
+----------
+
+This package is produced and maintained by `4teamwork <http://www.4teamwork.ch/>`_ company.
+
+
 
 
 .. _plone.mocktestcase: http://pypi.python.org/pypi/plone.mocktestcase
