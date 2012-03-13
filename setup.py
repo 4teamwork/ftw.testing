@@ -30,7 +30,10 @@ setup(name='ftw.testing',
 
       install_requires=[
         'setuptools',
-        'plone.mocktestcase'
+        'unittest2',
+        'plone.mocktestcase',
+        'zope.interface',
+        'zope.component',
         ],
 
       entry_points='''
