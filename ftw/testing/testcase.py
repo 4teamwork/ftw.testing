@@ -18,11 +18,12 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """
         dummy = self.create_dummy()
 
-        if isinstance(interfaces, Interface):
+        if isinstance(interfaces, (list, tuple, set)):
+            first_interface = interfaces.pop(0)
+
+        elif issubclass(interfaces, Interface):
             first_interface = interfaces
             interfaces = []
-        else:
-            first_interface = interfaces.pop(0)
 
         directlyProvides(dummy, first_interface)
 
