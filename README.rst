@@ -19,11 +19,20 @@ The following additional methos are available:
     ``self.providing_mock(interfaces, *args, **kwargs)``
       Creates a mock which provides ``interfaces``.
 
+    ``self.mock_interface(interface, provides=None, *args, **kwargs)``
+      Creates a mock object implementing ``interface``. The mock does not
+      only provide ``interface``, but also use it as specification and
+      asserts that the mocked methods do exist on the interface.
+
     ``self.stub(*args, **kwargs)``
       Creates a stub. It acts like a mock but has no assertions.
 
     ``self.providing_stub(interfaces, *args, **kwargs)``
       Creates a stub which provides ``interfaces``.
+
+    ``self.stub_interface(interface, provides=None, *args, **kwargs)``
+      Does the same as ``mock_interface``, but disables counting of expected
+      method calls and attribute access. See "Mocking vs. stubbing" below.
 
     ``self.set_parent(context, parent_context)``
       Stubs the ``context`` so that its acquision parent is ``parent_context``.

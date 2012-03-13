@@ -5,6 +5,10 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Add ``mock_interface`` and ``stub_interface`` methods to MockTestCase, creating
+  a mock and using the interface as spec.
+  [jone]
+
 - Accept also interfaces directly rather than lists of interfaces when
   creating mocks or stubs which provides the interfaces.
   [jone]

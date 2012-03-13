@@ -1,8 +1,10 @@
 from Acquisition import aq_inner, aq_parent
+from ftw.testing.implementer import Implementer
 from mocker import expect, ANY
 from plone import mocktestcase
 from zope.interface import Interface
 from zope.interface import alsoProvides
+from zope.interface import classImplements
 from zope.interface import directlyProvides
 import unittest2
 
@@ -32,6 +34,17 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
 
         return self.mocker.proxy(dummy, False, *args, **kwargs)
 
+    def mock_interface(self, interface, provides=None, *args, **kwargs):
+        """Creates and returns a new mock object implementing `interface`.
+        The interface is used as "spec" - the test fails when an undefined
+        method is mocked or the method signature does not match the
+        interface.
+        """
+        spec = Implementer(interface)()
+        if provides:
+            classImplements(spec, provides)
+        return self.mocker.mock(spec, *args, **kwargs)
+
     def stub(self, *args, **kwargs):
         """Creates a stub object, which does not assert the applied
         expectations.
@@ -44,6 +57,13 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """
         kwargs['count'] = False
         return self.providing_mock(interfaces, *args, **kwargs)
+
+    def stub_interface(self, interface, provides=None, *args, **kwargs):
+        """Creates a stub object, implementing `interface` and using it
+        as spec.
+        """
+        kwargs['count'] = False
+        return self.mock_interface(interface, provides=None, *args, **kwargs)
 
     def set_parent(self, context, parent_context):
         """Set the acquisition parent of `context` to `parent_context`.
@@ -70,7 +90,8 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """
 
         if self._getToolByName_mock is None:
-            self._getToolByName_mock = self.mocker.replace('Products.CMFCore.utils.getToolByName')
+            self._getToolByName_mock = self.mocker.replace(
+                'Products.CMFCore.utils.getToolByName')
 
         # patch: do not count.
         self.expect(self._getToolByName_mock(ANY, name)).result(mock).count(0, None)

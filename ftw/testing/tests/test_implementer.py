@@ -52,6 +52,10 @@ class Example(object):
 
 class TestImplementer(TestCase):
 
+    def test_implements_interface(self):
+        generated = Implementer(IExample)()
+        self.assertTrue(IExample.implementedBy(generated))
+
     def test_attributes(self):
         generated = Implementer(IExample)()
         self.assertTrue(hasattr(generated, 'foo'))

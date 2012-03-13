@@ -1,10 +1,12 @@
 from Acquisition import aq_inner, aq_parent
 from ftw.testing.testcase import MockTestCase
+from unittest2 import TestResult
 from zope.interface import Interface
 
 
 class IFoo(Interface):
     pass
+
 
 class IBar(Interface):
     pass
@@ -62,3 +64,70 @@ class TestMockTestCase(MockTestCase):
         # unittest2.TestCase.assertRaises has "with"-support
         with self.assertRaises(Exception):
             raise Exception()
+
+
+class ILocking(Interface):
+
+    def lock():
+        pass
+
+    def unlock(all=False):
+        pass
+
+
+class TestInterfaceMocking(MockTestCase):
+
+    def test_mock_interface_raises_when_function_not_known(self):
+        class Test(MockTestCase):
+            def runTest(self):
+                mock = self.mock_interface(ILocking)
+                self.expect(mock.crack()).result(True)
+                self.replay()
+                mock.crack()
+
+        result = TestResult()
+        Test().run(result=result)
+        self.assertFalse(result.wasSuccessful())
+        self.assertEqual(result.testsRun, 1)
+        self.assertEqual(len(result.failures), 1)
+        self.assertIn('mock.crack()\n - Method not ' + \
+                          'found in real specification',
+                      result.failures[0][1])
+
+    def test_mock_interface_raises_on_wrong_arguments(self):
+        class Test(MockTestCase):
+            def runTest(self):
+                mock = self.mock_interface(ILocking)
+                self.expect(mock.unlock(force=True)).result(True)
+                self.replay()
+                mock.unlock(force=True)
+
+        result = TestResult()
+        Test().run(result=result)
+        self.assertFalse(result.wasSuccessful())
+        self.assertEqual(result.testsRun, 1)
+        self.assertEqual(len(result.failures), 1)
+        self.assertIn('mock.unlock(force=True)\n - ' + \
+                          'Specification is unlock(all=False): unknown kwargs: force',
+                      result.failures[0][1])
+
+    def test_mock_interface_passes_when_defined_function_is_called(self):
+        mock = self.mock_interface(ILocking)
+        self.expect(mock.lock()).result('already locked')
+        self.replay()
+        self.assertEqual(mock.lock(), 'already locked')
+
+    def test_mock_interface_providing_addtional_interfaces(self):
+        mock = self.mock_interface(ILocking, provides=[IFoo, IBar])
+        self.replay()
+        self.assertTrue(ILocking.providedBy(mock))
+        self.assertTrue(IFoo.providedBy(mock))
+        self.assertTrue(IBar.providedBy(mock))
+
+    def test_stub_interface_does_not_count(self):
+        mock = self.stub_interface(ILocking)
+        self.expect(mock.lock()).result('already locked')
+        self.replay()
+        self.assertEqual(mock.lock(), 'already locked')
+        self.assertEqual(mock.lock(), 'already locked')
+        self.assertEqual(mock.lock(), 'already locked')

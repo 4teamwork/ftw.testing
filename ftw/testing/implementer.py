@@ -1,4 +1,5 @@
 from zope.interface import Attribute
+from zope.interface import classImplements
 from zope.interface.interface import Method
 
 
@@ -13,6 +14,7 @@ class Implementer(object):
         impl = self._generate_class()
         self._add_attributes(impl)
         self._generate_methods(impl)
+        classImplements(impl, self.interface)
         return impl
 
     def _generate_class(self):
