@@ -4,6 +4,10 @@ import os
 version = '1.2dev'
 maintainer = 'Jonas Baumann'
 
+tests_require = [
+    'Acquisition<4.0a1',
+    ]
+
 setup(name='ftw.testing',
       version=version,
       description='Provides some testing helpers and an advanced MockTestCase.',
@@ -35,6 +39,8 @@ setup(name='ftw.testing',
         'zope.interface',
         'zope.component',
         ],
+      tests_require=tests_require,
+      extras_require={'tests': tests_require},
 
       entry_points='''
       # -*- Entry points: -*-

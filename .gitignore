@@ -1,4 +1,9 @@
-
 *.egg-info
 *.mo
 *.pyc
+.installed.cfg
+bin/
+buildout.cfg
+coverage/
+develop-eggs
+parts/
