@@ -5,6 +5,10 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- No longer tear down the component registry in mock test case. Use the
+  ComponentRegistryLayer.
+  [jone]
+
 - Add ``ComponentRegistryLayer`` base class.
   [jone]
 

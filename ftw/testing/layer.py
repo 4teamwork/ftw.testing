@@ -1,7 +1,7 @@
 from plone.testing import Layer
 from plone.testing import zca
-from zope.component import globalregistry
 from zope.configuration import xmlconfig
+import zope.component.testing
 
 
 class ComponentRegistryLayer(Layer):
@@ -16,21 +16,21 @@ class ComponentRegistryLayer(Layer):
     def __init__(self):
         super(ComponentRegistryLayer, self).__init__()
         self._configuration_context = None
-        self._adapters = None
-        self._utilities = None
+
+    def setUp(self):
+        zca.pushGlobalRegistry()
 
     def testSetUp(self):
-        base = globalregistry.base
-        if self._adapters is None:
-            self._adapters = base.adapters
-            self._utilities = base.utilities
+        zca.pushGlobalRegistry()
 
-        else:
-            base.adapters = self._adapters
-            base.utilities = self._utilities
+    def testTearDown(self):
+        zca.popGlobalRegistry()
 
     def tearDown(self):
-        del self['configurationContext']
+        zca.popGlobalRegistry()
+        if hasattr(self, 'configurationContext'):
+            del self['configurationContext']
+        zope.component.testing.tearDown(self)
 
     def load_zcml_file(self, filename, module):
         xmlconfig.file(filename, module,

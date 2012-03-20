@@ -13,6 +13,10 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
     """Advanced mock test case.
     """
 
+    def tearDown(self):
+        super(mocktestcase.MockTestCase, self).tearDown()
+        self._getToolByName_mock = None
+
     def providing_mock(self, interfaces, *args, **kwargs):
         """Creates a new mock, based on a dummy object providing
         `interfaces`. The first interface in `interfaces` is directly
