@@ -5,6 +5,9 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Add ``ComponentRegistryLayer`` base class.
+  [jone]
+
 - Add ``mock_interface`` and ``stub_interface`` methods to MockTestCase, creating
   a mock and using the interface as spec.
   [jone]

@@ -72,6 +72,37 @@ something expected does not happen. So when using stubs we can assert
 the state without asserting the communcation between objects.
 
 
+Component registry layer
+------------------------
+
+The ``MockTestCase`` is able to mock components (adapters, utilities). It
+cleans up the component registry after every test.
+
+But when we use a ZCML layer, loading the ZCML of the package it should use
+the same component registry for all tests on the same layer. The
+``ComponentRegistryLayer`` is a layer superclass for sharing the component
+registry and speeding up tests.
+
+Usage::
+
+    >>> from ftw.testing.layer import ComponentRegistryLayer
+    >>>
+    >>> class ZCMLLayer(ComponentRegistryLayer):
+    ...
+    ...     def setUp(self):
+    ...         super(ZCMLLayer, self).setUp()
+    ...
+    ...         import my.package
+    ...         self.load_zcml_file('configure.zcml', my.package)
+    ...
+    ... ZCML_LAYER = ZCMLLayer()
+
+Be aware that ``ComponentRegistryLayer`` is a base class for creating your
+own layer (by subclassing ``ComponentRegistryLayer``) and is not usable with
+``defaultBases`` directly. This allows us to use the functions
+``load_zcml_file`` and ``load_zcml_string``.
+
+
 Links
 -----
 
