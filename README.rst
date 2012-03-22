@@ -40,6 +40,11 @@ The following additional methos are available:
       Stubs the ``context`` so that its acquision parent is ``parent_context``.
       Expects at least context to be a mock or a stub. Returns the ``context``.
 
+``self.stub_request(content_type='text/html')``
+      Returns a request stub which can be used for rendering templates. The
+      optional ``content_type`` argument defines the expected output content
+      type of the response.
+
 ``self.assertRaises(*args, **kwargs)``
       Uses ``unittest2`` implementation of assertRaises instead of
       ``unittest`` implementation.

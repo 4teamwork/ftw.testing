@@ -2,6 +2,7 @@ from Acquisition import aq_inner, aq_parent
 from ftw.testing.testcase import MockTestCase
 from unittest2 import TestResult
 from zope.interface import Interface
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
 class IFoo(Interface):
@@ -64,6 +65,22 @@ class TestMockTestCase(MockTestCase):
         # unittest2.TestCase.assertRaises has "with"-support
         with self.assertRaises(Exception):
             raise Exception()
+
+    def test_stub_request(self):
+        html_request = self.stub_request()
+        js_request = self.stub_request(content_type='text/javascript')
+
+        self.replay()
+
+        self.assertTrue(IDefaultBrowserLayer.providedBy(html_request))
+        self.assertEqual(html_request.debug, False)
+        self.assertEqual(html_request.response.getHeader(
+                'Content-Type'), 'text/html')
+
+        self.assertTrue(IDefaultBrowserLayer.providedBy(js_request))
+        self.assertEqual(html_request.debug, False)
+        self.assertEqual(js_request.response.getHeader(
+                'Content-Type'), 'text/javascript')
 
 
 class ILocking(Interface):

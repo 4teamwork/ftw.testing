@@ -5,6 +5,9 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Add ``stub_request`` method to ``MockTestCase``.
+  [jone]
+
 - No longer tear down the component registry in mock test case. Use the
   ComponentRegistryLayer.
   [jone]
