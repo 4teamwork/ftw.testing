@@ -98,4 +98,5 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
                 'Products.CMFCore.utils.getToolByName')
 
         # patch: do not count.
-        self.expect(self._getToolByName_mock(ANY, name)).result(mock).count(0, None)
+        self.expect(self._getToolByName_mock(ANY, name)).result(
+            mock).count(0, None)
