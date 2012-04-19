@@ -6,12 +6,17 @@ from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import classImplements
 from zope.interface import directlyProvides
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 import unittest2
 
 
 class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
     """Advanced mock test case.
     """
+
+    def tearDown(self):
+        super(mocktestcase.MockTestCase, self).tearDown()
+        self._getToolByName_mock = None
 
     def providing_mock(self, interfaces, *args, **kwargs):
         """Creates a new mock, based on a dummy object providing
@@ -94,4 +99,15 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
                 'Products.CMFCore.utils.getToolByName')
 
         # patch: do not count.
-        self.expect(self._getToolByName_mock(ANY, name)).result(mock).count(0, None)
+        self.expect(self._getToolByName_mock(ANY, name)).result(
+            mock).count(0, None)
+
+    def stub_request(self, content_type='text/html'):
+        """Returns a stub request providing IDefaultBrowserLayer with some
+        headers and options required for rendering templates.
+        """
+        request = self.providing_stub(IDefaultBrowserLayer)
+        self.expect(request.debug).result(False)
+        self.expect(request.response.getHeader('Content-Type')).result(
+            content_type)
+        return request

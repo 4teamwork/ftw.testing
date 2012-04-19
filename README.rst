@@ -40,6 +40,11 @@ The following additional methos are available:
       Stubs the ``context`` so that its acquision parent is ``parent_context``.
       Expects at least context to be a mock or a stub. Returns the ``context``.
 
+``self.stub_request(content_type='text/html')``
+      Returns a request stub which can be used for rendering templates. The
+      optional ``content_type`` argument defines the expected output content
+      type of the response.
+
 ``self.assertRaises(*args, **kwargs)``
       Uses ``unittest2`` implementation of assertRaises instead of
       ``unittest`` implementation.
@@ -70,6 +75,37 @@ define a result. The difference between **stubs** and **mocks** is that
 stubs do not assert the expectations, so there will be no errors if
 something expected does not happen. So when using stubs we can assert
 the state without asserting the communcation between objects.
+
+
+Component registry layer
+------------------------
+
+The ``MockTestCase`` is able to mock components (adapters, utilities). It
+cleans up the component registry after every test.
+
+But when we use a ZCML layer, loading the ZCML of the package it should use
+the same component registry for all tests on the same layer. The
+``ComponentRegistryLayer`` is a layer superclass for sharing the component
+registry and speeding up tests.
+
+Usage::
+
+    >>> from ftw.testing.layer import ComponentRegistryLayer
+    >>>
+    >>> class ZCMLLayer(ComponentRegistryLayer):
+    ...
+    ...     def setUp(self):
+    ...         super(ZCMLLayer, self).setUp()
+    ...
+    ...         import my.package
+    ...         self.load_zcml_file('configure.zcml', my.package)
+    ...
+    ... ZCML_LAYER = ZCMLLayer()
+
+Be aware that ``ComponentRegistryLayer`` is a base class for creating your
+own layer (by subclassing ``ComponentRegistryLayer``) and is not usable with
+``defaultBases`` directly. This allows us to use the functions
+``load_zcml_file`` and ``load_zcml_string``.
 
 
 Links
