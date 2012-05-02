@@ -68,7 +68,8 @@ class TestMockTestCase(MockTestCase):
 
     def test_stub_request(self):
         html_request = self.stub_request()
-        js_request = self.stub_request(content_type='text/javascript')
+        js_request = self.stub_request(content_type='text/javascript',
+                                       status=401)
 
         self.replay()
 
@@ -76,11 +77,13 @@ class TestMockTestCase(MockTestCase):
         self.assertEqual(html_request.debug, False)
         self.assertEqual(html_request.response.getHeader(
                 'Content-Type'), 'text/html')
+        self.assertEqual(html_request.response.getStatus(), 200)
 
         self.assertTrue(IDefaultBrowserLayer.providedBy(js_request))
-        self.assertEqual(html_request.debug, False)
+        self.assertEqual(js_request.debug, False)
         self.assertEqual(js_request.response.getHeader(
                 'Content-Type'), 'text/javascript')
+        self.assertEqual(js_request.response.getStatus(), 401)
 
 
 class ILocking(Interface):
