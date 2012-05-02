@@ -102,7 +102,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         self.expect(self._getToolByName_mock(ANY, name)).result(
             mock).count(0, None)
 
-    def stub_request(self, content_type='text/html'):
+    def stub_request(self, content_type='text/html', status=200):
         """Returns a stub request providing IDefaultBrowserLayer with some
         headers and options required for rendering templates.
         """
@@ -110,4 +110,6 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         self.expect(request.debug).result(False)
         self.expect(request.response.getHeader('Content-Type')).result(
             content_type)
+        self.expect(request.response.getStatus()).result(status)
+
         return request

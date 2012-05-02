@@ -5,6 +5,9 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Let the stub_request method also stub the getStatus of the response.
+  [phgross]
+
 - Add ``stub_request`` method to ``MockTestCase``.
   [jone]
 
