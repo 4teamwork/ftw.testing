@@ -99,6 +99,24 @@ class TestMockTestCase(MockTestCase):
                 'Content-Type'), 'text/html')
         self.assertEqual(html_request.response.getStatus(), 200)
 
+    def test_stub_response(self):
+        temp_request = self.stub()
+        html_response = self.stub_response()
+
+        js_response = self.stub_response(
+            request=temp_request, content_type='text/javascript', status=401)
+
+        self.replay()
+
+        self.assertEqual(html_response.getHeader('Content-Type'), 'text/html')
+        self.assertEqual(html_response.getStatus(), 200)
+
+        self.assertEqual(js_response.getHeader('Content-Type'), 'text/javascript')
+        self.assertEqual(
+            temp_request.response.getHeader('Content-Type'), 'text/javascript')
+        self.assertEqual(js_response.getStatus(), 401)
+        self.assertEqual(temp_request.response.getStatus(), 401)
+
 
 class ILocking(Interface):
 

@@ -40,10 +40,20 @@ The following additional methos are available:
       Stubs the ``context`` so that its acquision parent is ``parent_context``.
       Expects at least context to be a mock or a stub. Returns the ``context``.
 
-``self.stub_request(content_type='text/html')``
-      Returns a request stub which can be used for rendering templates. The
-      optional ``content_type`` argument defines the expected output content
-      type of the response.
+``self.stub_request(interfaces=[], stub_response=True,
+                     content_type='text/html', status=200)``
+      Returns a request stub which can be used for rendering templates. With the
+      ``stub respones`` option, you can define if the request should stub a
+      response by him self. The other optional arguments:
+      ``content_type``: Defines the expected output content type of the response.
+      ``status``: Defines the expected status code of the response.
+
+``self.stub_response(request=None, content_type='text/html', status=200))``
+      Returns a stub response with some headers and options. When a ``request``
+      is given the response would append also to the giver request.
+      The other optional arguments:
+      ``content_type``: Defines the expected output content type of the response.
+      ``status``: Defines the expected status code of the response.
 
 ``self.assertRaises(*args, **kwargs)``
       Uses ``unittest2`` implementation of assertRaises instead of
