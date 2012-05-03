@@ -6,6 +6,7 @@ from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import classImplements
 from zope.interface import directlyProvides
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 import unittest2
 
@@ -102,11 +103,20 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         self.expect(self._getToolByName_mock(ANY, name)).result(
             mock).count(0, None)
 
-    def stub_request(self, content_type='text/html', status=200):
+    def stub_request(self, interfaces=[],
+                     content_type='text/html', status=200):
         """Returns a stub request providing IDefaultBrowserLayer with some
         headers and options required for rendering templates.
         """
-        request = self.providing_stub(IDefaultBrowserLayer)
+
+        default_interfaces = [IDefaultBrowserLayer, IBrowserRequest]
+        if isinstance(interfaces, (list, tuple, set)):
+            interfaces = default_interfaces + interfaces
+        else:
+            interfaces = default_interfaces + [interfaces]
+
+        request = self.providing_stub(interfaces)
+
         self.expect(request.debug).result(False)
         self.expect(request.response.getHeader('Content-Type')).result(
             content_type)
