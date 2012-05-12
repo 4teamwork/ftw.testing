@@ -5,6 +5,16 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Add ``stub_reponse`` method to ``MockTestCase`` and adjust the
+  ``stub_request`` method accordant.
+  [phgross]
+
+- Made providing interfaces configurable for the ``stub_request`` method.
+  [phgross]
+
+- Let the stub_request method also stub the getStatus of the response.
+  [phgross]
+
 - Add ``stub_request`` method to ``MockTestCase``.
   [jone]
 

@@ -2,6 +2,7 @@ from Acquisition import aq_inner, aq_parent
 from ftw.testing.testcase import MockTestCase
 from unittest2 import TestResult
 from zope.interface import Interface
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
@@ -68,19 +69,53 @@ class TestMockTestCase(MockTestCase):
 
     def test_stub_request(self):
         html_request = self.stub_request()
-        js_request = self.stub_request(content_type='text/javascript')
+        js_request = self.stub_request(
+            content_type='text/javascript', status=401, interfaces=IFoo)
+        iface_request = self.stub_request(interfaces=[IFoo, IBar])
 
         self.replay()
 
         self.assertTrue(IDefaultBrowserLayer.providedBy(html_request))
+        self.assertTrue(IBrowserRequest.providedBy(html_request))
         self.assertEqual(html_request.debug, False)
         self.assertEqual(html_request.response.getHeader(
                 'Content-Type'), 'text/html')
+        self.assertEqual(html_request.response.getStatus(), 200)
 
         self.assertTrue(IDefaultBrowserLayer.providedBy(js_request))
-        self.assertEqual(html_request.debug, False)
+        self.assertTrue(IBrowserRequest.providedBy(js_request))
+        self.assertTrue(IFoo.providedBy(js_request))
+        self.assertEqual(js_request.debug, False)
         self.assertEqual(js_request.response.getHeader(
                 'Content-Type'), 'text/javascript')
+        self.assertEqual(js_request.response.getStatus(), 401)
+
+        self.assertTrue(IFoo.providedBy(iface_request))
+        self.assertTrue(IBar.providedBy(iface_request))
+        self.assertTrue(IDefaultBrowserLayer.providedBy(iface_request))
+        self.assertTrue(IBrowserRequest.providedBy(iface_request))
+        self.assertEqual(html_request.debug, False)
+        self.assertEqual(html_request.response.getHeader(
+                'Content-Type'), 'text/html')
+        self.assertEqual(html_request.response.getStatus(), 200)
+
+    def test_stub_response(self):
+        temp_request = self.stub()
+        html_response = self.stub_response()
+
+        js_response = self.stub_response(
+            request=temp_request, content_type='text/javascript', status=401)
+
+        self.replay()
+
+        self.assertEqual(html_response.getHeader('Content-Type'), 'text/html')
+        self.assertEqual(html_response.getStatus(), 200)
+
+        self.assertEqual(js_response.getHeader('Content-Type'), 'text/javascript')
+        self.assertEqual(
+            temp_request.response.getHeader('Content-Type'), 'text/javascript')
+        self.assertEqual(js_response.getStatus(), 401)
+        self.assertEqual(temp_request.response.getStatus(), 401)
 
 
 class ILocking(Interface):

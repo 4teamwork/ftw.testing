@@ -6,6 +6,7 @@ from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import classImplements
 from zope.interface import directlyProvides
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 import unittest2
 
@@ -102,12 +103,52 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         self.expect(self._getToolByName_mock(ANY, name)).result(
             mock).count(0, None)
 
-    def stub_request(self, content_type='text/html'):
+    def stub_request(self, interfaces=[], stub_response=True,
+                     content_type='text/html', status=200):
         """Returns a stub request providing IDefaultBrowserLayer with some
         headers and options required for rendering templates.
+
+        Keyword arguments:
+        interfaces -- all interfaces the request should provide additionaly.
+        stub_respone -- option if the request should stub a response
+        by him self.
+        content_type -- response content_type (default 'text/html')
+        status -- response http status code (default 200)
         """
-        request = self.providing_stub(IDefaultBrowserLayer)
+
+        default_interfaces = [IDefaultBrowserLayer, IBrowserRequest]
+        if isinstance(interfaces, (list, tuple, set)):
+            interfaces = default_interfaces + interfaces
+        else:
+            interfaces = default_interfaces + [interfaces]
+
+        request = self.providing_stub(interfaces)
         self.expect(request.debug).result(False)
-        self.expect(request.response.getHeader('Content-Type')).result(
-            content_type)
+
+        if stub_response:
+            self.stub_response(request=request, content_type=content_type,
+                               status=status)
+
         return request
+
+    def stub_response(self, request=None,
+                      content_type='text/html', status=200):
+        """Returns a stub response with some headers and options.
+        An append it also to the given request.
+
+        Keyword arguments:
+        request = the request who the response should appent it.
+        content_type -- response content_type (default 'text/html')
+        status -- response http status code (default 200)
+        """
+
+        response = self.stub()
+        if request:
+            self.expect(request.response).result(response)
+            self.expect(request.RESPONSE).result(response)
+
+        self.expect(response.getStatus()).result(status)
+        self.expect(response.getHeader('Content-Type')).result(
+            content_type)
+
+        return response
