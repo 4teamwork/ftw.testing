@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.2 (unreleased)
+1.2 (2012-05-22)
 ----------------
 
 - Add ``stub_reponse`` method to ``MockTestCase`` and adjust the
