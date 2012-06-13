@@ -40,8 +40,7 @@ The following additional methos are available:
       Stubs the ``context`` so that its acquision parent is ``parent_context``.
       Expects at least context to be a mock or a stub. Returns the ``context``.
 
-``self.stub_request(interfaces=[], stub_response=True,
-                     content_type='text/html', status=200)``
+``self.stub_request(interfaces=[], stub_response=True, content_type='text/html', status=200)``
       Returns a request stub which can be used for rendering templates. With the
       ``stub respones`` option, you can define if the request should stub a
       response by him self. The other optional arguments:
