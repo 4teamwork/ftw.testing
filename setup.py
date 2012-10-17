@@ -8,6 +8,16 @@ tests_require = [
     'Acquisition<4.0a1',
     ]
 
+
+extras_require = {
+    'tests': tests_require,
+    'robot': [
+        'plone.app.testing',
+        'robotframework-selenium2library',
+        'robotsuite',
+        'decorator',
+        'selenium']}
+
 setup(name='ftw.testing',
       version=version,
       description='Provides some testing helpers and an advanced MockTestCase.',
@@ -43,7 +53,7 @@ setup(name='ftw.testing',
         'zope.publisher',
         ],
       tests_require=tests_require,
-      extras_require={'tests': tests_require},
+      extras_require=extras_require,
 
       entry_points='''
       # -*- Entry points: -*-
