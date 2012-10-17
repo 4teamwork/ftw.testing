@@ -4,19 +4,20 @@ import os
 version = '1.3.dev0'
 maintainer = 'Jonas Baumann'
 
-tests_require = [
-    'Acquisition<4.0a1',
-    ]
-
-
 extras_require = {
-    'tests': tests_require,
     'robot': [
         'plone.app.testing',
         'robotframework-selenium2library',
         'robotsuite',
         'decorator',
         'selenium']}
+
+tests_require = [
+    'Acquisition<4.0a1',
+    ] + extras_require['robot']
+
+extras_require['tests'] = tests_require
+
 
 setup(name='ftw.testing',
       version=version,

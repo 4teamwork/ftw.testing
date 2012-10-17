@@ -117,6 +117,28 @@ own layer (by subclassing ``ComponentRegistryLayer``) and is not usable with
 ``load_zcml_file`` and ``load_zcml_string``.
 
 
+Robot framework testing
+-----------------------
+
+For loading the needed dependencies for robot testing, just add a dependency
+to `ftw.testing[robot]`. You may also want ``plone.act``_ for plone specific
+keywords.
+
+**Translations**
+
+Use the ``LocalizedRobotLayer`` for using robot framework in another language::
+
+    >>> from ftw.testing import LocalizedRobotLayer
+    >>> from plone.testing import Layer
+    >>>
+    >>> class MyPackage(Layer):
+    ...
+    ...     defaultBases = (LocalizedRobotLayer(['de']),)
+    ...
+    ... MY_PACKAGE = MyPackage()
+
+
+
 Links
 -----
 
@@ -138,3 +160,4 @@ This package is copyright by `4teamwork <http://www.4teamwork.ch/>`_.
 
 
 .. _plone.mocktestcase: http://pypi.python.org/pypi/plone.mocktestcase
+.. _plone.act: https://github.com/plone/plone.act
