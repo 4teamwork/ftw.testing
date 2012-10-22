@@ -74,3 +74,19 @@ class LocalizedRobotLayer(Layer):
     def _remove_patch(self):
         from robot.running import namespace
         namespace.Namespace._get_bdd_style_handler = self._original
+
+
+class RobotLibrary(object):
+
+    def __init__(self):
+        self._localization = None
+
+    def setup_localization(self, languages='en de'):
+        languages = languages.strip().split()
+        self._localization = LocalizedRobotLayer(languages)
+        self._localization.setUp()
+
+    def teardown_localization(self):
+        if self._localization:
+            self._localization.tearDown()
+            self._localization = None
