@@ -1,0 +1,9 @@
+*** Settings ***
+
+Resource  ftw/testing/keywords/en.txt
+
+
+*** Keywords ***
+
+ich bin auf der Startseite
+    I am on the homepage
