@@ -183,3 +183,54 @@ class TestInterfaceMocking(MockTestCase):
         self.assertEqual(mock.lock(), 'already locked')
         self.assertEqual(mock.lock(), 'already locked')
         self.assertEqual(mock.lock(), 'already locked')
+
+
+class TestSetUpError(MockTestCase):
+
+    def setUp(self):
+        # super setUp call is missing here
+        pass
+
+    def tearDown(self):
+        # disables the check on tear down, otherwise we cannot test it..
+        pass
+
+    def test_providing_mock(self):
+        with self.assertRaises(RuntimeError) as cm:
+            self.providing_mock(ILocking)
+
+        self.assertEqual(
+            str(cm.exception),
+            'TestSetUpError.setUp does not call superclass setUp().')
+
+    def test_mock_interface(self):
+        with self.assertRaises(RuntimeError):
+            self.mock_interface(ILocking)
+
+    def test_stub(self):
+        with self.assertRaises(RuntimeError):
+            self.stub()
+
+    def test_providing_stub(self):
+        with self.assertRaises(RuntimeError):
+            self.providing_mock(ILocking)
+
+    def test_stub_interface(self):
+        with self.assertRaises(RuntimeError):
+            self.stub_interface(ILocking)
+
+    def test_set_parent(self):
+        with self.assertRaises(RuntimeError):
+            self.set_parent(None, None)
+
+    def test_mock_tool(self):
+        with self.assertRaises(RuntimeError):
+            self.mock_tool(None, None)
+
+    def test_stub_request(self):
+        with self.assertRaises(RuntimeError):
+            self.stub_request()
+
+    def test_stub_response(self):
+        with self.assertRaises(RuntimeError):
+            self.stub_response()

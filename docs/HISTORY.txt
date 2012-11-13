@@ -5,6 +5,9 @@ Changelog
 1.3 (unreleased)
 ----------------
 
+- MockTestCase: add checks that setUp is called correctly.
+  [jone]
+
 - Add robot framework support with localization patch layer.
   [jone]
 

@@ -15,15 +15,27 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
     """Advanced mock test case.
     """
 
+    def setUp(self):
+        super(mocktestcase.MockTestCase, self).setUp()
+        self._MockTestCase_setup = True
+
     def tearDown(self):
+        self._check_super_setup()
         super(mocktestcase.MockTestCase, self).tearDown()
         self._getToolByName_mock = None
+
+    def _check_super_setup(self):
+        # We need subclassing tests to execute our setUp
+        if getattr(self, '_MockTestCase_setup', None) is None:
+            raise RuntimeError('%s.setUp does not call superclass setUp().' % (
+                    self.__class__.__name__))
 
     def providing_mock(self, interfaces, *args, **kwargs):
         """Creates a new mock, based on a dummy object providing
         `interfaces`. The first interface in `interfaces` is directly
         provided, the rest are also-provided.
         """
+        self._check_super_setup()
         dummy = self.create_dummy()
 
         if isinstance(interfaces, (list, tuple, set)):
@@ -46,6 +58,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         method is mocked or the method signature does not match the
         interface.
         """
+        self._check_super_setup()
         spec = Implementer(interface)()
         if provides:
             classImplements(spec, provides)
@@ -55,12 +68,14 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """Creates a stub object, which does not assert the applied
         expectations.
         """
+        self._check_super_setup()
         kwargs['count'] = False
         return self.mocker.mock(*args, **kwargs)
 
     def providing_stub(self, interfaces, *args, **kwargs):
         """Creates a stub object providing a list of interfaces.
         """
+        self._check_super_setup()
         kwargs['count'] = False
         return self.providing_mock(interfaces, *args, **kwargs)
 
@@ -68,12 +83,14 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """Creates a stub object, implementing `interface` and using it
         as spec.
         """
+        self._check_super_setup()
         kwargs['count'] = False
         return self.mock_interface(interface, provides=None, *args, **kwargs)
 
     def set_parent(self, context, parent_context):
         """Set the acquisition parent of `context` to `parent_context`.
         """
+        self._check_super_setup()
         expect(aq_parent(aq_inner(context))).result(
             parent_context).count(0, None)
         return context
@@ -94,6 +111,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """Register a mock tool that will be returned when getToolByName()
         is called.
         """
+        self._check_super_setup()
 
         if self._getToolByName_mock is None:
             self._getToolByName_mock = self.mocker.replace(
@@ -115,6 +133,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         content_type -- response content_type (default 'text/html')
         status -- response http status code (default 200)
         """
+        self._check_super_setup()
 
         default_interfaces = [IDefaultBrowserLayer, IBrowserRequest]
         if isinstance(interfaces, (list, tuple, set)):
@@ -141,6 +160,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         content_type -- response content_type (default 'text/html')
         status -- response http status code (default 200)
         """
+        self._check_super_setup()
 
         response = self.stub()
         if request:
