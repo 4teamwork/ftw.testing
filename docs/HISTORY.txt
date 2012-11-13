@@ -5,6 +5,9 @@ Changelog
 1.3 (unreleased)
 ----------------
 
+- MockTestCase: Support Products.PloneHotfix20121106 patch when mocking getToolByName.
+  [jone]
+
 - MockTestCase: add checks that setUp is called correctly.
   [jone]
 

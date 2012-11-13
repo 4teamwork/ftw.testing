@@ -18,11 +18,12 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
     def setUp(self):
         super(mocktestcase.MockTestCase, self).setUp()
         self._MockTestCase_setup = True
+        self._getToolByName_replacements = None
 
     def tearDown(self):
         self._check_super_setup()
         super(mocktestcase.MockTestCase, self).tearDown()
-        self._getToolByName_mock = None
+        self._getToolByName_replacements = None
 
     def _check_super_setup(self):
         # We need subclassing tests to execute our setUp
@@ -113,13 +114,25 @@ class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
         """
         self._check_super_setup()
 
-        if self._getToolByName_mock is None:
-            self._getToolByName_mock = self.mocker.replace(
-                'Products.CMFCore.utils.getToolByName')
+        if self._getToolByName_replacements is None:
+            self._getToolByName_replacements = []
+            self._getToolByName_replacements.append(self.mocker.replace(
+                    'Products.CMFCore.utils.getToolByName'))
+
+            import pkg_resources
+            try:
+                pkg_resources.get_distribution(
+                    'Products.PloneHotfix20121106')
+            except pkg_resources.DistributionNotFound:
+                pass
+            else:
+                self._getToolByName_replacements.append(self.mocker.replace(
+                        'Products.PloneHotfix20121106.gtbn.gtbn'))
 
         # patch: do not count.
-        self.expect(self._getToolByName_mock(ANY, name)).result(
-            mock).count(0, None)
+        for replacement in self._getToolByName_replacements:
+            self.expect(replacement(ANY, name)).result(
+                mock).count(0, None)
 
     def stub_request(self, interfaces=[], stub_response=True,
                      content_type='text/html', status=200):

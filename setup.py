@@ -14,6 +14,7 @@ extras_require = {
 
 tests_require = [
     'Acquisition<4.0a1',
+    'Products.PloneHotfix20121106',
     ] + extras_require['robot']
 
 extras_require['tests'] = tests_require
