@@ -16,7 +16,7 @@ the `plone.mocktestcase`_ ``MockTestCase``.
     >>> from ftw.testing import MockTestCase
 
 
-The following additional methos are available:
+The following additional methods are available:
 
 ``self.providing_mock(interfaces, *args, **kwargs)``
       Creates a mock which provides ``interfaces``.
