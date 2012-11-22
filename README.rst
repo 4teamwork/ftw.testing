@@ -16,7 +16,7 @@ the `plone.mocktestcase`_ ``MockTestCase``.
     >>> from ftw.testing import MockTestCase
 
 
-The following additional methos are available:
+The following additional methods are available:
 
 ``self.providing_mock(interfaces, *args, **kwargs)``
       Creates a mock which provides ``interfaces``.
@@ -37,19 +37,19 @@ The following additional methos are available:
       method calls and attribute access. See "Mocking vs. stubbing" below.
 
 ``self.set_parent(context, parent_context)``
-      Stubs the ``context`` so that its acquision parent is ``parent_context``.
+      Stubs the ``context`` so that its acquisition parent is ``parent_context``.
       Expects at least context to be a mock or a stub. Returns the ``context``.
 
 ``self.stub_request(interfaces=[], stub_response=True, content_type='text/html', status=200)``
       Returns a request stub which can be used for rendering templates. With the
-      ``stub respones`` option, you can define if the request should stub a
-      response by him self. The other optional arguments:
+      ``stub_response`` option, you can define if the request should stub a
+      response by itself. The other optional arguments:
       ``content_type``: Defines the expected output content type of the response.
       ``status``: Defines the expected status code of the response.
 
 ``self.stub_response(request=None, content_type='text/html', status=200))``
       Returns a stub response with some headers and options. When a ``request``
-      is given the response would append also to the giver request.
+      is given the response is also added to the given request.
       The other optional arguments:
       ``content_type``: Defines the expected output content type of the response.
       ``status``: Defines the expected status code of the response.
@@ -69,16 +69,16 @@ A **mock** is used for testing the communication between two objects. It
 asserts *method calls*. This is used when a test should not test if
 a object has a specific state after doing something (e.g. it has it's
 attribute *xy* set to something), but if the object *does* something
-with another object when. If for example a object `Foo` sends a email
+with another object. If for example an object `Foo` sends an email
 when method `bar` is called, we could mock the sendmail object and
 assert on the send-email method call.
 
-On the other hand we often have to test the state of a object (attribute
+On the other hand we often have to test the state of an object (attribute
 values) after doing something. This can be done without mocks by just
 calling the method and asserting the attribute values. But then we have
 to set up an integration test and install plone, which takes very long.
 For testing an object with dependencies to other parts of plone in a
-unit test, we can use **stubs** for faking other (seperately tested) parts
+unit test, we can use **stubs** for faking other (separately tested) parts
 of plone. Stubs work like mocks: you can "expect" a method call and
 define a result. The difference between **stubs** and **mocks** is that
 stubs do not assert the expectations, so there will be no errors if

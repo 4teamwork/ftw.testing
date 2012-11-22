@@ -28,6 +28,7 @@ setup(name='ftw.testing',
           open(os.path.join('docs', 'HISTORY.txt')).read(),
 
       classifiers=[
+        'Framework :: Plone',
         'Programming Language :: Python',
         'Topic :: Software Development :: Testing',
         ],
