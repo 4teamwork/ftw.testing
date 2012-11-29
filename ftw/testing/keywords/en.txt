@@ -1,0 +1,10 @@
+*** Settings ***
+
+Resource  plone/act/keywords.txt
+Resource  plone/act/keywords.txt
+
+
+*** Keywords ***
+
+I am on the homepage
+    Go to   ${PLONE_URL}
