@@ -4,6 +4,12 @@ ftw.testing
 
 This package provides helpers for writing tests.
 
+.. figure:: http://onegov.ch/approved.png/image
+   :align: right
+   :target: http://onegov.ch/community/zertifizierte-module/ftw.testing
+
+   Certified: 01/2013
+
 
 MockTestCase
 ------------
@@ -121,7 +127,7 @@ Robot framework testing
 -----------------------
 
 For loading the needed dependencies for robot testing, just add a dependency
-to `ftw.testing[robot]`. You may also want ``plone.act``_ for plone specific
+to `ftw.testing[robot]`. You may also want `plone.act`_ for plone specific
 keywords.
 
 **Translations**

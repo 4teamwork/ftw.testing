@@ -5,6 +5,9 @@ Changelog
 1.3 (unreleased)
 ----------------
 
+- onegov.ch approved: add badge to readme.
+  [jone]
+
 - MockTestCase: Support Products.PloneHotfix20121106 patch when mocking getToolByName.
   [jone]
 
