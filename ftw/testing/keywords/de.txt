@@ -1,9 +1,226 @@
 *** Settings ***
 
 Resource  ftw/testing/keywords/en.txt
+Variables  plone/app/testing/interfaces.py
+Library  robot.libraries.String.String
 
 
 *** Keywords ***
 
+
+# ----------------------------------------------------------------------
+# Plone login
+
+Anmelden
+    [Documentation]  Log in to the site as ${userid} using ${password}. There
+    ...              is no guarantee of where in the site you are once this is
+    ...              done. (You are responsible for knowing where you are and
+    ...              where you want to be)
+    [Arguments]  ${userid}  ${password}
+
+    Go to  ${PLONE_URL}/login_form
+    Page should contain element  __ac_name
+    Page should contain element  __ac_password
+    Page should contain button  Anmelden
+    Input text  __ac_name  ${userid}
+    Input text  __ac_password  ${password}
+    Click Button  Anmelden
+
+
+Anmelden als admin
+    Anmelden  ${SITE_OWNER_NAME}  ${SITE_OWNER_PASSWORD}
+    Go to   ${PLONE_URL}
+
+
+Anmelden als testbenutzer
+    Anmelden  ${TEST_USER_NAME}  ${TEST_USER_PASSWORD}
+    Go to   ${PLONE_URL}
+
+
+
+
+# ----------------------------------------------------------------------
+# General navigation
+
 ich bin auf der Startseite
     I am on the homepage
+
+
+ich auf Inhalte der Plone-Seite gehe
+    Go to  ${PLONE_URL}/folder_contents
+
+
+ich auf die Startseite gehe
+    Go to  ${PLONE_URL}
+
+
+auf "${label}" klicke
+    Click Link  ${label}
+
+
+auf "${label}" klicken
+    auf "${label}" klicke
+
+
+ich auf den Unterinhalt "${titel}" gehe
+    ${current_url} =  Get Location
+    Go to  ${current_url}/folder_contents
+    ${elm_xpath} =  Convert To String  //*[@id='content-core']//td/a[normalize-space(text())='${titel}']
+    ${target} =  Get Element Attribute  xpath=${elm_xpath}@href
+    ${target} =  Replace String  ${target}  /folder_contents  /
+    Go to  ${target}
+
+
+
+
+# ----------------------------------------------------------------------
+# General assertions
+
+
+sollte ich "${text}" sehen
+    Page should contain  ${text}
+
+
+ich sollte "${text}" sehen
+    sollte ich "${text}" sehen
+
+
+
+
+# ----------------------------------------------------------------------
+# Adding content
+
+sollte ich auf einem Hinzufügen-Formular sein
+    Wait until keyword succeeds  10s  0.5s  Location Should Contain  /portal_factory/
+    Location Should Contain  /edit
+    Page Should Contain Button  Speichern
+    Page Should Contain Button  Abbrechen
+
+
+Formular zum Hinzufügen von ${typ} öffnen
+    Open Add New Menu
+    Click link  xpath=//*[@id="plone-contentmenu-factories"]//a[starts-with(@class, "contenttype-")]/span[text()="${typ}"]/..
+    sollte ich auf einem Hinzufügen-Formular sein
+
+
+${anzahl} Inhaltstypen hinzufügbar
+    Xpath Should Match X Times  //*[@id="plone-contentmenu-factories"]//a[starts-with(@class, "contenttype-")]  ${anzahl}
+
+
+1 Inhaltstyp hinzufügbar
+    1 Inhaltstypen hinzufügbar
+
+
+Inhaltstyp ${typ} ist hinzufügbar
+    ${url} =  Get Location
+    Formular zum Hinzufügen von ${typ} öffnen
+    Go to  ${url}
+
+
+sollte ich ein ${typ} hinzufügen können
+    Inhaltstyp ${typ} ist hinzufügbar
+
+
+sollte ich eine ${typ} hinzufügen können
+    sollte ich ein ${typ} hinzufügen können
+
+
+sollte ich einen ${typ} hinzufügen können
+    sollte ich ein ${typ} hinzufügen können
+
+
+ich sollte ein ${typ} hinzufügen können
+    sollte ich ein ${typ} hinzufügen können
+
+
+ich sollte eine ${typ} hinzufügen können
+    sollte ich ein ${typ} hinzufügen können
+
+
+ich sollte einen ${typ} hinzufügen können
+    sollte ich ein ${typ} hinzufügen können
+
+
+sollte ich nur ein ${typ} hinzufügen können
+    1 Inhaltstyp hinzufügbar
+    Inhaltstyp ${typ} ist hinzufügbar
+
+
+sollte ich nur eine ${typ} hinzufügen können
+    sollte ich nur ein ${typ} hinzufügen können
+
+
+sollte ich nur einen ${typ} hinzufügen können
+    sollte ich nur ein ${typ} hinzufügen können
+
+
+sollte ich kein ${typ} hinzufügen können
+    Xpath Should Match X Times	//*[@id="plone-contentmenu-factories"]//a[starts-with(@class, "contenttype-")]/span[text()="${typ}"]  0
+
+
+sollte ich keine ${typ} hinzufügen können
+    sollte ich kein ${typ} hinzufügen können
+
+
+sollte ich keinen ${typ} hinzufügen können
+    sollte ich kein ${typ} hinzufügen können
+
+
+ich sollte kein ${typ} hinzufügen können
+    sollte ich kein ${typ} hinzufügen können
+
+
+ich sollte keine ${typ} hinzufügen können
+    sollte ich kein ${typ} hinzufügen können
+
+
+ich sollte keinen ${typ} hinzufügen können
+    sollte ich kein ${typ} hinzufügen können
+
+
+sollte ich Kommentare hinzufügen können
+    ${comment_header_xpath} =  Convert To String  //dt[contains(concat(' ', normalize-space(@class), ' '), ' collapsibleHeader ') and text() = 'Kommentare']
+    ${comment_xpath} =  Convert To String  ${comment_header_xpath}/..
+    ${comment_content_xpath} =  Convert To String  ${comment_xpath}/dd
+
+    Element Should Be Visible  xpath=${comment_header_xpath}
+    Element Should Not Be Visible  xpath=${comment_content_xpath}
+    Click Element  xpath=${comment_header_xpath}
+
+    Element Should Be Visible  xpath=${comment_content_xpath}
+    Element Should Be Visible  xpath=${comment_content_xpath}//input[@type='submit' and @value='Kommentieren']
+
+
+
+
+# ----------------------------------------------------------------------
+# ftw.tabbedview specific
+
+sollte ich im Tab ${tab} "${text}" sehen
+    Wait until keyword succeeds  10s  0.5s  Element Should Not Be Visible  css=#tabbedview-spinner
+    ${tab_link_xpath} =  Convert To String  //*[contains(concat(' ', normalize-space(@class), ' '), ' tabbedview-tabs ')]/ul[contains(concat(' ', normalize-space(@class), ' '), ' formTabs ')]//a[starts-with(@id, 'tab-')]/span[text()='${tab}']/..
+    Element Should Be Visible  xpath=${tab_link_xpath}
+    Click Link  xpath=${tab_link_xpath}
+    Sleep  1s
+    Wait until keyword succeeds  10s  0.5s  Element Should Not Be Visible  css=#tabbedview-spinner
+
+    ${visible_pane_xpath} =  Convert To String  //*[@id='tabbedview-body']/div[contains(concat(' ', normalize-space(@class), ' '), ' pane ') and contains(@style, 'display: block')]
+    Xpath Should Match X Times  ${visible_pane_xpath}  1
+    Wait until keyword succeeds  10s  0.5s  Element Should Be Visible  xpath=${visible_pane_xpath}//*[contains(text(), '${text}')]
+
+
+sollte ich das Tab "${tab}" nicht sehen
+    ${tab_link_xpath} =  Convert To String  //*[contains(concat(' ', normalize-space(@class), ' '), ' tabbedview-tabs ')]/ul[contains(concat(' ', normalize-space(@class), ' '), ' formTabs ')]//a[starts-with(@id, 'tab-')]/span[text()='${tab}']/..
+    Xpath Should Match X Times  ${tab_link_xpath}  0
+
+
+sollte ich das Tab "${tab}" sehen
+    ${tab_link_xpath} =  Convert To String  //*[contains(concat(' ', normalize-space(@class), ' '), ' tabbedview-tabs ')]/ul[contains(concat(' ', normalize-space(@class), ' '), ' formTabs ')]//a[starts-with(@id, 'tab-')]/span[text()='${tab}']/..
+    Xpath Should Match X Times  ${tab_link_xpath}  1
+
+
+sollte die Reihenfolge der Tabs so sein:
+    [arguments]  @{labels}
+    ${len}=  Get Length  ${labels}
+    :FOR  ${i}  IN RANGE  ${len}
+    \   Xpath Should Match X Times  //*[contains(concat(' ', normalize-space(@class), ' '), ' tabbedview-tabs ')]/ul[contains(concat(' ', normalize-space(@class), ' '), ' formTabs ')]/li[position()=${i}+1]/a/span[text()='@{labels}[${i}]']  1
