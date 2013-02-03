@@ -17,9 +17,9 @@ MockTestCase
 ``ftw.testing`` provides an advanced MockTestCase which provides bases on
 the `plone.mocktestcase`_ ``MockTestCase``.
 
-::
+.. code:: python
 
-    >>> from ftw.testing import MockTestCase
+    from ftw.testing import MockTestCase
 
 
 The following additional methods are available:
@@ -103,19 +103,21 @@ the same component registry for all tests on the same layer. The
 ``ComponentRegistryLayer`` is a layer superclass for sharing the component
 registry and speeding up tests.
 
-Usage::
+Usage:
 
-    >>> from ftw.testing.layer import ComponentRegistryLayer
-    >>>
-    >>> class ZCMLLayer(ComponentRegistryLayer):
-    ...
-    ...     def setUp(self):
-    ...         super(ZCMLLayer, self).setUp()
-    ...
-    ...         import my.package
-    ...         self.load_zcml_file('configure.zcml', my.package)
-    ...
-    ... ZCML_LAYER = ZCMLLayer()
+.. code:: python
+
+    from ftw.testing.layer import ComponentRegistryLayer
+
+    class ZCMLLayer(ComponentRegistryLayer):
+
+        def setUp(self):
+            super(ZCMLLayer, self).setUp()
+
+            import my.package
+            self.load_zcml_file('configure.zcml', my.package)
+
+    ZCML_LAYER = ZCMLLayer()
 
 Be aware that ``ComponentRegistryLayer`` is a base class for creating your
 own layer (by subclassing ``ComponentRegistryLayer``) and is not usable with
@@ -132,16 +134,18 @@ keywords.
 
 **Translations**
 
-Use the ``LocalizedRobotLayer`` for using robot framework in another language::
+Use the ``LocalizedRobotLayer`` for using robot framework in another language:
 
-    >>> from ftw.testing import LocalizedRobotLayer
-    >>> from plone.testing import Layer
-    >>>
-    >>> class MyPackage(Layer):
-    ...
-    ...     defaultBases = (LocalizedRobotLayer(['de']),)
-    ...
-    ... MY_PACKAGE = MyPackage()
+.. code:: python
+
+    from ftw.testing import LocalizedRobotLayer
+    from plone.testing import Layer
+
+    class MyPackage(Layer):
+
+        defaultBases = (LocalizedRobotLayer(['de']),)
+
+    MY_PACKAGE = MyPackage()
 
 
 
