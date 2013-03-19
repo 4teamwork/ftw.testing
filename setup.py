@@ -54,14 +54,16 @@ setup(name='ftw.testing',
 
       install_requires=[
         'setuptools',
-        'unittest2',
         'plone.mocktestcase',
         'plone.testing',
-        'zope.interface',
+        'splinter',
+        'unittest2',
         'zope.component',
         'zope.configuration',
+        'zope.interface',
         'zope.publisher',
         ],
+
       tests_require=tests_require,
       extras_require=extras_require,
 
