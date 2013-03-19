@@ -1,3 +1,4 @@
+from ftw.testing import browser
 from plone.app.testing import PLONE_SITE_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
@@ -6,11 +7,6 @@ import os
 
 
 class PageObject(object):
-
-    def __init__(self, browser):
-        """Expects a splinter `browser` instance as argument
-        """
-        self.browser = browser
 
     @property
     def portal_url(self):
@@ -46,7 +42,7 @@ class PageObject(object):
         """
 
         return next((name for name, klass in _DRIVERS.items()
-                     if type(self.browser) is klass))
+                     if type(browser()) is klass))
 
     @property
     def javascript_supported(self):
@@ -66,7 +62,7 @@ class PageObject(object):
         """Finds one single element by xpath.
         If there is no element or more than one matching raise an error.
         """
-        elements = self.browser.find_by_xpath(selector)
+        elements = browser().find_by_xpath(selector)
 
         assert len(elements) != 0, \
             'No element found with xpath: %s' % selector
@@ -82,18 +78,19 @@ class PageObject(object):
 class Plone(PageObject):
 
     def visit_portal(self):
-        self.browser.visit(self.portal_url)
+        browser().visit(self.portal_url)
         return self
 
     def login(self, user=TEST_USER_NAME, password=TEST_USER_PASSWORD):
-        self.browser.visit(self.portal_url + '/login')
-        self.browser.fill('__ac_name', user)
-        self.browser.fill('__ac_password', password)
-        self.browser.find_by_xpath(
+        # This should be implemented by setting request headers.
+        browser().visit(self.portal_url + '/login')
+        browser().fill('__ac_name', user)
+        browser().fill('__ac_password', password)
+        browser().find_by_xpath(
             '//input[@type="submit" and @value="Log in"]').first.click()
 
     def portal_messages(self):
-        return {'info': self.browser.find_by_css('.portalMessage.info dd')}
+        return {'info': browser().find_by_css('.portalMessage.info dd')}
 
     def portal_text_messages(self):
         messages = self.portal_messages()
@@ -108,29 +105,38 @@ class Plone(PageObject):
             message, kind, str(messages))
 
     def disable_wysiwyg_for_field(self, fieldname):
-        self.browser.find_by_css(
+        browser().find_by_css(
             'div[data-fieldname=%s] .suppressVisualEditor a' % fieldname).first.click()
-        assert self.browser.is_text_not_present('Edit without visual editor'), \
+        assert browser().is_text_not_present('Edit without visual editor'), \
             'Failed to disable WYSIWYG field "%s"' % fieldname
 
     def open_add_form(self, type_name):
         if self.javascript_supported:
-            self.browser.find_by_xpath(
+            browser().find_by_xpath(
                 "//span[text() = 'Add new\xe2\x80\xa6']").click()
 
         self.find_one_by_xpath(
             '//a/span[normalize-space(text()) = "%s"]/..' % type_name).click()
 
-        if 'portal_factory' in self.browser.url:
-            return ATFormPage(self.browser)
+        if 'portal_factory' in browser().url:
+            return ATFormPage()
         else:
             raise NotImplementedError()
+
+    def create_object(self, type_title, fields):
+        page = self.open_add_form(type_title)
+        for key, value in fields.items():
+            page.fill_field(key, value)
+
+        page = page.save()
+        page.assert_portal_message('info', 'Changes saved.')
+        return page
 
 
 class FormPage(Plone):
 
     def fill_field(self, label, value):
-        fields = self.browser.find_by_xpath(
+        fields = browser().find_by_xpath(
             '//*[@name=//label[normalize-space(text())="%s"]/@for]' % label)
 
         assert len(fields) != 0, \
@@ -143,11 +149,11 @@ class FormPage(Plone):
         if 'mce_editable' in fields.first['class'].split(' ') and \
                 self.iframes_supported:
             # oh gosh, its tinymce
-            with self.browser.get_iframe('%s_ifr' % fields.first['name']) as frame:
+            with browser().get_iframe('%s_ifr' % fields.first['name']) as frame:
                 frame.find_by_xpath('//body').first.type(value)
 
         else:
-            self.browser.fill_form({fields.first['name']: value})
+            browser().fill_form({fields.first['name']: value})
 
     def click_button(self, value, type_=None):
         if type_ is not None:
@@ -157,7 +163,7 @@ class FormPage(Plone):
             xpr = '//input[(@type="submit" or @type="button") and @value="%s"]' % \
                 value
 
-        elements = self.browser.find_by_xpath(xpr)
+        elements = browser().find_by_xpath(xpr)
 
         assert len(elements) != 0, \
             'No button "%s" found.\nXPath: %s' % (value, xpr)
@@ -173,4 +179,4 @@ class ATFormPage(FormPage):
 
     def save(self):
         self.click_button('Save', type_='submit')
-        return Plone(self.browser)
+        return Plone()
