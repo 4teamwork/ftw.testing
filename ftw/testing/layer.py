@@ -87,6 +87,10 @@ class FunctionalSplinterTesting(FunctionalTesting):
 
 class PloneZopeTestBrowser(ZopeTestBrowser):
 
+    def __init__(self, *args, **kwargs):
+        super(PloneZopeTestBrowser, self).__init__(*args, **kwargs)
+        self._browser.handleErrors = False
+
     def _get_mech_browser(self, user_agent):
         with z2.zopeApp() as app:
             return Zope2MechanizeBrowser(app)
