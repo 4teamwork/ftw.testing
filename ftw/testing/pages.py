@@ -89,6 +89,31 @@ class Plone(PageObject):
         browser().find_by_xpath(
             '//input[@type="submit" and @value="Log in"]').first.click()
 
+    def get_first_heading(self):
+        return browser().find_by_css('.documentFirstHeading').text
+
+    def get_body_classes(self):
+        """Returns the classes of the body node.
+        """
+        body = browser().find_by_xpath('//body').first
+        assert body, 'No <body> tag found.'
+        return body['class'].strip().split(' ')
+
+    def get_template_class(self):
+        """Returns the template class of the body node.
+        """
+        template = [cls for cls in self.get_body_classes()
+                    if cls.startswith('template-')]
+
+        assert len(template) != 0, \
+            'No "tempalte-" class on body tag found.'
+
+        assert len(template) == 1, \
+            'Template classes on body ambiguous: %s' % (
+            str(template))
+
+        return template[0]
+
     def portal_messages(self):
         return {'info': browser().find_by_css('.portalMessage.info dd')}
 
