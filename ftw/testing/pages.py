@@ -165,6 +165,28 @@ class Plone(PageObject):
         page.assert_portal_message('info', 'Changes saved.')
         return page
 
+    def get_button(self, value, type_=None):
+        if type_ is not None:
+            xpr = '//input[@type="%s" and @value="%s"]' % (type_, value)
+
+        else:
+            xpr = '//input[(@type="submit" or @type="button") and @value="%s"]' % \
+                value
+
+        elements = browser().find_by_xpath(xpr)
+
+        if len(elements) == 0:
+            return None
+
+        assert len(elements) < 2, \
+            'Ambiguous matches for button "%s".\nXpath: %s\n%s' % (
+            value, xpr, str(map(lambda item: item.outer_html, elements)))
+
+        return elements.first
+
+    def click_button(self, value, type_=None):
+        self.get_button(value, type_=type_).click()
+
 
 class FormPage(Plone):
 
@@ -187,25 +209,6 @@ class FormPage(Plone):
 
         else:
             browser().fill_form({fields.first['name']: value})
-
-    def click_button(self, value, type_=None):
-        if type_ is not None:
-            xpr = '//input[@type="%s" and @value="%s"]' % (type_, value)
-
-        else:
-            xpr = '//input[(@type="submit" or @type="button") and @value="%s"]' % \
-                value
-
-        elements = browser().find_by_xpath(xpr)
-
-        assert len(elements) != 0, \
-            'No button "%s" found.\nXPath: %s' % (value, xpr)
-
-        assert len(elements) < 2, \
-            'Ambiguous matches for button "%s".\nXpath: %s\n%s' % (
-            value, xpr, str(map(lambda item: item.outer_html, elements)))
-
-        elements.first.click()
 
 
 class ATFormPage(FormPage):
