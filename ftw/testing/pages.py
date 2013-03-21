@@ -74,6 +74,9 @@ class PageObject(object):
 
         return elements.first
 
+    def normalize_whitespace(self, text):
+        return ' '.join(text.split())
+
 
 class Plone(PageObject):
 
@@ -115,12 +118,17 @@ class Plone(PageObject):
         return template[0]
 
     def portal_messages(self):
-        return {'info': browser().find_by_css('.portalMessage.info dd')}
+        return {'info': browser().find_by_css('.portalMessage.info dd'),
+                'warning': browser().find_by_css('.portalMessage.warning dd'),
+                'error': browser().find_by_css('.portalMessage.error dd')}
 
     def portal_text_messages(self):
         messages = self.portal_messages()
-        item_to_text = lambda item: item.text.strip()
-        return {'info': map(item_to_text, messages['info'])}
+        item_to_text = lambda item: self.normalize_whitespace(
+            item.text.strip())
+        return {'info': map(item_to_text, messages['info']),
+                'warning': map(item_to_text, messages['warning']),
+                'error': map(item_to_text, messages['error'])}
 
     def assert_portal_message(self, kind, message):
         message = message.strip()
