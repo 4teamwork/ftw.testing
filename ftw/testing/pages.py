@@ -103,6 +103,12 @@ class Plone(PageObject):
         assert body, 'No <body> tag found.'
         return body['class'].strip().split(' ')
 
+    def assert_body_class(self, cssclass):
+        assert cssclass in self.get_body_classes(), \
+            'Missing body class "%s" on this page. Body classes are: %s' % (
+            cssclass,
+            self.get_body_classes())
+
     def get_template_class(self):
         """Returns the template class of the body node.
         """
@@ -226,3 +232,23 @@ class DXFormPage(FormPage):
         self.click_button('Save', type_='submit')
         self.assert_portal_message('info', 'Item created')
         return Plone()
+
+
+class PloneControlPanel(Plone):
+
+    def open(self):
+        browser().visit('/'.join((
+                    self.portal_url, '@@overview-controlpanel')))
+        return self
+
+    def assert_on_control_panel(self):
+        self.assert_body_class('template-overview-controlpanel')
+        self.assert_body_class('portaltype-plone-site')
+
+    def get_control_panel_links(self):
+        self.assert_on_control_panel()
+        links = browser().find_by_css('ul.configlets li a')
+        return dict(map(lambda link: (link.text.strip(), link), links))
+
+    def get_control_panel_link(self, title):
+        return self.get_control_panel_links().get(title)
