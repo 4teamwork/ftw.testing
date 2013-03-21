@@ -91,6 +91,7 @@ class Plone(PageObject):
         browser().fill('__ac_password', password)
         browser().find_by_xpath(
             '//input[@type="submit" and @value="Log in"]').first.click()
+        return self
 
     def get_first_heading(self):
         return browser().find_by_css('.documentFirstHeading').text
@@ -153,6 +154,8 @@ class Plone(PageObject):
 
         if 'portal_factory' in browser().url:
             return ATFormPage()
+        elif '++add++' in browser().url:
+            return DXFormPage()
         else:
             raise NotImplementedError()
 
@@ -161,9 +164,7 @@ class Plone(PageObject):
         for key, value in fields.items():
             page.fill_field(key, value)
 
-        page = page.save()
-        page.assert_portal_message('info', 'Changes saved.')
-        return page
+        return page.save()
 
     def get_button(self, value, type_=None):
         if type_ is not None:
@@ -192,7 +193,7 @@ class FormPage(Plone):
 
     def fill_field(self, label, value):
         fields = browser().find_by_xpath(
-            '//*[@name=//label[normalize-space(text())="%s"]/@for]' % label)
+            '//*[@*[name()="id" or name()="name"]=//label[normalize-space(text())="%s"]/@for]' % label)
 
         assert len(fields) != 0, \
             'No field with label-content "%s" found.' % label
@@ -215,4 +216,13 @@ class ATFormPage(FormPage):
 
     def save(self):
         self.click_button('Save', type_='submit')
+        self.assert_portal_message('info', 'Changes saved.')
+        return Plone()
+
+
+class DXFormPage(FormPage):
+
+    def save(self):
+        self.click_button('Save', type_='submit')
+        self.assert_portal_message('info', 'Item created')
         return Plone()
