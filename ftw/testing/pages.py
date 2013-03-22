@@ -68,7 +68,7 @@ class PageObject(object):
             'No element found with xpath: %s' % selector
 
         assert len(elements) == 1, \
-            'More than one element found with xpath:%s\n%s' % (
+            'More than one element found with xpath: %s\n%s' % (
             selector,
             str(map(lambda item: item.outer_html, elements)))
 
