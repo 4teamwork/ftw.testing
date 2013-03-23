@@ -99,7 +99,8 @@ class Plone(PageObject):
         return self
 
     def get_first_heading(self):
-        return browser().find_by_css('.documentFirstHeading').text
+        return self.normalize_whitespace(
+            browser().find_by_css('.documentFirstHeading').text)
 
     def get_body_classes(self):
         """Returns the classes of the body node.
