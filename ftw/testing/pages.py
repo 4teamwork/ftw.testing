@@ -80,8 +80,13 @@ class PageObject(object):
 
 class Plone(PageObject):
 
-    def visit_portal(self):
-        browser().visit(self.portal_url)
+    def visit_portal(self, path=None):
+        if path:
+            url = '/'.join((self.portal_url, path))
+        else:
+            url = self.portal_url
+
+        browser().visit(url)
         return self
 
     def login(self, user=TEST_USER_NAME, password=TEST_USER_PASSWORD):
