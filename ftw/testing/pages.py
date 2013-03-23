@@ -150,12 +150,6 @@ class Plone(PageObject):
             'Portal message "%s" of kind %s is not visible. Got %s' % (
             message, kind, str(messages))
 
-    def disable_wysiwyg_for_field(self, fieldname):
-        browser().find_by_css(
-            'div[data-fieldname=%s] .suppressVisualEditor a' % fieldname).first.click()
-        assert browser().is_text_not_present('Edit without visual editor'), \
-            'Failed to disable WYSIWYG field "%s"' % fieldname
-
     def open_add_form(self, type_name):
         if self.javascript_supported:
             browser().find_by_xpath(
