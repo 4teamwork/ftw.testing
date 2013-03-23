@@ -209,10 +209,15 @@ class FormPage(Plone):
             label, str(map(lambda item: item.outer_html, fields)))
 
         if 'mce_editable' in fields.first['class'].split(' ') and \
-                self.iframes_supported:
-            # oh gosh, its tinymce
-            with browser().get_iframe('%s_ifr' % fields.first['name']) as frame:
-                frame.find_by_xpath('//body').first.type(value)
+                self.javascript_supported:
+
+            # Typing in the iframe does not work with PhantomJS.
+            # Because of this and because we need to have a consistent input
+            # value (=HTML) we just set the HTML content in TinyMCE by
+            # using JavaScript.
+            jscode = 'tinyMCE.getInstanceById("%s").setContent("%s");' % (
+                fields.first['name'], value.replace('"', '\"'))
+            browser().execute_script(jscode)
 
         else:
             browser().fill_form({fields.first['name']: value})
