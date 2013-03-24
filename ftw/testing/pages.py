@@ -99,12 +99,18 @@ class Plone(PageObject):
         """Log the current browser in with the passed user / password or with
         the default `plone.app.testing` user if no arguemnts are passed.
         """
-        # This should be implemented by setting request headers.
-        browser().visit(self.concat_portal_url('login'))
-        browser().fill('__ac_name', user)
-        browser().fill('__ac_password', password)
-        browser().find_by_xpath(
-            '//input[@type="submit" and @value="Log in"]').first.click()
+
+        if self.browser_driver == 'zope.testbrowser':
+            browser()._browser.addHeader('Authorization',
+                                         'Basic %s:%s' % (user, password))
+
+        else:
+            browser().visit(self.concat_portal_url('login'))
+            browser().fill('__ac_name', user)
+            browser().fill('__ac_password', password)
+            browser().find_by_xpath(
+                '//input[@type="submit" and @value="Log in"]').first.click()
+
         return self
 
     def get_first_heading(self):

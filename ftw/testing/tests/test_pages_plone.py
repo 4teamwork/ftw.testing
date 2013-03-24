@@ -32,6 +32,7 @@ class TestPlonePageObject(TestCase):
                         'Could not find login link.')
 
         Plone().login()
+        Plone().visit_portal()
 
         self.assertFalse(browser().find_link_by_text('Log in'),
                         'Found Log in link - assuming not logged in.')
