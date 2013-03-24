@@ -86,12 +86,19 @@ class PageObject(object):
 class Plone(PageObject):
 
     def visit_portal(self, *paths):
+        """Open the plone site root in the current browser.
+        If one or more path partials as passed as positional arguments
+        they are appended to the site root url.
+        """
         url = self.concat_portal_url(*paths)
         locals()['__traceback_info__'] = (paths, ':', url)
         browser().visit(url)
         return self
 
     def login(self, user=TEST_USER_NAME, password=TEST_USER_PASSWORD):
+        """Log the current browser in with the passed user / password or with
+        the default `plone.app.testing` user if no arguemnts are passed.
+        """
         # This should be implemented by setting request headers.
         browser().visit(self.concat_portal_url('login'))
         browser().fill('__ac_name', user)
@@ -101,8 +108,11 @@ class Plone(PageObject):
         return self
 
     def get_first_heading(self):
+        """Returns the first heading (h1.documentFirstHeading) of the current
+        page.
+        """
         return self.normalize_whitespace(
-            browser().find_by_css('.documentFirstHeading').text)
+            browser().find_by_css('h1.documentFirstHeading').text)
 
     def get_body_classes(self):
         """Returns the classes of the body node.
@@ -113,6 +123,11 @@ class Plone(PageObject):
         return body['class'].strip().split(' ')
 
     def assert_body_class(self, cssclass):
+        """Assert that the <body>-Tag of the current page has a class.
+        This is useful for asserting that we are on a certain browser
+        view (template-folder_contents) or on an object of a certain
+        content type (portaltype-folder).
+        """
         locals()['__traceback_info__'] = browser().url
         assert cssclass in self.get_body_classes(), \
             'Missing body class "%s" on this page. Body classes are: %s' % (
@@ -136,11 +151,17 @@ class Plone(PageObject):
         return template[0]
 
     def portal_messages(self):
+        """Returns a dict with lists of portal message elements (dd) grouped
+        by type (info, warning, error).
+        """
         return {'info': browser().find_by_css('.portalMessage.info dd'),
                 'warning': browser().find_by_css('.portalMessage.warning dd'),
                 'error': browser().find_by_css('.portalMessage.error dd')}
 
     def portal_text_messages(self):
+        """Returns a dict of lists of portal message texts grouped by
+        portal message type (info, warning, error).
+        """
         messages = self.portal_messages()
         item_to_text = lambda item: self.normalize_whitespace(
             item.text.strip())
@@ -149,6 +170,9 @@ class Plone(PageObject):
                 'error': map(item_to_text, messages['error'])}
 
     def assert_portal_message(self, kind, message):
+        """Asserts that a status message of a certain `kind` with a given
+        `message` text is visible on the current page.
+        """
         locals()['__traceback_info__'] = browser().url
         message = message.strip()
         messages = self.portal_text_messages()
@@ -157,6 +181,11 @@ class Plone(PageObject):
             message, kind, str(messages))
 
     def open_add_form(self, type_name):
+        """Opens the add form for adding an object of type `type_name` by
+        opening the add menu and clicking on the link.
+        A ATFormPage or a DXFormPage object is returned, depending on the
+        type of object which is added.
+        """
         locals()['__traceback_info__'] = browser().url
         if self.javascript_supported:
             browser().find_by_xpath(
@@ -173,6 +202,12 @@ class Plone(PageObject):
             raise NotImplementedError()
 
     def create_object(self, type_title, fields):
+        """Creates a new object of type `type_title`.
+        The object is created by clicking on the link in the add-menu and
+        then filling the passed `fields`.
+        The `fields` is a dict of field-labels (e.g. Body Text) and the
+        values to be filled.
+        """
         page = self.open_add_form(type_title)
         for key, value in fields.items():
             locals()['__traceback_info__'] = (key, value)
@@ -181,6 +216,12 @@ class Plone(PageObject):
         return page.save()
 
     def get_button(self, value, type_=None):
+        """Returns a button with a certain text (`value`). Optional the type
+        of the button (submit, button) may be passed as second argument.
+
+        If no button is found, it returns None.
+        If more than one button is found, an AssertionError is thrown.
+        """
         if type_ is not None:
             xpr = '//input[@type="%s" and @value="%s"]' % (type_, value)
 
@@ -200,6 +241,8 @@ class Plone(PageObject):
         return elements.first
 
     def click_button(self, value, type_=None):
+        """Click on a butten with a certain text (`value`).
+        """
         locals()['__traceback_info__'] = browser().url
         self.get_button(value, type_=type_).click()
 
@@ -207,6 +250,9 @@ class Plone(PageObject):
 class FormPage(Plone):
 
     def fill_field(self, label, value):
+        """Fill the field with the text-`label` with the passed `value`.
+        For TinyMCE fields bare HTML is expected.
+        """
         locals()['__traceback_info__'] = browser().url
         fields = browser().find_by_xpath(
             '//*[@*[name()="id" or name()="name"]'
@@ -237,6 +283,8 @@ class FormPage(Plone):
 class ATFormPage(FormPage):
 
     def save(self):
+        """Save the archetypes add form.
+        """
         self.click_button('Save', type_='submit')
         self.assert_portal_message('info', 'Changes saved.')
         return Plone()
@@ -245,6 +293,8 @@ class ATFormPage(FormPage):
 class DXFormPage(FormPage):
 
     def save(self):
+        """Save the dexterity add form.
+        """
         self.click_button('Save', type_='submit')
         self.assert_portal_message('info', 'Item created')
         return Plone()
@@ -253,17 +303,29 @@ class DXFormPage(FormPage):
 class PloneControlPanel(Plone):
 
     def open(self):
+        """Open the plone control panel in the current browser.
+        """
         browser().visit(self.concat_portal_url('@@overview-controlpanel'))
         return self
 
     def assert_on_control_panel(self):
+        """Assert that the current browser is on the plone control panel.
+        """
         self.assert_body_class('template-overview-controlpanel')
         self.assert_body_class('portaltype-plone-site')
 
     def get_control_panel_links(self):
+        """Return a dict with the links on the plone control panel.
+        Expects that the control panel is already opened.
+        The keys of the dict are the text labels of the links, the values
+        are the link object.
+        """
         self.assert_on_control_panel()
         links = browser().find_by_css('ul.configlets li a')
         return dict(map(lambda link: (link.text.strip(), link), links))
 
     def get_control_panel_link(self, title):
+        """Assuming that we are on the control panel page, click on the
+        control panel link with a certain text (`title`).
+        """
         return self.get_control_panel_links().get(title)
