@@ -3,6 +3,8 @@ from ftw.testing import javascript
 from ftw.testing.pages import Plone
 from ftw.testing.testing import PAGE_OBJECT_FUNCTIONAL
 from mechanize._mechanize import BrowserStateError
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
 from unittest2 import TestCase
 
 
@@ -19,6 +21,9 @@ class TestPlonePageObject(TestCase):
             'visit_portal call should return the Plone object itself')
 
         self.assertEquals(browser().url, 'http://nohost/plone')
+
+        Plone().visit_portal('login')
+        self.assertEquals(browser().url, 'http://nohost/plone/login')
 
     def test_login__ZOPE_TESTBROWSER(self):
         Plone().visit_portal()
@@ -43,11 +48,128 @@ class TestPlonePageObject(TestCase):
         self.assertFalse(browser().find_link_by_text('Log in'),
                         'Found Log in link - assuming not logged in.')
 
-    def test_get_first_heading__TESTBROWSER(self):
+    def test_get_first_heading(self):
         Plone().visit_portal()
         self.assertEquals('Plone site', Plone().get_first_heading())
 
-    @javascript
-    def test_get_first_heading__JAVASCRIPT(self):
+    def test_get_body_classes(self):
         Plone().visit_portal()
-        self.assertEquals('Plone site', Plone().get_first_heading())
+        self.assertIn('site-plone', set(Plone().get_body_classes()),
+                      'Expected site-plone to be a body class.')
+
+    def test_assert_body_class(self):
+        Plone().visit_portal()
+
+        Plone().assert_body_class('site-plone')
+
+        with self.assertRaises(AssertionError):
+            Plone().assert_body_class('some-class')
+
+    def test_get_template_class(self):
+        Plone().visit_portal()
+
+        self.assertEquals(
+            'template-folder_listing',
+            Plone().get_template_class(),
+            'Expected template class on body to be template-folder_listing')
+
+    def test_portal_messages(self):
+        Plone().visit_portal('test_rendering')
+
+        message_count = dict((type_, len(msgs)) for (type_, msgs)
+                             in Plone().portal_messages().items())
+
+        self.assertEquals({'info': 2,
+                           'warning': 0,
+                           'error': 0}, message_count)
+
+    def test_portal_text_messages(self):
+        Plone().visit_portal('test_rendering')
+
+        self.assertEquals(
+            {'info': ['',
+                      'The portalMessage class, can also contain links'
+                      ' - used to give the user temporary status messages.'],
+             'warning': [],
+             'error': []},
+
+            Plone().portal_text_messages())
+
+    def test_assert_portal_message(self):
+        Plone().visit_portal('test_rendering')
+
+        Plone().assert_portal_message(
+            'info',
+            'The portalMessage class, can also contain links'
+            ' - used to give the user temporary status messages.')
+
+        with self.assertRaises(AssertionError) as cm:
+            Plone().assert_portal_message('error', 'Something')
+
+        self.assertEquals(
+            'Portal message "Something" of kind error is not visible.'
+            ' Got {\'info\': [\'\', \'The portalMessage class, can'
+            ' also contain links - used to give the user temporary'
+            ' status messages.\'], \'warning\': [], \'error\': []}',
+
+            str(cm.exception))
+
+    def test_open_add_form__ZOPE_TESTBROWSER(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        page = Plone().open_add_form('Folder')
+        self.assertEquals('Add Folder', Plone().get_first_heading())
+
+        self.assertEquals(
+            'ATFormPage', type(page).__name__,
+            'Expected to get a ATFormPage object.')
+
+    @javascript
+    def test_open_add_form__JAVASCRIPT(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        page = Plone().open_add_form('Folder')
+        self.assertEquals('Add Folder', Plone().get_first_heading())
+
+        self.assertEquals(
+            'ATFormPage', type(page).__name__,
+            'Expected to get a ATFormPage object.')
+
+    def test_create_object__ZOPE_TESTBROWSER(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        text = 'Some contents for Foo.'
+        Plone().create_object('Page', {'Title': 'Foo',
+                                       'Body Text': '<b>%s</b>' % text})
+
+        self.assertEquals('%s/foo' % Plone().portal_url, browser().url)
+        self.assertEquals('Foo', Plone().get_first_heading(),
+                          'Title of newly created page is wrong.')
+        self.assertTrue(browser().is_text_present(text),
+                        'Body Text of newly create page not visible.')
+
+        bold = browser().find_by_xpath('//b[text()="%s"]' % text).first
+        self.assertEquals(text, bold.text,
+                          'Insert HTML bold tag could not be found.')
+
+    @javascript
+    def test_create_object__JAVASCRIPT(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        text = 'Some contents for Foo.'
+        Plone().create_object('Page', {'Title': 'Foo',
+                                       'Body Text': '<b>%s</b>' % text})
+
+        self.assertEquals('%s/foo' % Plone().portal_url, browser().url)
+        self.assertEquals('Foo', Plone().get_first_heading(),
+                          'Title of newly created page is wrong.')
+        self.assertTrue(browser().is_text_present(text),
+                        'Body Text of newly create page not visible.')
+
+        bold = browser().find_by_xpath('//b[text()="%s"]' % text).first
+        self.assertEquals(text, bold.text,
+                          'Insert HTML bold tag could not be found.')

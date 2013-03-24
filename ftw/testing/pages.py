@@ -184,8 +184,8 @@ class Plone(PageObject):
             xpr = '//input[@type="%s" and @value="%s"]' % (type_, value)
 
         else:
-            xpr = '//input[(@type="submit" or @type="button") and @value="%s"]' % \
-                value
+            xpr = '//input[(@type="submit" or @type="button")' + \
+                ' and @value="%s"]' % value
 
         elements = browser().find_by_xpath(xpr)
 
