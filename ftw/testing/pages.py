@@ -86,6 +86,7 @@ class Plone(PageObject):
         else:
             url = self.portal_url
 
+        locals()['__traceback_info__'] = path
         browser().visit(url)
         return self
 
@@ -106,10 +107,12 @@ class Plone(PageObject):
         """Returns the classes of the body node.
         """
         body = browser().find_by_xpath('//body').first
+        locals()['__traceback_info__'] = browser().url
         assert body, 'No <body> tag found.'
         return body['class'].strip().split(' ')
 
     def assert_body_class(self, cssclass):
+        locals()['__traceback_info__'] = browser().url
         assert cssclass in self.get_body_classes(), \
             'Missing body class "%s" on this page. Body classes are: %s' % (
             cssclass,
@@ -118,6 +121,7 @@ class Plone(PageObject):
     def get_template_class(self):
         """Returns the template class of the body node.
         """
+        locals()['__traceback_info__'] = browser().url
         template = [cls for cls in self.get_body_classes()
                     if cls.startswith('template-')]
 
@@ -144,6 +148,7 @@ class Plone(PageObject):
                 'error': map(item_to_text, messages['error'])}
 
     def assert_portal_message(self, kind, message):
+        locals()['__traceback_info__'] = browser().url
         message = message.strip()
         messages = self.portal_text_messages()
         assert message in messages[kind], \
@@ -151,6 +156,7 @@ class Plone(PageObject):
             message, kind, str(messages))
 
     def open_add_form(self, type_name):
+        locals()['__traceback_info__'] = browser().url
         if self.javascript_supported:
             browser().find_by_xpath(
                 "//span[text() = 'Add new\xe2\x80\xa6']").click()
@@ -168,6 +174,7 @@ class Plone(PageObject):
     def create_object(self, type_title, fields):
         page = self.open_add_form(type_title)
         for key, value in fields.items():
+            locals()['__traceback_info__'] = (key, value)
             page.fill_field(key, value)
 
         return page.save()
@@ -192,14 +199,17 @@ class Plone(PageObject):
         return elements.first
 
     def click_button(self, value, type_=None):
+        locals()['__traceback_info__'] = browser().url
         self.get_button(value, type_=type_).click()
 
 
 class FormPage(Plone):
 
     def fill_field(self, label, value):
+        locals()['__traceback_info__'] = browser().url
         fields = browser().find_by_xpath(
-            '//*[@*[name()="id" or name()="name"]=//label[normalize-space(text())="%s"]/@for]' % label)
+            '//*[@*[name()="id" or name()="name"]'
+            '=//label[normalize-space(text())="%s"]/@for]' % label)
 
         assert len(fields) != 0, \
             'No field with label-content "%s" found.' % label
