@@ -53,6 +53,10 @@ def get_driver():
 
 
 def shutdown_browser():
+    if CURRENT_BROWSER_INSTANCE is None:
+        # no browser is opened - no need for shutting down.
+        return
+
     assert CURRENT_BROWSER_DRIVER is not None
     if CURRENT_BROWSER_DRIVER != 'zope.testbrowser':
         obj = browser()
