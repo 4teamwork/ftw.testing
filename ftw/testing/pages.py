@@ -30,6 +30,11 @@ class PageObject(object):
 
         return 'http://%s:%s/%s' % (host, port, PLONE_SITE_ID)
 
+    def concat_portal_url(self, *path):
+        """Concats the portal url with one or more bits of path.
+        """
+        return '/'.join((self.portal_url,) + path)
+
     @property
     def browser_driver(self):
         """Returns the name (string) of the browser driver currently in use.
@@ -80,19 +85,15 @@ class PageObject(object):
 
 class Plone(PageObject):
 
-    def visit_portal(self, path=None):
-        if path:
-            url = '/'.join((self.portal_url, path))
-        else:
-            url = self.portal_url
-
-        locals()['__traceback_info__'] = path
+    def visit_portal(self, *paths):
+        url = self.concat_portal_url(*paths)
+        locals()['__traceback_info__'] = (paths, ':', url)
         browser().visit(url)
         return self
 
     def login(self, user=TEST_USER_NAME, password=TEST_USER_PASSWORD):
         # This should be implemented by setting request headers.
-        browser().visit(self.portal_url + '/login')
+        browser().visit(self.concat_portal_url('login'))
         browser().fill('__ac_name', user)
         browser().fill('__ac_password', password)
         browser().find_by_xpath(
@@ -252,8 +253,7 @@ class DXFormPage(FormPage):
 class PloneControlPanel(Plone):
 
     def open(self):
-        browser().visit('/'.join((
-                    self.portal_url, '@@overview-controlpanel')))
+        browser().visit(self.concat_portal_url('@@overview-controlpanel'))
         return self
 
     def assert_on_control_panel(self):

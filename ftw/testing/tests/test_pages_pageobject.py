@@ -31,6 +31,16 @@ class TestPageObject(TestCase):
             PageObject().browser_driver,
             'Expected browser driver to be "zope.testbrowser"')
 
+    def test_concat_portal_url(self):
+        self.assertEquals('http://nohost/plone',
+                          PageObject().concat_portal_url())
+
+        self.assertEquals('http://nohost/plone/foo',
+                          PageObject().concat_portal_url('foo'))
+
+        self.assertEquals('http://nohost/plone/foo/bar',
+                          PageObject().concat_portal_url('foo', 'bar'))
+
     @javascript
     def test_browser_driver__PHANTOMS(self):
         self.assertEquals(
