@@ -35,7 +35,7 @@ class TestPlonePageObject(TestCase):
         Plone().visit_portal()
 
         self.assertFalse(browser().find_link_by_text('Log in'),
-                        'Found Log in link - assuming not logged in.')
+                         'Found Log in link - assuming not logged in.')
 
     @javascript
     def test_login__PHANTOMJS(self):
@@ -47,7 +47,7 @@ class TestPlonePageObject(TestCase):
         Plone().login()
 
         self.assertFalse(browser().find_link_by_text('Log in'),
-                        'Found Log in link - assuming not logged in.')
+                         'Found Log in link - assuming not logged in.')
 
     def test_get_first_heading(self):
         Plone().visit_portal()
