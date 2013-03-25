@@ -11,6 +11,155 @@ This package provides helpers for writing tests.
    Certified: 01/2013
 
 
+Browser testing with splinter
+-----------------------------
+
+`Splinter`_ is a library which provides a common API for multiple browser.
+It allows to operate zope.testbrowser, PhantomJS or other Selenium brwowsers
+such as Firefox or Chrome with the same API.
+
+The `ftw.testing` package provides integration of `Splinter`_ with Plone
+using Page Objects.
+
+
+Setting a package up for browser tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's easy to setup your package for browser tests:
+
+- Add a test-dependency to `ftw.testing` in your `setup.py`:
+
+.. code:: python
+
+    tests_require = [
+        'ftw.testing',
+        ]
+
+    setup(name='my.package',
+          ...
+          tests_require=tests_require,
+          extras_require=dict(tests=tests_require),
+          )
+
+- In your `testing.py` use the `FunctionalSplinterTesting` layer wrapper:
+
+.. code:: python
+
+    from ftw.testing import FunctionalSplinterTesting
+    from plone.app.testing import PLONE_FIXTURE
+    from plone.app.testing import PloneSandboxLayer
+    from plone.app.testing import applyProfile
+    from zope.configuration import xmlconfig
+
+
+    class MyPackageLayer(PloneSandboxLayer):
+
+        defaultBases = (PLONE_FIXTURE,)
+
+        def setUpZope(self, app, configurationContext):
+            import my.package
+            xmlconfig.file('configure.zcml', my.package)
+
+        def setUpPloneSite(self, portal):
+            applyProfile(portal, 'my.package:default')
+
+
+    MY_PACKAGE_FIXTURE = MyPackageLayer()
+    MY_PACKAGE_FUNCTIONAL_TESTING = FunctionalSplinterTesting(
+        bases=(MY_PACKAGE_FIXTURE, ),
+        name="my.package:functional")
+
+- Write tests using the Plone Page Objects:
+
+.. code:: python
+
+    from ftw.testing import browser
+    from ftw.testing import browser
+    from ftw.testing.pages import Plone
+    from my.package.testing import MY_PACKAGE_FUNCTIONAL_TESTING
+    from plone.app.testing import SITE_OWNER_NAME
+    from plone.app.testing import SITE_OWNER_PASSWORD
+    from unittest2 import TestCase
+
+
+    class TestDocument(TestCase):
+
+        layer = MY_PACKAGE_FUNCTIONAL_TESTING
+
+        def test_add_document(self):
+            Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+            Plone().visit_portal()
+            Plone().create_object('Page', {'Title': 'Foo',
+                                           'Body Text': '<b>Hello World</b>'})
+            self.assertTrue(browser().is_text_present('Hello World'))
+
+
+Writing Page Objects
+~~~~~~~~~~~~~~~~~~~~
+
+Write your own Page Objects for your views and content types.
+Put a module `pages.py` in your tests folder:
+
+.. code:: python
+
+    from ftw.testing.pages import Plone
+
+
+    class MyContentType(Plone):
+
+        def create_my_content(self, title, text):
+            self.create_object('MyContent', {'Title': title,
+                                             'Body Text: text})
+            return self
+
+The Page Object should have methods for all features of your view.
+
+
+Switching to a JavaScript browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default browser for JavaScript enabled tests is `PhantomJS`_.
+PhantomJS is fast, headless but runs JS by using Gecko.
+You should write JavaScript tests as few as possible but as much as
+necessary, because it will get really slow when you have lots of them.
+
+Switching to the PhantomJS is done by just marking your test with the
+`javascript` decorator:
+
+.. code:: python
+
+    from ftw.testing import javascript
+
+
+    class TestDocument(TestCase):
+
+        @javascript
+        def test_add_document(self):
+            Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+            Plone().visit_portal()
+            Plone().create_object('Page', {'Title': 'Foo',
+                                           'Body Text': '<b>Hello World</b>'})
+            self.assertTrue(browser().is_text_present('Hello World'))
+
+
+Using the Plone Page Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Plone page object provided by `ftw.testing` already has the most
+important features built in, such as:
+
+- portal_url handling (the zope.testbrowser URL is different than the
+  PhantomJS url)
+- Login
+- Accessing Headings, <body>-CSS-classes, status messages
+- Adding content
+- TinyMCE handling
+
+Currently it's best to just look in the
+`page object code <https://github.com/4teamwork/ftw.testing/blob/jone-splinter/ftw/testing/pages.py>`.
+
+
+
 MockTestCase
 ------------
 
@@ -171,3 +320,5 @@ This package is copyright by `4teamwork <http://www.4teamwork.ch/>`_.
 
 .. _plone.mocktestcase: http://pypi.python.org/pypi/plone.mocktestcase
 .. _plone.act: https://github.com/plone/plone.act
+.. _Splinter: https://pypi.python.org/pypi/splinter
+.. _PhantomJS: http://phantomjs.org/

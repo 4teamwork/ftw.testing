@@ -15,6 +15,8 @@ extras_require = {
 tests_require = [
     'Acquisition<4.0a1',
     'Products.PloneHotfix20121106',
+    'Plone',
+    'plone.app.testing',
     ] + extras_require['robot']
 
 extras_require['tests'] = tests_require
@@ -54,14 +56,16 @@ setup(name='ftw.testing',
 
       install_requires=[
         'setuptools',
-        'unittest2',
         'plone.mocktestcase',
         'plone.testing',
-        'zope.interface',
+        'splinter',
+        'unittest2',
         'zope.component',
         'zope.configuration',
+        'zope.interface',
         'zope.publisher',
         ],
+
       tests_require=tests_require,
       extras_require=extras_require,
 
