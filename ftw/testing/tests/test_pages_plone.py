@@ -143,8 +143,9 @@ class TestPlonePageObject(TestCase):
         Plone().visit_portal()
 
         text = 'Some contents for Foo.'
-        Plone().create_object('Page', {'Title': 'Foo',
-                                       'Body Text': '<b>%s</b>' % text})
+        Plone().create_object('Page', {
+                'Title': 'Foo',
+                'Body Text': '<strong>%s</strong>' % text})
 
         self.assertEquals('%s/foo' % Plone().portal_url, browser().url)
         self.assertEquals('Foo', Plone().get_first_heading(),
@@ -152,9 +153,9 @@ class TestPlonePageObject(TestCase):
         self.assertTrue(browser().is_text_present(text),
                         'Body Text of newly create page not visible.')
 
-        bold = browser().find_by_xpath('//b[text()="%s"]' % text).first
+        bold = browser().find_by_xpath('//strong[text()="%s"]' % text).first
         self.assertEquals(text, bold.text,
-                          'Insert HTML bold tag could not be found.')
+                          'Insert HTML strong tag could not be found.')
 
     @javascript
     def test_create_object__JAVASCRIPT(self):
@@ -162,8 +163,9 @@ class TestPlonePageObject(TestCase):
         Plone().visit_portal()
 
         text = 'Some contents for Foo.'
-        Plone().create_object('Page', {'Title': 'Foo',
-                                       'Body Text': '<b>%s</b>' % text})
+        Plone().create_object('Page', {
+                'Title': 'Foo',
+                'Body Text': '<strong>%s</strong>' % text})
 
         self.assertEquals('%s/foo' % Plone().portal_url, browser().url)
         self.assertEquals('Foo', Plone().get_first_heading(),
@@ -171,6 +173,6 @@ class TestPlonePageObject(TestCase):
         self.assertTrue(browser().is_text_present(text),
                         'Body Text of newly create page not visible.')
 
-        bold = browser().find_by_xpath('//b[text()="%s"]' % text).first
+        bold = browser().find_by_xpath('//strong[text()="%s"]' % text).first
         self.assertEquals(text, bold.text,
-                          'Insert HTML bold tag could not be found.')
+                          'Insert HTML strong tag could not be found.')
