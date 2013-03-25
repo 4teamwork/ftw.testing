@@ -55,13 +55,14 @@ class TestPlonePageObject(TestCase):
 
     def test_get_body_classes(self):
         Plone().visit_portal()
-        self.assertIn('site-plone', set(Plone().get_body_classes()),
-                      'Expected site-plone to be a body class.')
+        self.assertIn('portaltype-plone-site',
+                      set(Plone().get_body_classes()),
+                      'Expected portaltype-plone-site to be a body class.')
 
     def test_assert_body_class(self):
         Plone().visit_portal()
 
-        Plone().assert_body_class('site-plone')
+        Plone().assert_body_class('portaltype-plone-site')
 
         with self.assertRaises(AssertionError):
             Plone().assert_body_class('some-class')
