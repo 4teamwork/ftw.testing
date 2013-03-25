@@ -23,7 +23,12 @@ class TestPlonePageObject(TestCase):
         self.assertEquals(browser().url, 'http://nohost/plone')
 
         Plone().visit_portal('login')
-        self.assertEquals(browser().url, 'http://nohost/plone/login')
+        self.assertIn(browser().url, [
+                # Plone <= 4.0
+                'http://nohost/plone/login_form?came_from=localhost',
+                # Plone >= 4.1
+                'http://nohost/plone/login',
+                ])
 
     def test_login__ZOPE_TESTBROWSER(self):
         Plone().visit_portal()
