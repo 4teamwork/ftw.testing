@@ -21,6 +21,10 @@ such as Firefox or Chrome with the same API.
 The `ftw.testing` package provides integration of `Splinter`_ with Plone
 using Page Objects.
 
+For using the splinter features, use the `splinter` extras require::
+
+    ftw.testing [splinter]
+
 
 Setting a package up for browser tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

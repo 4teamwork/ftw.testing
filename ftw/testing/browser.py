@@ -1,4 +1,53 @@
+from plone.app.testing import PLONE_ZSERVER
+from plone.app.testing.layers import FunctionalTesting
+from plone.testing import z2
+from plone.testing._z2_testbrowser import Zope2MechanizeBrowser
 from splinter.browser import Browser
+from splinter.browser import _DRIVERS
+from splinter.driver.zopetestbrowser import ZopeTestBrowser
+
+
+class FunctionalSplinterTesting(FunctionalTesting):
+
+    defaultBases = ()
+
+    def __init__(self, bases=None, name=None, module=None):
+        # We need to make sure that we open the ZSERVER port
+        # by using the PLONE_ZSERVER layer.
+        if not bases:
+            bases = self.defaultBases
+        bases = bases + (PLONE_ZSERVER, )
+
+        super(FunctionalSplinterTesting, self).__init__(
+            bases=bases, name=name, module=module)
+
+    def testSetUp(self):
+        super(FunctionalSplinterTesting, self).testSetUp()
+        # The default browser is zope.testbrowser.
+        # The browser may be changed later using decorators.
+        set_browser_driver('zope.testbrowser')
+
+    def testTearDown(self):
+        shutdown_browser()
+        super(FunctionalSplinterTesting, self).testTearDown()
+
+    def tearDown(self):
+        shutdown_all_browser()
+        super(FunctionalSplinterTesting, self).tearDown()
+
+
+class PloneZopeTestBrowser(ZopeTestBrowser):
+
+    def __init__(self, *args, **kwargs):
+        super(PloneZopeTestBrowser, self).__init__(*args, **kwargs)
+        self._browser.handleErrors = False
+
+    def _get_mech_browser(self, user_agent):
+        with z2.zopeApp() as app:
+            return Zope2MechanizeBrowser(app)
+
+
+_DRIVERS['zope.testbrowser'] = PloneZopeTestBrowser
 
 
 CURRENT_BROWSER_DRIVER = None

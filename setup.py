@@ -10,14 +10,17 @@ extras_require = {
         'robotframework-selenium2library',
         'robotsuite',
         'decorator',
-        'selenium']}
+        'selenium'],
+
+    'splinter': [
+        'splinter']}
 
 tests_require = [
     'Acquisition<4.0a1',
     'Products.PloneHotfix20121106',
     'Plone',
     'plone.app.testing',
-    ] + extras_require['robot']
+    ] + extras_require['robot'] + extras_require['splinter']
 
 extras_require['tests'] = tests_require
 
@@ -58,7 +61,6 @@ setup(name='ftw.testing',
         'setuptools',
         'plone.mocktestcase',
         'plone.testing',
-        'splinter',
         'unittest2',
         'zope.component',
         'zope.configuration',
