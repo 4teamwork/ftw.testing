@@ -189,7 +189,6 @@ class Plone(PageObject):
             assertion_msg += '. Additional info %s' % str(assertion_info)
         assert message in messages[kind], assertion_msg
 
-
     def open_add_form(self, type_name):
         """Opens the add form for adding an object of type `type_name` by
         opening the add menu and clicking on the link.
