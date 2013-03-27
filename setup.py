@@ -13,6 +13,7 @@ extras_require = {
         'selenium'],
 
     'splinter': [
+        'plone.app.testing',
         'splinter']}
 
 tests_require = [
