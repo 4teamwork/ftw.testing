@@ -175,16 +175,20 @@ class Plone(PageObject):
                 'warning': map(item_to_text, messages['warning']),
                 'error': map(item_to_text, messages['error'])}
 
-    def assert_portal_message(self, kind, message):
+    def assert_portal_message(self, kind, message, assertion_info=''):
         """Asserts that a status message of a certain `kind` with a given
         `message` text is visible on the current page.
         """
         locals()['__traceback_info__'] = browser().url
         message = message.strip()
         messages = self.portal_text_messages()
-        assert message in messages[kind], \
-            'Portal message "%s" of kind %s is not visible. Got %s' % (
-            message, kind, str(messages))
+
+        assertion_msg = 'Portal message "%s" of kind %s is not visible. '\
+                        'Got %s' % (message, kind, str(messages))
+        if assertion_info:
+            assertion_msg += '. Additional info %s' % str(assertion_info)
+        assert message in messages[kind], assertion_msg
+
 
     def open_add_form(self, type_name):
         """Opens the add form for adding an object of type `type_name` by
@@ -302,8 +306,13 @@ class DXFormPage(FormPage):
         """Save the dexterity add form.
         """
         self.click_button('Save', type_='submit')
-        self.assert_portal_message('info', 'Item created')
+        self.assert_portal_message('info', 'Item created',
+                                   assertion_info=self.get_form_errors())
         return Plone()
+
+    def get_form_errors(self):
+        items = browser().find_by_css('.fieldErrorBox div.error')
+        return [self.normalize_whitespace(each.text.strip()) for each in items]
 
 
 class PloneControlPanel(Plone):
