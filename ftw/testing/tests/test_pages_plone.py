@@ -182,3 +182,24 @@ class TestPlonePageObject(TestCase):
         bold = browser().find_by_xpath('//strong[text()="%s"]' % text).first
         self.assertEquals(text, bold.text,
                           'Insert HTML strong tag could not be found.')
+
+    def test_DEXTERITY_create_object_ZOPE_TESTBROWSER(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        Plone().create_object('DXType', {'Title': 'Bar'})
+
+        self.assertEquals('%s/bar/view' % Plone().portal_url, browser().url)
+        self.assertEquals('Bar', Plone().get_first_heading(),
+                          'Title of newly created page is wrong.')
+
+    @javascript
+    def test_DEXTERITY_create_object_JAVASCRIPT(self):
+        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        Plone().visit_portal()
+
+        Plone().create_object('DXType', {'Title': 'Bar'})
+
+        self.assertEquals('%s/bar/view' % Plone().portal_url, browser().url)
+        self.assertEquals('Bar', Plone().get_first_heading(),
+                          'Title of newly created page is wrong.')

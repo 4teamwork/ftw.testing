@@ -200,6 +200,15 @@ class Plone(PageObject):
             browser().find_by_xpath(
                 "//span[text() = 'Add new\xe2\x80\xa6']").click()
 
+        factories = [
+            self.normalize_whitespace(item.text) for item
+            in browser().find_by_css(
+                '#plone-contentmenu-factories li a span')]
+
+        assert self.normalize_whitespace(type_name) in factories, \
+            'The type "%s" is not addable. Addable types: %s' % (
+            type_name, str(factories))
+
         self.find_one_by_xpath(
             '//a/span[normalize-space(text()) = "%s"]/..' % type_name).click()
 

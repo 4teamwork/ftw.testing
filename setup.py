@@ -21,6 +21,7 @@ tests_require = [
     'Products.PloneHotfix20121106',
     'Plone',
     'plone.app.testing',
+    'plone.app.dexterity',
     ] + extras_require['robot'] + extras_require['splinter']
 
 extras_require['tests'] = tests_require
