@@ -5,6 +5,9 @@ Changelog
 1.3 (unreleased)
 ----------------
 
+- Drop official Plone 4.0 support.
+  [jone]
+
 - Component registry layer: use isolated ZCML layers.
   When using the same layer instances it may conflict with integration or
   functional testing layers.
