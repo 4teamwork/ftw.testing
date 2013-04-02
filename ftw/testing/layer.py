@@ -4,6 +4,15 @@ from zope.configuration import xmlconfig
 import zope.component.testing
 
 
+# We do not use the standard zca.ZCML_DIRECTIVES layer, but a separate
+# instances so that we do not share it with integration / functional tests.
+# Using the same instance can cause tearing down issues.
+
+SEPARATED_ZCML_DIRECTIVES = zca.ZCMLDirectives(
+    bases=(zca.LayerCleanup(name='ftw.testing:LAYER_CLEANUP'),),
+    name='ftw.testing:ZCML_DIRECTIVES')
+
+
 class ComponentRegistryLayer(Layer):
     """Testing layer used for loading ZCML and keeping the same global
     component registry for all tests. This speeds up the setup.
@@ -11,7 +20,7 @@ class ComponentRegistryLayer(Layer):
     It is meant to be subclassed by the implementing layer.
     """
 
-    defaultBases = (zca.ZCML_DIRECTIVES,)
+    defaultBases = (SEPARATED_ZCML_DIRECTIVES,)
 
     def __init__(self):
         super(ComponentRegistryLayer, self).__init__()
