@@ -203,3 +203,23 @@ class TestPlonePageObject(TestCase):
         self.assertEquals('%s/bar/view' % Plone().portal_url, browser().url)
         self.assertEquals('Bar', Plone().get_first_heading(),
                           'Title of newly created page is wrong.')
+
+    def test_no_portal_messages(self):
+        Plone().visit_portal()
+        Plone().assert_no_portal_messages()
+
+        Plone().visit_portal('test_rendering')
+        with self.assertRaises(AssertionError) as cm:
+            Plone().assert_no_portal_messages()
+
+        self.assertEquals(
+            str(cm.exception),
+            "Expected no portal messages but got:"
+            " {'info': ['', 'The portalMessage class, can also contain"
+            " links - used to give the user temporary status messages.'],"
+            " 'warning': [],"
+            " 'error': []}")
+
+    def test_assert_no_error_messages(self):
+        Plone().visit_portal('test_rendering')
+        Plone().assert_no_error_messages()

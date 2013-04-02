@@ -189,6 +189,28 @@ class Plone(PageObject):
             assertion_msg += '. Additional info %s' % str(assertion_info)
         assert message in messages[kind], assertion_msg
 
+    def assert_no_portal_messages(self):
+        """Asserts that there are no portal messages.
+        """
+        locals()['__traceback_info__'] = browser().url
+        messages = self.portal_text_messages()
+
+        # kss empty portal message workaround
+        if messages['info'] == ['']:
+            messages['info'] = []
+
+        assert messages == {'info': [], 'warning': [], 'error': []}, \
+            'Expected no portal messages but got: %s' % str(messages)
+
+    def assert_no_error_messages(self):
+        """Asserts that there are no error portal messages.
+        """
+        locals()['__traceback_info__'] = browser().url
+        messages = self.portal_text_messages()
+
+        assert messages['error'] == [], \
+            'Expected no error portal messages but got: %s' % str(messages)
+
     def open_add_form(self, type_name):
         """Opens the add form for adding an object of type `type_name` by
         opening the add menu and clicking on the link.
