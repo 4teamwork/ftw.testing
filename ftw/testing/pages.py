@@ -1,3 +1,5 @@
+from Products.CMFPlone.tests.utils import MockMailHost
+from Products.MailHost.interfaces import IMailHost
 from ftw.testing import browser
 from plone.app.testing import PLONE_SITE_ID
 from plone.app.testing import TEST_USER_NAME
@@ -374,3 +376,43 @@ class PloneControlPanel(Plone):
         control panel link with a certain text (`title`).
         """
         return self.get_control_panel_links().get(title)
+
+
+class Mailing(object):
+
+    def __init__(self, portal):
+        self.portal = portal
+
+    def set_up(self, configure=True):
+        """Setup a mock mail host so that emails can be catched and tested.
+        """
+
+        mockmailhost = MockMailHost('MailHost')
+        self.portal.MailHost = mockmailhost
+        sm = self.portal.getSiteManager()
+        sm.registerUtility(component=mockmailhost,
+                           provided=IMailHost)
+
+        if configure:
+            mockmailhost.smtp_host = 'localhost'
+            self.portal.email_from_address = 'test@localhost'
+
+    def get_mailhost(self):
+        sm = self.portal.getSiteManager()
+        mailhost = sm.getUtility(IMailHost)
+        assert isinstance(mailhost, MockMailHost), \
+            'The mailhost mocking was not set up properly. ' \
+            'Call ftw.testing.pages.Mailing().set_up() in your setUp method.'
+        return mailhost
+
+    def get_messages(self):
+        return self.get_mailhost().messages
+
+    def has_messages(self):
+        return len(self.get_messages()) > 0
+
+    def pop(self):
+        return self.get_messages().pop()
+
+    def reset(self):
+        self.get_mailhost().reset()
