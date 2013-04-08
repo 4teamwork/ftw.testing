@@ -97,6 +97,19 @@ def browser():
         return obj
 
 
+def clear_browser():
+    """Clears the browser session. Depending on the driver the browser is
+    completely restarted.
+    """
+
+    if CURRENT_BROWSER_DRIVER != 'zope.testbrowser':
+        obj = browser()
+        obj.cookies.delete()
+        obj.visit('file://about:blank')
+
+    _set_browser(None)
+
+
 def get_driver():
     return CURRENT_BROWSER_DRIVER
 
@@ -107,13 +120,8 @@ def shutdown_browser():
         return
 
     assert CURRENT_BROWSER_DRIVER is not None
-    if CURRENT_BROWSER_DRIVER != 'zope.testbrowser':
-        obj = browser()
-        obj.cookies.delete()
-        obj.visit('file://about:blank')
-
+    clear_browser()
     set_browser_driver(None)
-    _set_browser(None)
 
 
 def shutdown_all_browser():
