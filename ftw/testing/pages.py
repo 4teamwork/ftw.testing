@@ -388,15 +388,20 @@ class Mailing(object):
         """Setup a mock mail host so that emails can be catched and tested.
         """
 
-        mockmailhost = MockMailHost('MailHost')
-        self.portal.MailHost = mockmailhost
+        self._mockmailhost = MockMailHost('MailHost')
+        self.portal.MailHost = self._mockmailhost
         sm = self.portal.getSiteManager()
-        sm.registerUtility(component=mockmailhost,
+        sm.registerUtility(component=self._mockmailhost,
                            provided=IMailHost)
 
         if configure:
-            mockmailhost.smtp_host = 'localhost'
+            self._mockmailhost.smtp_host = 'localhost'
             self.portal.email_from_address = 'test@localhost'
+
+    def tear_down(self):
+        sm = self.portal.getSiteManager()
+        sm.unregisterUtility(component=self._mockmailhost)
+        self._mockmailhost = None
 
     def get_mailhost(self):
         sm = self.portal.getSiteManager()
@@ -416,4 +421,9 @@ class Mailing(object):
         return self.get_messages().pop()
 
     def reset(self):
-        self.get_mailhost().reset()
+        # self.get_mailhost().reset()
+        try:
+            while self.pop():
+                pass
+        except IndexError:
+            pass
