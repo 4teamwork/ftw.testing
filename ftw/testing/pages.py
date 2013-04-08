@@ -307,7 +307,8 @@ class FormPage(Plone):
             'Ambiguous matches for fields with labels "%s": %s' % (
             label, str(map(lambda item: item.outer_html, fields)))
 
-        if 'mce_editable' in fields.first['class'].split(' ') and \
+        if 'class' in fields.first and \
+                'mce_editable' in fields.first['class'].split(' ') and \
                 self.javascript_supported:
 
             # Typing in the iframe does not work with PhantomJS.
