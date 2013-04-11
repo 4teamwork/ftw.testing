@@ -160,7 +160,7 @@ important features built in, such as:
 - TinyMCE handling
 
 Currently it's best to just look in the
-`page object code <https://github.com/4teamwork/ftw.testing/blob/jone-splinter/ftw/testing/pages.py>`.
+`page object code <https://github.com/4teamwork/ftw.testing/blob/master/ftw/testing/pages.py>`_.
 
 
 
