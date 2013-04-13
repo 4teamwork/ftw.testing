@@ -94,8 +94,7 @@ class TestPlonePageObject(TestCase):
         Plone().visit_portal('test_rendering')
 
         self.assertEquals(
-            {'info': ['',
-                      'The portalMessage class, can also contain links'
+            {'info': ['The portalMessage class, can also contain links'
                       ' - used to give the user temporary status messages.'],
              'warning': [],
              'error': []},
@@ -115,7 +114,7 @@ class TestPlonePageObject(TestCase):
 
         self.assertEquals(
             'Portal message "Something" of kind error is not visible.'
-            ' Got {\'info\': [\'\', \'The portalMessage class, can'
+            ' Got {\'info\': [\'The portalMessage class, can'
             ' also contain links - used to give the user temporary'
             ' status messages.\'], \'warning\': [], \'error\': []}',
 
@@ -215,7 +214,7 @@ class TestPlonePageObject(TestCase):
         self.assertEquals(
             str(cm.exception),
             "Expected no portal messages but got:"
-            " {'info': ['', 'The portalMessage class, can also contain"
+            " {'info': ['The portalMessage class, can also contain"
             " links - used to give the user temporary status messages.'],"
             " 'warning': [],"
             " 'error': []}")

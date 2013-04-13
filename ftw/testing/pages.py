@@ -173,7 +173,14 @@ class Plone(PageObject):
         messages = self.portal_messages()
         item_to_text = lambda item: self.normalize_whitespace(
             item.text.strip())
-        return {'info': map(item_to_text, messages['info']),
+
+        info_messages = map(item_to_text, messages['info'])
+
+        # remove the empty & invisble KSS info message - we never should assert it.
+        if '' in info_messages:
+            info_messages.remove('')
+
+        return {'info': info_messages,
                 'warning': map(item_to_text, messages['warning']),
                 'error': map(item_to_text, messages['error'])}
 
@@ -196,10 +203,6 @@ class Plone(PageObject):
         """
         locals()['__traceback_info__'] = browser().url
         messages = self.portal_text_messages()
-
-        # kss empty portal message workaround
-        if messages['info'] == ['']:
-            messages['info'] = []
 
         assert messages == {'info': [], 'warning': [], 'error': []}, \
             'Expected no portal messages but got: %s' % str(messages)
