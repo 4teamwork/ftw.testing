@@ -78,7 +78,6 @@ It's easy to setup your package for browser tests:
 .. code:: python
 
     from ftw.testing import browser
-    from ftw.testing import browser
     from ftw.testing.pages import Plone
     from my.package.testing import MY_PACKAGE_FUNCTIONAL_TESTING
     from plone.app.testing import SITE_OWNER_NAME
