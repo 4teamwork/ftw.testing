@@ -36,7 +36,7 @@ It's easy to setup your package for browser tests:
 .. code:: python
 
     tests_require = [
-        'ftw.testing',
+        'ftw.testing[splinter]',
         ]
 
     setup(name='my.package',
