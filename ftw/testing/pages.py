@@ -1,4 +1,3 @@
-from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
 from ftw.testing import browser
 from plone.app.testing import PLONE_SITE_ID
@@ -390,6 +389,9 @@ class Mailing(object):
         """Setup a mock mail host so that emails can be catched and tested.
         """
 
+        # Do NOT move the MockMailHost import to the top! It patches things implicitly!
+        from Products.CMFPlone.tests.utils import MockMailHost
+
         self._mockmailhost = MockMailHost('MailHost')
         self.portal.MailHost = self._mockmailhost
         sm = self.portal.getSiteManager()
@@ -408,6 +410,10 @@ class Mailing(object):
     def get_mailhost(self):
         sm = self.portal.getSiteManager()
         mailhost = sm.getUtility(IMailHost)
+
+        # Do NOT move the MockMailHost import to the top! It patches things implicitly!
+        from Products.CMFPlone.tests.utils import MockMailHost
+
         assert isinstance(mailhost, MockMailHost), \
             'The mailhost mocking was not set up properly. ' \
             'Call ftw.testing.pages.Mailing().set_up() in your setUp method.'
