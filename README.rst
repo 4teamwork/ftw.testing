@@ -112,7 +112,7 @@ Put a module `pages.py` in your tests folder:
 
         def create_my_content(self, title, text):
             self.create_object('MyContent', {'Title': title,
-                                             'Body Text: text})
+                                             'Body Text': text})
             return self
 
 The Page Object should have methods for all features of your view.
