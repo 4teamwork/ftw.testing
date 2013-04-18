@@ -1,10 +1,12 @@
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing.layers import FunctionalTesting
-from plone.testing import z2
 from plone.testing._z2_testbrowser import Zope2MechanizeBrowser
 from splinter.browser import Browser
 from splinter.browser import _DRIVERS
 from splinter.driver.zopetestbrowser import ZopeTestBrowser
+from zope.component.hooks import getSite
 
 
 class FunctionalSplinterTesting(FunctionalTesting):
@@ -43,8 +45,8 @@ class PloneZopeTestBrowser(ZopeTestBrowser):
         self._browser.handleErrors = False
 
     def _get_mech_browser(self, user_agent):
-        with z2.zopeApp() as app:
-            return Zope2MechanizeBrowser(app)
+        app = aq_parent(aq_inner(getSite()))
+        return Zope2MechanizeBrowser(app)
 
 
 _DRIVERS['zope.testbrowser'] = PloneZopeTestBrowser
