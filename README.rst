@@ -325,3 +325,8 @@ This package is copyright by `4teamwork <http://www.4teamwork.ch/>`_.
 .. _plone.act: https://github.com/plone/plone.act
 .. _Splinter: https://pypi.python.org/pypi/splinter
 .. _PhantomJS: http://phantomjs.org/
+
+.. image:: https://cruel-carlota.pagodabox.com/fbb27e21f06d795e60173da59259a1a6
+   :alt: githalytics.com
+   :target: http://githalytics.com/4teamwork/ftw.testing
+
