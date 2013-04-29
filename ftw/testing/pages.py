@@ -389,29 +389,36 @@ class Mailing(object):
         """Setup a mock mail host so that emails can be catched and tested.
         """
 
-        # Do NOT move the MockMailHost import to the top! It patches things implicitly!
+        # Do NOT move the MockMailHost import to the top!
+        # It patches things implicitly!
         from Products.CMFPlone.tests.utils import MockMailHost
 
-        self._mockmailhost = MockMailHost('MailHost')
-        self.portal.MailHost = self._mockmailhost
+        mockmailhost = MockMailHost('MailHost')
+        self.portal.MailHost = mockmailhost
         sm = self.portal.getSiteManager()
-        sm.registerUtility(component=self._mockmailhost,
+        sm.registerUtility(component=mockmailhost,
                            provided=IMailHost)
 
         if configure:
-            self._mockmailhost.smtp_host = 'localhost'
+            mockmailhost.smtp_host = 'localhost'
             self.portal.email_from_address = 'test@localhost'
 
     def tear_down(self):
+        # Do NOT move the MockMailHost import to the top!
+        # It patches things implicitly!
+        from Products.CMFPlone.tests.utils import MockMailHost
+
         sm = self.portal.getSiteManager()
-        sm.unregisterUtility(component=self._mockmailhost)
-        self._mockmailhost = None
+        mailhost = sm.getUtility(IMailHost)
+        if isinstance(mailhost, MockMailHost):
+            sm.unregisterUtility(component=mailhost)
 
     def get_mailhost(self):
         sm = self.portal.getSiteManager()
         mailhost = sm.getUtility(IMailHost)
 
-        # Do NOT move the MockMailHost import to the top! It patches things implicitly!
+        # Do NOT move the MockMailHost import to the top!
+        # It patches things implicitly!
         from Products.CMFPlone.tests.utils import MockMailHost
 
         assert isinstance(mailhost, MockMailHost), \
