@@ -7,7 +7,9 @@ maintainer = 'Jonas Baumann'
 extras_require = {
     'splinter': [
         'plone.app.testing',
-        'splinter']}
+        'splinter >= 0.5.1',
+        'lxml',
+        'cssselect']}
 
 tests_require = [
     'Acquisition<4.0a1',
