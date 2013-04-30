@@ -16,9 +16,6 @@ Changelog
 - Add splinter integration and Plone page objects.
   [jone]
 
-- Add some general BDD style robot frameworks in German.
-  [jone]
-
 - onegov.ch approved: add badge to readme.
   [jone]
 
@@ -26,9 +23,6 @@ Changelog
   [jone]
 
 - MockTestCase: add checks that setUp is called correctly.
-  [jone]
-
-- Add robot framework support with localization patch layer.
   [jone]
 
 

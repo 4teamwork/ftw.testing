@@ -5,13 +5,6 @@ version = '1.3.dev0'
 maintainer = 'Jonas Baumann'
 
 extras_require = {
-    'robot': [
-        'plone.app.testing',
-        'robotframework-selenium2library',
-        'robotsuite',
-        'decorator',
-        'selenium'],
-
     'splinter': [
         'plone.app.testing',
         'splinter']}
@@ -22,7 +15,7 @@ tests_require = [
     'Plone',
     'plone.app.testing',
     'plone.app.dexterity',
-    ] + extras_require['robot'] + extras_require['splinter']
+    ] + extras_require['splinter']
 
 extras_require['tests'] = tests_require
 
