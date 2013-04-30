@@ -4,6 +4,8 @@ from plone.app.testing import PLONE_SITE_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from splinter.browser import _DRIVERS
+from zope.component import getUtility
+from zope.component import provideUtility
 import os
 
 
@@ -381,6 +383,30 @@ class PloneControlPanel(Plone):
 
 
 class Mailing(object):
+    """The Mailing page object mocks the mailhost and captures sent emails.
+    The emails can then be easily used for assertions.
+
+    Usage:
+
+    >>> from ftw.testing.pages import Mailing
+    >>> import transaction
+
+    >>> class MyTest(TestCase):
+    ...     layer = MY_FUNCTIONAL_TESTING
+    ...
+    ...     def setUp(self):
+    ...         Mailing(self.layer['portal']).set_up()
+    ...         transaction.commit()
+    ...
+    ...     def tearDown(self):
+    ...         Mailing(self.layer['portal']).set_up()
+    ...
+    ...     def test_mail_stuff(self):
+    ...         portal = self.layer['portal']
+    ...         do_send_email()
+    ...         mail = Mailing(self.portal).pop()
+    ...         self.assertEquals('Subject: ...', mail)
+    """
 
     def __init__(self, portal):
         self.portal = portal
@@ -411,11 +437,10 @@ class Mailing(object):
         sm = self.portal.getSiteManager()
         mailhost = sm.getUtility(IMailHost)
         if isinstance(mailhost, MockMailHost):
-            sm.unregisterUtility(component=mailhost)
+            sm.unregisterUtility(component=mailhost, provided=IMailHost)
 
     def get_mailhost(self):
-        sm = self.portal.getSiteManager()
-        mailhost = sm.getUtility(IMailHost)
+        mailhost = getUtility(IMailHost)
 
         # Do NOT move the MockMailHost import to the top!
         # It patches things implicitly!
