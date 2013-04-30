@@ -26,7 +26,13 @@ class TestMailingPageObject(TestCase):
                         'There should be one message in the MockMailHost,'
                         ' but there was none.')
 
+        self.assertEquals(
+            1, len(Mailing(self.layer['portal']).get_messages()),
+            'Expected exactly one email in the MockMailHost.')
         message = Mailing(self.layer['portal']).pop().split('\n')
+        self.assertEquals(
+            0, len(Mailing(self.layer['portal']).get_messages()),
+            'Expected no email in the MockMailHost after popping.')
 
         # replace "Date: ..." - it changes constantly.
         message = [line.startswith('Date:') and 'Date: ---' or line
