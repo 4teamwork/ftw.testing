@@ -1,5 +1,6 @@
 from ftw.testing import FunctionalSplinterTesting
 from plone.app.testing import PLONE_FIXTURE
+from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
 from zope.configuration import xmlconfig
@@ -27,5 +28,5 @@ class PageObjectLayer(PloneSandboxLayer):
 
 PAGE_OBJECT_FIXTURE = PageObjectLayer()
 PAGE_OBJECT_FUNCTIONAL = FunctionalSplinterTesting(
-    bases=(PAGE_OBJECT_FIXTURE, ),
+    bases=(PAGE_OBJECT_FIXTURE, PLONE_ZSERVER),
     name="ftw.testing:pageobject:functional")

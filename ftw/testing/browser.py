@@ -1,6 +1,5 @@
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing.layers import FunctionalTesting
 from plone.testing._z2_testbrowser import Zope2MechanizeBrowser
 from splinter.browser import Browser
@@ -12,16 +11,6 @@ from zope.component.hooks import getSite
 class FunctionalSplinterTesting(FunctionalTesting):
 
     defaultBases = ()
-
-    def __init__(self, bases=None, name=None, module=None):
-        # We need to make sure that we open the ZSERVER port
-        # by using the PLONE_ZSERVER layer.
-        if not bases:
-            bases = self.defaultBases
-        bases = bases + (PLONE_ZSERVER, )
-
-        super(FunctionalSplinterTesting, self).__init__(
-            bases=bases, name=name, module=module)
 
     def testSetUp(self):
         super(FunctionalSplinterTesting, self).testSetUp()
