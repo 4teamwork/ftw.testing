@@ -144,6 +144,18 @@ Switching to the PhantomJS is done by just marking your test with the
                                            'Body Text': '<b>Hello World</b>'})
             self.assertTrue(browser().is_text_present('Hello World'))
 
+Make sure your testing layer opens a port by using the `PLONE_ZSERVER` base layer:
+
+.. code:: python
+
+    from plone.app.testing import PLONE_ZSERVER
+
+    ...
+
+    MY_PACKAGE_FUNCTIONAL_TESTING = FunctionalSplinterTesting(
+        bases=(MY_PACKAGE_FIXTURE, PLONE_ZSERVER),
+        name="my.package:functional")
+
 
 Using the Plone Page Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
