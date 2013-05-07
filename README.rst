@@ -10,6 +10,8 @@ This package provides helpers for writing tests.
 
    Certified: 01/2013
 
+.. contents:: Table of Contents
+
 
 Browser testing with splinter
 -----------------------------
@@ -288,6 +290,34 @@ own layer (by subclassing ``ComponentRegistryLayer``) and is not usable with
 ``defaultBases`` directly. This allows us to use the functions
 ``load_zcml_file`` and ``load_zcml_string``.
 
+
+Mailing test helper
+-------------------
+The Mailing helper object mocks the mailhost and captures sent emails.
+The emails can then be easily used for assertions.
+
+Usage:
+
+.. code:: python
+
+    from ftw.testing.pages import Mailing
+    import transaction
+
+    class MyTest(TestCase):
+        layer = MY_FUNCTIONAL_TESTING
+
+     def setUp(self):
+         Mailing(self.layer['portal']).set_up()
+         transaction.commit()
+
+     def tearDown(self):
+         Mailing(self.layer['portal']).tear_down()
+
+     def test_mail_stuff(self):
+         portal = self.layer['portal']
+         do_send_email()
+         mail = Mailing(portal).pop()
+         self.assertEquals('Subject: ...', mail)
 
 
 Links
