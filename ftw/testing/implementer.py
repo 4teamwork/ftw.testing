@@ -4,7 +4,7 @@ from zope.interface.interface import Method
 
 
 class Implementer(object):
-    """The implementer creates a class implementing an interface dinamically.
+    """The implementer creates a class implementing an interface dynamically.
     """
 
     def __init__(self, interface):
