@@ -1,11 +1,8 @@
-from Products.MailHost.interfaces import IMailHost
 from ftw.testing import browser
 from plone.app.testing import PLONE_SITE_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from splinter.browser import _DRIVERS
-from zope.component import getUtility
-from zope.component import provideUtility
 import os
 
 
@@ -380,4 +377,3 @@ class PloneControlPanel(Plone):
         control panel link with a certain text (`title`).
         """
         return self.get_control_panel_links().get(title)
-
