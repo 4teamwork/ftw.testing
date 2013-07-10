@@ -95,6 +95,19 @@ class Plone(PageObject):
         browser().visit(url)
         return self
 
+    def visit(self, obj, view=None):
+        """Open the default view or a particular `view` of the passed
+        `obj` in the browser.
+        """
+
+        url = obj.absolute_url()
+        if view is not None:
+            url = '/'.join((url, view))
+
+        locals()['__traceback_info__'] = ('URL:', url)
+        browser().visit(url)
+        return self
+
     def login(self, user=TEST_USER_NAME, password=TEST_USER_PASSWORD):
         """Log the current browser in with the passed user / password or with
         the default `plone.app.testing` user if no arguemnts are passed.
