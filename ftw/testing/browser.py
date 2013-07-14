@@ -6,6 +6,7 @@ from splinter.browser import Browser
 from splinter.browser import _DRIVERS
 from splinter.driver.zopetestbrowser import ZopeTestBrowser
 from zope.component.hooks import getSite
+from zope.deprecation import deprecated
 
 
 class FunctionalSplinterTesting(FunctionalTesting):
@@ -52,6 +53,7 @@ CURRENT_BROWSER_INSTANCE = None
 BROWSER_CACHE = {}
 
 
+
 def javascript(func):
     """Decorator for marking a test method to require javascript.
     """
@@ -62,6 +64,7 @@ def javascript(func):
 
     _javascript_required_decorator.__name__ = func.__name__
     return _javascript_required_decorator
+deprecated('javascript', 'Javascript support will be dropped soon!')
 
 
 def browser():

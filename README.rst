@@ -16,9 +16,8 @@ This package provides helpers for writing tests.
 Browser testing with splinter
 -----------------------------
 
-`Splinter`_ is a library which provides a common API for multiple browser.
-It allows to operate zope.testbrowser, PhantomJS or other Selenium brwowsers
-such as Firefox or Chrome with the same API.
+`Splinter`_ is a library which provides a common browser API with a driver
+for `zope.testbrowser`.
 
 The `ftw.testing` package provides integration of `Splinter`_ with Plone
 using Page Objects.
@@ -120,44 +119,6 @@ Put a module `pages.py` in your tests folder:
 The Page Object should have methods for all features of your view.
 
 
-Switching to a JavaScript browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The default browser for JavaScript enabled tests is `PhantomJS`_.
-PhantomJS is fast, headless but runs JS by using Gecko.
-You should write JavaScript tests as few as possible but as much as
-necessary, because it will get really slow when you have lots of them.
-
-Switching to the PhantomJS is done by just marking your test with the
-`javascript` decorator:
-
-.. code:: python
-
-    from ftw.testing import javascript
-
-
-    class TestDocument(TestCase):
-
-        @javascript
-        def test_add_document(self):
-            Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
-            Plone().visit_portal()
-            Plone().create_object('Page', {'Title': 'Foo',
-                                           'Body Text': '<b>Hello World</b>'})
-            self.assertTrue(browser().is_text_present('Hello World'))
-
-Make sure your testing layer opens a port by using the `PLONE_ZSERVER` base layer:
-
-.. code:: python
-
-    from plone.app.testing import PLONE_ZSERVER
-
-    ...
-
-    MY_PACKAGE_FUNCTIONAL_TESTING = FunctionalSplinterTesting(
-        bases=(MY_PACKAGE_FIXTURE, PLONE_ZSERVER),
-        name="my.package:functional")
-
 
 Using the Plone Page Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,8 +126,7 @@ Using the Plone Page Objects
 The Plone page object provided by `ftw.testing` already has the most
 important features built in, such as:
 
-- portal_url handling (the zope.testbrowser URL is different than the
-  PhantomJS url)
+- portal_url handling
 - Login
 - Accessing Headings, <body>-CSS-classes, status messages
 - Adding content
@@ -348,7 +308,6 @@ This package is copyright by `4teamwork <http://www.4teamwork.ch/>`_.
 
 .. _plone.mocktestcase: http://pypi.python.org/pypi/plone.mocktestcase
 .. _Splinter: https://pypi.python.org/pypi/splinter
-.. _PhantomJS: http://phantomjs.org/
 
 .. image:: https://cruel-carlota.pagodabox.com/fbb27e21f06d795e60173da59259a1a6
    :alt: githalytics.com

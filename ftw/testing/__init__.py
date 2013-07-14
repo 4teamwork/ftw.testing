@@ -11,4 +11,3 @@ except pkg_resources.DistributionNotFound:
 else:
     from ftw.testing.browser import FunctionalSplinterTesting
     from ftw.testing.browser import browser
-    from ftw.testing.browser import javascript

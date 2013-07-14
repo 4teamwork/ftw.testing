@@ -1,5 +1,4 @@
 from ftw.testing import browser
-from ftw.testing import javascript
 from ftw.testing.pages import Plone
 from ftw.testing.testing import PAGE_OBJECT_FUNCTIONAL
 from mechanize._mechanize import BrowserStateError
@@ -30,7 +29,7 @@ class TestPlonePageObject(TestCase):
                 'http://nohost/plone/login',
                 ])
 
-    def test_login__ZOPE_TESTBROWSER(self):
+    def test_login(self):
         Plone().visit_portal()
 
         self.assertTrue(browser().find_link_by_text('Log in'),
@@ -38,18 +37,6 @@ class TestPlonePageObject(TestCase):
 
         Plone().login()
         Plone().visit_portal()
-
-        self.assertFalse(browser().find_link_by_text('Log in'),
-                         'Found Log in link - assuming not logged in.')
-
-    @javascript
-    def test_login__PHANTOMJS(self):
-        Plone().visit_portal()
-
-        self.assertTrue(browser().find_link_by_text('Log in'),
-                        'Could not find login link.')
-
-        Plone().login()
 
         self.assertFalse(browser().find_link_by_text('Log in'),
                          'Found Log in link - assuming not logged in.')
@@ -120,7 +107,7 @@ class TestPlonePageObject(TestCase):
 
             str(cm.exception))
 
-    def test_open_add_form__ZOPE_TESTBROWSER(self):
+    def test_open_add_form(self):
         Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
         Plone().visit_portal()
 
@@ -131,39 +118,7 @@ class TestPlonePageObject(TestCase):
             'ATFormPage', type(page).__name__,
             'Expected to get a ATFormPage object.')
 
-    @javascript
-    def test_open_add_form__JAVASCRIPT(self):
-        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
-        Plone().visit_portal()
-
-        page = Plone().open_add_form('Folder')
-        self.assertEquals('Add Folder', Plone().get_first_heading())
-
-        self.assertEquals(
-            'ATFormPage', type(page).__name__,
-            'Expected to get a ATFormPage object.')
-
-    def test_create_object__ZOPE_TESTBROWSER(self):
-        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
-        Plone().visit_portal()
-
-        text = 'Some contents for Foo.'
-        Plone().create_object('Page', {
-                'Title': 'Foo',
-                'Body Text': '<strong>%s</strong>' % text})
-
-        self.assertEquals('%s/foo' % Plone().portal_url, browser().url)
-        self.assertEquals('Foo', Plone().get_first_heading(),
-                          'Title of newly created page is wrong.')
-        self.assertTrue(browser().is_text_present(text),
-                        'Body Text of newly create page not visible.')
-
-        bold = browser().find_by_xpath('//strong[text()="%s"]' % text).first
-        self.assertEquals(text, bold.text,
-                          'Insert HTML strong tag could not be found.')
-
-    @javascript
-    def test_create_object__JAVASCRIPT(self):
+    def test_create_object(self):
         Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
         Plone().visit_portal()
 
@@ -183,17 +138,6 @@ class TestPlonePageObject(TestCase):
                           'Insert HTML strong tag could not be found.')
 
     def test_DEXTERITY_create_object_ZOPE_TESTBROWSER(self):
-        Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
-        Plone().visit_portal()
-
-        Plone().create_object('DXType', {'Title': 'Bar'})
-
-        self.assertEquals('%s/bar/view' % Plone().portal_url, browser().url)
-        self.assertEquals('Bar', Plone().get_first_heading(),
-                          'Title of newly created page is wrong.')
-
-    @javascript
-    def test_DEXTERITY_create_object_JAVASCRIPT(self):
         Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
         Plone().visit_portal()
 
