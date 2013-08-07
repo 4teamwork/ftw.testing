@@ -16,7 +16,7 @@ class Mailing(object):
 
         # Do NOT move the MockMailHost import to the top!
         # It patches things implicitly!
-        from Products.CMFPlone.tests.utils import MockMailHost
+        from ftw.testing.mailhost import MockMailHost
 
         mockmailhost = MockMailHost('MailHost')
         self.portal.MailHost = mockmailhost
@@ -31,7 +31,7 @@ class Mailing(object):
     def tear_down(self):
         # Do NOT move the MockMailHost import to the top!
         # It patches things implicitly!
-        from Products.CMFPlone.tests.utils import MockMailHost
+        from ftw.testing.mailhost import MockMailHost
 
         sm = self.portal.getSiteManager()
         mailhost = sm.getUtility(IMailHost)
@@ -43,7 +43,7 @@ class Mailing(object):
 
         # Do NOT move the MockMailHost import to the top!
         # It patches things implicitly!
-        from Products.CMFPlone.tests.utils import MockMailHost
+        from ftw.testing.mailhost import MockMailHost
 
         assert isinstance(mailhost, MockMailHost), \
             'The mailhost mocking was not set up properly. ' \
@@ -51,13 +51,19 @@ class Mailing(object):
         return mailhost
 
     def get_messages(self):
-        return self.get_mailhost().messages
+        return self.get_mailhost().get_messages()
+
+    def get_messages_by_recipient(self):
+        return self.get_mailhost().get_messages_by_recipient()
+
+    def get_messages_by_sender(self):
+        return self.get_mailhost().get_messages_by_sender()
 
     def has_messages(self):
-        return len(self.get_messages()) > 0
+        return self.get_mailhost().has_messages()
 
     def pop(self):
-        return self.get_messages().pop()
+        return self.get_mailhost().pop()
 
     def reset(self):
         # self.get_mailhost().reset()
