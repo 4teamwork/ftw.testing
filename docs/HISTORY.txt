@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-1.3.2 (unreleased)
-------------------
+1.4 (2013-08-26)
+----------------
 
 - Add custom mailhost class, remembering the sender and recipient
   of each email separately.
