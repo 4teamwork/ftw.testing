@@ -13,7 +13,6 @@ class Mailing(object):
     def set_up(self, configure=True):
         """Setup a mock mail host so that emails can be catched and tested.
         """
-
         # Do NOT move the MockMailHost import to the top!
         # It patches things implicitly!
         from ftw.testing.mailhost import MockMailHost
@@ -33,6 +32,8 @@ class Mailing(object):
         # It patches things implicitly!
         from ftw.testing.mailhost import MockMailHost
 
+        self.get_mailhost().reset()
+
         sm = self.portal.getSiteManager()
         mailhost = sm.getUtility(IMailHost)
         if isinstance(mailhost, MockMailHost):
@@ -48,6 +49,7 @@ class Mailing(object):
         assert isinstance(mailhost, MockMailHost), \
             'The mailhost mocking was not set up properly. ' \
             'Call ftw.testing.pages.Mailing().set_up() in your setUp method.'
+
         return mailhost
 
     def get_messages(self):
@@ -66,9 +68,4 @@ class Mailing(object):
         return self.get_mailhost().pop()
 
     def reset(self):
-        # self.get_mailhost().reset()
-        try:
-            while self.pop():
-                pass
-        except IndexError:
-            pass
+        self.get_mailhost().reset()
