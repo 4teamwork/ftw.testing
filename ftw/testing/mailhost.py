@@ -1,6 +1,5 @@
 from Products.CMFPlone.tests.utils import MockMailHost as DefaultMockMailHost
 from Products.MailHost.MailHost import _mungeHeaders
-from persistent.list import PersistentList
 
 
 class MockMessage(object):
@@ -11,20 +10,32 @@ class MockMessage(object):
         self.messageText = messageText
 
 
+MESSAGES = []
+
+
 class MockMailHost(DefaultMockMailHost):
     """Remembers senders and recipient of messages.
 
     Provides utility methods to access mails by sender/recipient.
-    """
 
+    """
     def reset(self):
-        self._messages = PersistentList()
+        try:
+            while MESSAGES.pop():
+                pass
+        except IndexError:
+            pass
+
+    @property
+    def messages(self):
+        return MESSAGES
 
     def _send(self, mfrom, mto, messageText, immediate=False):
-        self._messages.append(MockMessage(mfrom, mto, messageText))
+        self.messages.append(MockMessage(mfrom, mto, messageText))
 
     def send(self, messageText, mto=None, mfrom=None, subject=None,
              encode=None, immediate=False, charset=None, msg_type=None):
+
         messageText, mto, mfrom = _mungeHeaders(messageText,
                                                 mto, mfrom, subject,
                                                 charset=charset,
@@ -32,14 +43,14 @@ class MockMailHost(DefaultMockMailHost):
         self._send(mfrom, mto, messageText)
 
     def pop(self):
-        return self._messages.pop().messageText
+        return self.messages.pop().messageText
 
     def get_messages_by_sender(self):
         """Return the messages by sender.
         """
 
         result = dict()
-        for each in self._messages:
+        for each in self.messages:
             if not each.mfrom in result:
                 result[each.mfrom] = []
             result[each.mfrom].append(each.messageText)
@@ -50,7 +61,7 @@ class MockMailHost(DefaultMockMailHost):
         """
 
         result = dict()
-        for each in self._messages:
+        for each in self.messages:
             for recipient in each.mto:
                 if not recipient in result:
                     result[recipient] = []
@@ -61,10 +72,10 @@ class MockMailHost(DefaultMockMailHost):
         """Return a list of message texts.
         """
 
-        return [each.messageText for each in self._messages]
+        return [each.messageText for each in self.messages]
 
     def has_messages(self):
         """Return whether there are outgoing messages.
         """
 
-        return len(self._messages) > 0
+        return len(self.messages) > 0
