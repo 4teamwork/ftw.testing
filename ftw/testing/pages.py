@@ -345,6 +345,66 @@ class ATFormPage(FormPage):
         self.assert_portal_message('info', 'Changes saved.')
         return Plone()
 
+    @property
+    def field_labels(self):
+        return reduce(list.__add__, self.schemata_field_labels.values())
+
+    @property
+    def schemata_labels(self):
+        labels = []
+        for label, _item in self.schematas:
+            labels.append(label)
+        return labels
+
+    @property
+    def schemata_field_labels(self):
+        schematas = {}
+        for schemata_label, fields in self.schemata_fields.items():
+            labels = schematas[schemata_label] = []
+            for field in fields:
+                labels.append(field['label'])
+
+        return schematas
+
+    @property
+    def schemata_fields(self):
+        schematas = {}
+        for schemata in dict(self.schematas).values():
+            fields = schematas[schemata['label']] = []
+            for div in schemata['fieldset'].find_by_xpath('div'):
+                try:
+                    cssclasses = div['class'].strip().split()
+                except KeyError:
+                    continue
+                else:
+                    if 'field' not in cssclasses:
+                        continue
+
+                label_node = div.find_by_css('label, .formQuestion').first
+                # Use ._element for getting the lxml representation, of which the
+                # .text does not include childrens. This is necessary because we
+                # have no seperate tag for the label.
+                label = label_node._element.text.strip()
+                fields.append({
+                        'label': label,
+                        'div': div})
+        return schematas
+
+    @property
+    def schematas(self):
+        schematas = []
+
+        for fieldset in browser().find_by_css('form fieldset'):
+            legend = fieldset.find_by_css('legend').first
+            label = legend.text.strip()
+            schematas.append(
+                (label,
+                 {'label': label,
+                  'legend': legend,
+                  'fieldset': fieldset}))
+
+        return schematas
+
 
 class DXFormPage(FormPage):
 

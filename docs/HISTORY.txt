@@ -5,7 +5,9 @@ Changelog
 1.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- AT form page object: add schemata helper methods for testing visible
+  schematas and fields.
+  [jone]
 
 
 1.4 (2013-08-26)
