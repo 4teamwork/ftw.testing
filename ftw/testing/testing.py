@@ -8,7 +8,7 @@ from zope.configuration import xmlconfig
 
 class PageObjectLayer(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE, )
+    defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
         import plone.app.dexterity
@@ -28,5 +28,5 @@ class PageObjectLayer(PloneSandboxLayer):
 
 PAGE_OBJECT_FIXTURE = PageObjectLayer()
 PAGE_OBJECT_FUNCTIONAL = FunctionalSplinterTesting(
-    bases=(PAGE_OBJECT_FIXTURE, PLONE_ZSERVER),
+    bases=(PAGE_OBJECT_FIXTURE, PLONE_ZSERVER, ),
     name="ftw.testing:pageobject:functional")
