@@ -260,7 +260,7 @@ Usage:
 
 .. code:: python
 
-    from ftw.testing.pages import Mailing
+    from ftw.testing.mailing import Mailing
     import transaction
 
     class MyTest(TestCase):
