@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.1 (unreleased)
+1.5.1 (2014-02-08)
 ------------------
 
 - Implement ``freeze`` context manager for freezing the time.
