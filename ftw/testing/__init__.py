@@ -1,3 +1,4 @@
+from ftw.testing.freezer import freeze
 from ftw.testing.layer import ComponentRegistryLayer
 from ftw.testing.testcase import MockTestCase
 import pkg_resources

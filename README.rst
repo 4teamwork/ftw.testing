@@ -280,6 +280,26 @@ Usage:
          self.assertEquals('Subject: ...', mail)
 
 
+Freezing datetime.now()
+-----------------------
+
+When testing code which depends on the current time, it is necessary to set
+the current time to a specific time. The ``freeze`` context manager makes that
+really easy:
+
+.. code:: python
+
+    from ftw.testing import freeze
+    from datetime import datetime
+
+    with freeze(datetime(2014, 5, 7, 12, 30)):
+        # test code
+
+The ``freeze`` context manager patches the `datetime` module, the `time` module
+and supports the Zope `DateTime` module. It removes the patches when exiting
+the context manager.
+
+
 Compatibility
 -------------
 

@@ -5,7 +5,8 @@ Changelog
 1.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Implement ``freeze`` context manager for freezing the time.
+  [jone]
 
 
 1.5.0 (2013-09-24)
