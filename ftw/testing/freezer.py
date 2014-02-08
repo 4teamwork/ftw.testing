@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from datetime import datetime
 from mocker import Mocker
+from mocker import ProxyReplacer
 from mocker import expect
 import calendar
 
@@ -14,13 +15,19 @@ def freeze(new_now):
 
     mocker = Mocker()
 
-    # Replace "now" function
-    now_func = mocker.replace('datetime.datetime.now')
-    expect(now_func()).call(lambda: new_now).count(0, None)
+    # Manually create a proxy mock class for overwriting "now"
+    class datetime_class(datetime):
+        @staticmethod
+        def now():
+            return new_now
+        __mocker_object__ = datetime
+        __mocker_replace__ = False
 
-    # Replace "datetime" class
-    datetime_class = mocker.replace('datetime.datetime')
-    expect(datetime_class.now).result(now_func).count(0, None)
+    event = mocker._get_replay_restore_event()
+    event.add_task(ProxyReplacer(datetime_class))
+
+    # Rebuild the new_now so that it is an instance of the mocked class
+    new_now = datetime_class(*new_now.timetuple()[:-3] + (new_now.microsecond,))
 
     # Replace "datetime" module
     datetime_module = mocker.replace('datetime', spec=False)

@@ -83,3 +83,8 @@ class TestFreeze(TestCase):
             str(cm.exception),
             'The freeze_date argument must be a datetime.datetime'
             ' instance, got int')
+
+    def test_isinstance_still_works(self):
+        with freeze(datetime.datetime(2010, 10, 20)):
+            self.assertTrue(isinstance(datetime.datetime.now(),
+                                       datetime_class))

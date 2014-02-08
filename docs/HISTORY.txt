@@ -5,7 +5,8 @@ Changelog
 1.5.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix ``instance`` calls of freezed time in ``freeze`` context manager.
+  [jone]
 
 
 1.5.1 (2014-02-08)
