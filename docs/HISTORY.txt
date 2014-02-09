@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.2 (unreleased)
+1.5.2 (2014-02-09)
 ------------------
 
 - Fix ``isinstance`` calls of freezed time in ``freeze`` context manager.
