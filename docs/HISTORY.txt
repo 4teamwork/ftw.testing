@@ -5,7 +5,7 @@ Changelog
 1.5.2 (unreleased)
 ------------------
 
-- Fix ``instance`` calls of freezed time in ``freeze`` context manager.
+- Fix ``isinstance`` calls of freezed time in ``freeze`` context manager.
   [jone]
 
 
