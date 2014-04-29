@@ -5,7 +5,8 @@ Changelog
 1.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Also install profile dependencies before creating a snapshot.
+  [deif]
 
 
 1.6.0 (2014-04-29)

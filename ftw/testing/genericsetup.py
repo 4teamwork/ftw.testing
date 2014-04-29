@@ -1,11 +1,12 @@
 from plone.app.testing import IntegrationTesting
+from plone.app.testing import login
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
-from plone.app.testing import login
-from plone.app.testing import setRoles
 from plone.testing.z2 import installProduct
+from Products.CMFCore.utils import getToolByName
 from zope.configuration import xmlconfig
 
 
@@ -80,25 +81,33 @@ class GenericSetupUninstallMixin(object):
     autoinclude = True
     additional_zcml_packages = ()
     additional_products = ()
+    install_dependencies = True
     install_profile_name = 'default'
     uninstall_profile_name = 'uninstall'
     skip_files = ()
 
     def test_uninstall_profile_removes_resets_configuration(self):
-        self.maxDiff = None
-
-        from Products.CMFCore.utils import getToolByName
         setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
-        setup_tool.createSnapshot('before-install')
-        setup_tool.runAllImportStepsFromProfile(
-            'profile-%s:%s' % (self.package, self.install_profile_name),
-            ignore_dependencies=True)
-        setup_tool.runAllImportStepsFromProfile(
-            'profile-%s:%s' % (self.package, self.uninstall_profile_name))
+        install_profile_id = 'profile-{0}:{1}'.format(
+            self.package, self.install_profile_name)
+        uninstall_profile_id = 'profile-{0}:{1}'.format(
+            self.package, self.uninstall_profile_name)
 
+        if self.install_dependencies:
+            for profile in setup_tool.getDependenciesForProfile(
+                    install_profile_id):
+                setup_tool.runAllImportStepsFromProfile(profile)
+
+        setup_tool.createSnapshot('before-install')
+        setup_tool.runAllImportStepsFromProfile(install_profile_id,
+                                                ignore_dependencies=True)
+        setup_tool.runAllImportStepsFromProfile(uninstall_profile_id)
         setup_tool.createSnapshot('after-uninstall')
+
         before = setup_tool._getImportContext('snapshot-before-install')
         after = setup_tool._getImportContext('snapshot-after-uninstall')
+
+        self.maxDiff = None
         self.assertMultiLineEqual(
             setup_tool.compareConfigurations(
                 before, after, skip=self.skip_files),
