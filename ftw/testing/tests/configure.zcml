@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="ftw.testing.tests">
+
+    <genericsetup:registerProfile
+        name="default"
+        title="ftw.testing.tests"
+        directory="profiles/default"
+        description=""
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+    <genericsetup:registerProfile
+        name="uninstall"
+        title="Uninstall ftw.testing.tests"
+        directory="profiles/uninstall"
+        description=""
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+</configure>

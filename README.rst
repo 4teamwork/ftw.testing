@@ -300,6 +300,98 @@ and supports the Zope `DateTime` module. It removes the patches when exiting
 the context manager.
 
 
+Generic Setup uninstall test
+----------------------------
+
+``ftw.testing`` provides a test superclass for testing uninstall profiles.
+The test makes a Generic Setup snapshot before installing the package, then
+installs and uninstalls the package, creates another snapshot and diffs it.
+The package is installed without installing its dependencies, because it
+should not include uninstalling dependencies in the uninstall profile.
+
+Appropriate testing layer setup is included and the test runs on a seperate
+layer which should not interfere with other tests.
+
+Simple example:
+
+.. code:: python
+
+    from ftw.testing.genericsetup import GenericSetupUninstallMixin
+    from ftw.testing.genericsetup import apply_generic_setup_layer
+    from unittest2 import TestCase
+
+
+    @apply_generic_setup_layer
+    class TestGenericSetupUninstall(TestCase, GenericSetupUninstallMixin):
+        package = 'my.package'
+
+
+The ``my.package`` is expected to have a Generic Setup profile
+``profile-my.package:default`` for installing the package and a
+``profile-my.package:uninstall`` for uninstalling the package.
+It is expected to use ``z3c.autoinclude`` entry points for loading
+its ZCML.
+
+The options are configured as class variables:
+
+**package**
+    The dotted name of the package as string, which is used for things such
+    as guessing the Generic Setup profile names. This is mandatory.
+
+**is_product** (``False``)
+    Set this to True when you have a product, which is when you have
+    an ``initialize`` function in your package. This is always the case if you
+    define new Archetypes contents.
+    The product name is expected to be the same as ``package``.
+
+**autoinclude** (``True``)
+    This makes the testing fixture load ZCML using the ``z3c.autoinclude``
+    entry points registered for the target ``plone``.
+
+**additional_zcml_packages** (``()``)
+    Use this if needed ZCML is not loaded using the ``autoinclude`` option,
+    e.g. when you need to load testing zcml. Pass in an iterable of
+    dottednames of packages, which contain a ``configure.zcml``.
+
+**additional_products** (``()``)
+    A list of additional Zope products to install.
+
+**install_profile_name** (``default``)
+    The Generic Setup install profile name postfix.
+
+**uninstall_profile_name** (``uninstall``)
+    The Generic Setup uninstall profile name postfix.
+
+**skip_files** (``()``)
+    An iterable of Generic Setup files (e.g. ``("viewlets.xml",)``) to be
+    ignored in the diff. This is sometimes necessary, because not all
+    components can and should be uninstalled properly. For example viewlet
+    orders cannot be removed using Generic Setup - but this is not a problem
+    they do no longer take effect when the viewlets / viewlet managers are
+    no longer registered.
+
+
+Full example:
+
+.. code:: python
+
+    from ftw.testing.genericsetup import GenericSetupUninstallMixin
+    from ftw.testing.genericsetup import apply_generic_setup_layer
+    from unittest2 import TestCase
+
+
+    @apply_generic_setup_layer
+    class TestGenericSetupUninstall(TestCase, GenericSetupUninstallMixin):
+        package = 'my.package'
+        is_package = True
+        autoinclude = False
+        additional_zcml_packages = ('my.package', 'my.package.tests')
+        additional_products = ('another.package', )
+        install_profile_name = 'default'
+        uninstall_profile_name = 'uninstall'
+        skip_files = ('viewlets.xml', 'rolemap.xml')
+
+
 Compatibility
 -------------
 
