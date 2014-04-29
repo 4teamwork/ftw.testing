@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.3 (unreleased)
+1.6.0 (2014-04-29)
 ------------------
 
 - Implement Generic Setup uninstall base test.
