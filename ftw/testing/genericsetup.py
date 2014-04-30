@@ -1,12 +1,13 @@
+from Products.CMFCore.utils import getToolByName
+from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import login
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import login
+from plone.app.testing import setRoles
 from plone.testing.z2 import installProduct
-from Products.CMFCore.utils import getToolByName
 from zope.configuration import xmlconfig
 
 
@@ -46,9 +47,7 @@ class ZCMLLayer(PloneSandboxLayer):
             '</configure>',
             context=configurationContext)
 
-        if self.is_product:
-            installProduct(app, self.package)
-
+        installProduct(app, self.package)
         for product in self.additional_products:
             installProduct(app, product)
 
@@ -60,7 +59,6 @@ class ZCMLLayer(PloneSandboxLayer):
 def apply_generic_setup_layer(test_class):
     FIXTURE = ZCMLLayer(
         package=test_class.package,
-        is_product=test_class.is_product,
         autoinclude=test_class.autoinclude,
         additional_zcml_packages=test_class.additional_zcml_packages,
         additional_products=test_class.additional_products)
@@ -77,7 +75,6 @@ class GenericSetupUninstallMixin(object):
     """
 
     package = None
-    is_product = False
     autoinclude = True
     additional_zcml_packages = ()
     additional_products = ()
@@ -113,3 +110,14 @@ class GenericSetupUninstallMixin(object):
                 before, after, skip=self.skip_files),
             '',
             'The uninstall profile seems to not uninstall everything.')
+
+    def test_uninstall_method_is_available(self):
+        product = InstalledProduct(self.package)
+        self.assertIsNotNone(
+            product.getUninstallMethod(),
+
+            'The package "{0}" has no uninstall external method defined,'
+            ' or there is an error (e.g. ImportError) in your external'
+            ' method, which might be swallowed silently by quick installer.'
+            ' Take a look at the ftw.contentpage package for an example.'
+            .format(self.package))
