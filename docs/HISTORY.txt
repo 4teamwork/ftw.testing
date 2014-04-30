@@ -5,7 +5,10 @@ Changelog
 1.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Generic Setup uninstall test: test that there is an uninstall external method.
+  Uninstall external methods are still necessary today for properly uninstalling
+  a package.
+  [jone]
 
 
 1.6.2 (2014-04-30)

@@ -1,12 +1,13 @@
+from Products.CMFCore.utils import getToolByName
+from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import login
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import login
+from plone.app.testing import setRoles
 from plone.testing.z2 import installProduct
-from Products.CMFCore.utils import getToolByName
 from zope.configuration import xmlconfig
 
 
@@ -113,3 +114,14 @@ class GenericSetupUninstallMixin(object):
                 before, after, skip=self.skip_files),
             '',
             'The uninstall profile seems to not uninstall everything.')
+
+    def test_uninstall_method_is_available(self):
+        product = InstalledProduct(self.package)
+        self.assertIsNotNone(
+            product.getUninstallMethod(),
+
+            'The package "{0}" has no uninstall external method defined,'
+            ' or there is an error (e.g. ImportError) in your external'
+            ' method, which might be swallowed silently by quick installer.'
+            ' Take a look at the ftw.contentpage package for an example.'
+            .format(self.package))
