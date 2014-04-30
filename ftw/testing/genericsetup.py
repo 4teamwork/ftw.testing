@@ -83,15 +83,15 @@ class GenericSetupUninstallMixin(object):
     additional_products = ()
     install_dependencies = True
     install_profile_name = 'default'
-    uninstall_profile_name = 'uninstall'
     skip_files = ()
 
     def test_uninstall_profile_removes_resets_configuration(self):
         setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
+        quick_installer_tool = getToolByName(self.layer['portal'],
+                                             'portal_quickinstaller')
+
         install_profile_id = 'profile-{0}:{1}'.format(
             self.package, self.install_profile_name)
-        uninstall_profile_id = 'profile-{0}:{1}'.format(
-            self.package, self.uninstall_profile_name)
 
         if self.install_dependencies:
             for profile in setup_tool.getDependenciesForProfile(
@@ -101,7 +101,7 @@ class GenericSetupUninstallMixin(object):
         setup_tool.createSnapshot('before-install')
         setup_tool.runAllImportStepsFromProfile(install_profile_id,
                                                 ignore_dependencies=True)
-        setup_tool.runAllImportStepsFromProfile(uninstall_profile_id)
+        quick_installer_tool.uninstallProducts([self.package])
         setup_tool.createSnapshot('after-uninstall')
 
         before = setup_tool._getImportContext('snapshot-before-install')

@@ -359,9 +359,6 @@ The options are configured as class variables:
 **install_profile_name** (``default``)
     The Generic Setup install profile name postfix.
 
-**uninstall_profile_name** (``uninstall``)
-    The Generic Setup uninstall profile name postfix.
-
 **skip_files** (``()``)
     An iterable of Generic Setup files (e.g. ``("viewlets.xml",)``) to be
     ignored in the diff. This is sometimes necessary, because not all
@@ -388,7 +385,6 @@ Full example:
         additional_zcml_packages = ('my.package', 'my.package.tests')
         additional_products = ('another.package', )
         install_profile_name = 'default'
-        uninstall_profile_name = 'uninstall'
         skip_files = ('viewlets.xml', 'rolemap.xml')
 
 
