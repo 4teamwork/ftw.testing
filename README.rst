@@ -338,12 +338,6 @@ The options are configured as class variables:
     The dotted name of the package as string, which is used for things such
     as guessing the Generic Setup profile names. This is mandatory.
 
-**is_product** (``False``)
-    Set this to True when you have a product, which is when you have
-    an ``initialize`` function in your package. This is always the case if you
-    define new Archetypes contents.
-    The product name is expected to be the same as ``package``.
-
 **autoinclude** (``True``)
     This makes the testing fixture load ZCML using the ``z3c.autoinclude``
     entry points registered for the target ``plone``.
@@ -380,7 +374,6 @@ Full example:
     @apply_generic_setup_layer
     class TestGenericSetupUninstall(TestCase, GenericSetupUninstallMixin):
         package = 'my.package'
-        is_package = True
         autoinclude = False
         additional_zcml_packages = ('my.package', 'my.package.tests')
         additional_products = ('another.package', )

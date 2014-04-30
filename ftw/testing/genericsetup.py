@@ -47,9 +47,7 @@ class ZCMLLayer(PloneSandboxLayer):
             '</configure>',
             context=configurationContext)
 
-        if self.is_product:
-            installProduct(app, self.package)
-
+        installProduct(app, self.package)
         for product in self.additional_products:
             installProduct(app, product)
 
@@ -61,7 +59,6 @@ class ZCMLLayer(PloneSandboxLayer):
 def apply_generic_setup_layer(test_class):
     FIXTURE = ZCMLLayer(
         package=test_class.package,
-        is_product=test_class.is_product,
         autoinclude=test_class.autoinclude,
         additional_zcml_packages=test_class.additional_zcml_packages,
         additional_products=test_class.additional_products)
@@ -78,7 +75,6 @@ class GenericSetupUninstallMixin(object):
     """
 
     package = None
-    is_product = False
     autoinclude = True
     additional_zcml_packages = ()
     additional_products = ()

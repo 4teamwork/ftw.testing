@@ -5,6 +5,11 @@ Changelog
 1.6.3 (unreleased)
 ------------------
 
+- Generic Setup uninstall test: Remove is_product option, since we
+  require an uninstall external method which requires the package
+  to be a product anyway.
+  [jone]
+
 - Generic Setup uninstall test: test that there is an uninstall external method.
   Uninstall external methods are still necessary today for properly uninstalling
   a package.
