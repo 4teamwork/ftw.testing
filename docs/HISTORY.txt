@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.4 (unreleased)
+1.6.4 (2014-05-01)
 ------------------
 
 - Generic Setup uninstall test: Add a second test that uses Portal Setup for
