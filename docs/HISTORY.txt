@@ -5,7 +5,10 @@ Changelog
 1.6.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Generic Setup uninstall test: Add a second test that uses Portal Setup for
+  uninstallation. This makes sure that Portal Setup uninstallation behaves the same as
+  quickinstaller uninstallation.
+  [deif]
 
 
 1.6.3 (2014-04-30)
