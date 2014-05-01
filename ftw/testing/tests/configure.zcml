@@ -1,11 +1,17 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="ftw.testing.tests">
 
     <five:registerPackage package="." initialize=".initialize" />
+
+    <browser:resourceDirectory
+        name="ftw.testing.tests"
+        directory="resources"
+        />
 
     <genericsetup:registerProfile
         name="default"

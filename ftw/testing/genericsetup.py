@@ -82,27 +82,34 @@ class GenericSetupUninstallMixin(object):
     install_profile_name = 'default'
     skip_files = ()
 
-    def test_uninstall_profile_removes_resets_configuration(self):
-        setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
-        quick_installer_tool = getToolByName(self.layer['portal'],
-                                             'portal_quickinstaller')
+    @property
+    def uninstall_profile_id(self):
+        return 'profile-{0}:{1}'.format(self.package, 'uninstall')
 
-        install_profile_id = 'profile-{0}:{1}'.format(
+    @property
+    def install_profile_id(self):
+        return 'profile-{0}:{1}'.format(
             self.package, self.install_profile_name)
 
+    def _install_dependencies(self):
+        setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
         if self.install_dependencies:
             for profile in setup_tool.getDependenciesForProfile(
-                    install_profile_id):
+                    self.install_profile_id):
                 setup_tool.runAllImportStepsFromProfile(profile)
 
-        setup_tool.createSnapshot('before-install')
-        setup_tool.runAllImportStepsFromProfile(install_profile_id,
-                                                ignore_dependencies=True)
-        quick_installer_tool.uninstallProducts([self.package])
-        setup_tool.createSnapshot('after-uninstall')
+    def assertSnapshotsEqual(self, before_id='before-install',
+                             after_id='after-uninstall'):
+        """Assert that two configuration snapshots are equal.
 
-        before = setup_tool._getImportContext('snapshot-before-install')
-        after = setup_tool._getImportContext('snapshot-after-uninstall')
+        Compare setup-tool snapshots identified by ``before_id`` and
+        ``after_id`` and assert that they are equal.
+
+        """
+        setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
+
+        before = setup_tool._getImportContext('snapshot-' + before_id)
+        after = setup_tool._getImportContext('snapshot-' + after_id)
 
         self.maxDiff = None
         self.assertMultiLineEqual(
@@ -110,6 +117,32 @@ class GenericSetupUninstallMixin(object):
                 before, after, skip=self.skip_files),
             '',
             'The uninstall profile seems to not uninstall everything.')
+
+    def test_quickinstall_uninstallation_removes_resets_configuration(self):
+        self._install_dependencies()
+
+        setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
+        quick_installer_tool = getToolByName(self.layer['portal'],
+                                             'portal_quickinstaller')
+        setup_tool.createSnapshot('before-install')
+        setup_tool.runAllImportStepsFromProfile(self.install_profile_id,
+                                                ignore_dependencies=True)
+        quick_installer_tool.uninstallProducts([self.package])
+        setup_tool.createSnapshot('after-uninstall')
+
+        self.assertSnapshotsEqual()
+
+    def test_setup_tool_uninstall_profile_removes_resets_configuration(self):
+        self._install_dependencies()
+
+        setup_tool = getToolByName(self.layer['portal'], 'portal_setup')
+        setup_tool.createSnapshot('before-install')
+        setup_tool.runAllImportStepsFromProfile(self.install_profile_id,
+                                                ignore_dependencies=True)
+        setup_tool.runAllImportStepsFromProfile(self.uninstall_profile_id)
+        setup_tool.createSnapshot('after-uninstall')
+
+        self.assertSnapshotsEqual()
 
     def test_uninstall_method_is_available(self):
         product = InstalledProduct(self.package)
