@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.5 (unreleased)
+1.7.0 (2014-09-30)
 ------------------
 
 - Add patcher for disabling quickinstaller snappshotting in tests.
