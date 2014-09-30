@@ -381,6 +381,63 @@ Full example:
         skip_files = ('viewlets.xml', 'rolemap.xml')
 
 
+Disabling quickinstaller snapshots
+----------------------------------
+
+Quickinstaller normally makes a complete Generic Setup (GS) snapshot
+before and after installing each GS profile, in order to be able to
+uninstall the profile afterwards.
+
+In tests we usually don't need this feature and want to disable it to
+speed up tests.
+
+The ``ftw.testing.quickinstaller`` module provides a patcher for
+replacing the quickinstaller event handlers to skip creating snapshots.
+Usually we want to do this early (when loading ``testing.py``), so that
+all the tests are speeding up.
+However, some tests which involve quickinstaller rely on having the
+snapshots made (see previous section about uninstall tests).
+Therefore the snapshot patcher object provides context managers for
+temporarily enabling / disabling the snapshot feature.
+
+Usage:
+
+Disable snapshots early, so that everything is fast. Usually this is
+done in the ``testing.py`` in module scope, so that it happens already
+when the testrunner imports the tests:
+
+.. code:: python
+
+  from ftw.testing.quickinstaller import snapshots
+  from plone.app.testing import PloneSandboxLayer
+
+  snapshots.disable()
+
+  class MyPackageLayer(PloneSandboxLayer):
+  ...
+
+When testing quickinstaller snapshot related things, such as uninstalling,
+the snapshots can be re-enabled for a context manager or in general:
+
+.. code:: Python
+  from ftw.testing.quickinstaller import snapshots
+
+  snapshots.disable()
+  # snapshotting is now disabled
+
+  with snapshots.enabled():
+      # snapshotting is enabled only within this block
+
+  snapshots.enable()
+  # snapshotting is now enabled
+
+  with snapshots.disabled():
+      # snapshotting is disabled only within this block
+
+
+
+
+
 Compatibility
 -------------
 

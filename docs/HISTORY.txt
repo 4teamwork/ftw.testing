@@ -5,7 +5,8 @@ Changelog
 1.6.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add patcher for disabling quickinstaller snappshotting in tests.
+  [jone]
 
 
 1.6.4 (2014-05-01)
