@@ -1,9 +1,13 @@
 from ftw.testing import FunctionalSplinterTesting
+from ftw.testing.quickinstaller import snapshots
+from plone.app.testing import applyProfile
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import applyProfile
 from zope.configuration import xmlconfig
+
+
+snapshots.disable()
 
 
 class PageObjectLayer(PloneSandboxLayer):

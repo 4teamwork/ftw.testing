@@ -1,13 +1,14 @@
-from Products.CMFCore.utils import getToolByName
-from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import IntegrationTesting
+from plone.app.testing import login
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
-from plone.app.testing import login
-from plone.app.testing import setRoles
 from plone.testing.z2 import installProduct
+from Products.CMFCore.utils import getToolByName
+from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 from zope.configuration import xmlconfig
 
 
@@ -147,7 +148,8 @@ class GenericSetupUninstallMixin(object):
         self._install_dependencies()
 
         self._create_before_snapshot()
-        self._install_package()
+        with snapshots.enabled():
+            self._install_package()
         self._quickinstaller_uninstall_package()
         self._create_after_shapshot()
 
@@ -158,7 +160,8 @@ class GenericSetupUninstallMixin(object):
         self._install_dependencies()
 
         self._create_before_snapshot()
-        self._install_package()
+        with snapshots.enabled():
+            self._install_package()
         self._setuptool_uninstall_package()
         self._create_after_shapshot()
 
