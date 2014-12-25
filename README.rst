@@ -419,7 +419,8 @@ when the testrunner imports the tests:
 When testing quickinstaller snapshot related things, such as uninstalling,
 the snapshots can be re-enabled for a context manager or in general:
 
-.. code:: Python
+.. code:: python
+
   from ftw.testing.quickinstaller import snapshots
 
   snapshots.disable()
@@ -433,6 +434,57 @@ the snapshots can be re-enabled for a context manager or in general:
 
   with snapshots.disabled():
       # snapshotting is disabled only within this block
+
+
+Testing Layers
+--------------
+
+Component registry isolation layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``plone.app.testing``'s default testing layers (such as ``PLONE_FIXTURE``) do not
+isolate the component registry for each test.
+
+``ftw.testing``'s ``COMPONENT_REGISTRY_ISOLATION`` testing layer isolates the
+component registry for each test, provides a stacked ZCML configuration context
+and provides the methods ``load_zcml_string`` and ``load_zcml_file`` for loading
+ZCML.
+
+Example:
+
+.. code:: python
+
+    # testing.py
+    from ftw.testing.layer import COMPONENT_REGISTRY_ISOLATION
+    from plone.app.testing import IntegrationTesting
+    from plone.app.testing import PloneSandboxLayer
+    from zope.configuration import xmlconfig
+
+
+    class MyPackageLayer(PloneSandboxLayer):
+        defaultBases = (COMPONENT_REGISTRY_ISOLATION,)
+
+        def setUpZope(self, app, configurationContext):
+            import my.package
+            xmlconfig.file('configure.zcml', ftw.package,
+                           context=configurationContext)
+
+    MY_PACKAGE_FIXTURE = MyPackageLayer()
+    MY_PACKAGE_INTEGRATION = IntegrationTesting(
+        bases=(MY_PACKAGE_FIXTURE,
+               COMPONENT_REGISTRY_ISOLATION),
+        name='my.package:integration')
+
+
+    # ----------------------------
+    # test_*.py
+    from unittest2 import TestCase
+
+    class TestSomething(TestCase):
+        layer = MY_PACKAGE_INTEGRATION
+
+        def test(self):
+            self.layer['load_zcml_string']('<configure>...</configure>')
 
 
 
