@@ -25,6 +25,10 @@ class PageObjectLayer(PloneSandboxLayer):
                        ftw.testing.tests,
                        context=configurationContext)
 
+        xmlconfig.file('views.zcml',
+                       ftw.testing.tests,
+                       context=configurationContext)
+
     def setUpPloneSite(self, portal):
         applyProfile(
             portal, 'ftw.testing.tests:dxtype')

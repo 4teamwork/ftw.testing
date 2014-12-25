@@ -68,44 +68,61 @@ class TestPlonePageObject(TestCase):
             'Expected template class on body to be template-folder_listing')
 
     def test_portal_messages(self):
-        Plone().visit_portal('test_rendering')
+        Plone().visit_portal('status-messages-test')
 
         message_count = dict((type_, len(msgs)) for (type_, msgs)
                              in Plone().portal_messages().items())
 
         self.assertEquals({'info': 2,
-                           'warning': 0,
-                           'error': 0}, message_count)
+                           'warning': 1,
+                           'error': 1}, message_count)
 
     def test_portal_text_messages(self):
-        Plone().visit_portal('test_rendering')
+        Plone().visit_portal('status-messages-test')
 
         self.assertEquals(
-            {'info': ['The portalMessage class, can also contain links'
-                      ' - used to give the user temporary status messages.'],
-             'warning': [],
-             'error': []},
+            {'info': ['This is an INFO message.'],
+             'warning': ['This is an WARNING message.'],
+             'error': ['This is an ERROR message.']},
 
             Plone().portal_text_messages())
 
     def test_assert_portal_message(self):
-        Plone().visit_portal('test_rendering')
+        Plone().visit_portal('status-messages-test')
 
         Plone().assert_portal_message(
             'info',
-            'The portalMessage class, can also contain links'
-            ' - used to give the user temporary status messages.')
+            'This is an INFO message.')
 
         with self.assertRaises(AssertionError) as cm:
             Plone().assert_portal_message('error', 'Something')
 
         self.assertEquals(
-            'Portal message "Something" of kind error is not visible.'
-            ' Got {\'info\': [\'The portalMessage class, can'
-            ' also contain links - used to give the user temporary'
-            ' status messages.\'], \'warning\': [], \'error\': []}',
+            'Portal message "Something" of kind error is not'' visible.'
+            ' Got {\'info\': [\'This is an INFO message.\'], '
+            '\'warning\': [\'This is an WARNING message.\'], '
+            '\'error\': [\'This is an ERROR message.\']}',
 
             str(cm.exception))
+
+    def test_no_portal_messages(self):
+        Plone().visit_portal()
+        Plone().assert_no_portal_messages()
+
+        Plone().visit_portal('status-messages-test')
+        with self.assertRaises(AssertionError) as cm:
+            Plone().assert_no_portal_messages()
+
+        self.assertEquals(
+            "Expected no portal messages but got: "
+            "{'info': ['This is an INFO message.'],"
+            " 'warning': ['This is an WARNING message.'],"
+            " 'error': ['This is an ERROR message.']}",
+            str(cm.exception))
+
+    def test_assert_no_error_messages(self):
+        Plone().visit_portal()
+        Plone().assert_no_error_messages()
 
     def test_open_add_form(self):
         Plone().login(SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
@@ -146,23 +163,3 @@ class TestPlonePageObject(TestCase):
         self.assertEquals('%s/bar/view' % Plone().portal_url, browser().url)
         self.assertEquals('Bar', Plone().get_first_heading(),
                           'Title of newly created page is wrong.')
-
-    def test_no_portal_messages(self):
-        Plone().visit_portal()
-        Plone().assert_no_portal_messages()
-
-        Plone().visit_portal('test_rendering')
-        with self.assertRaises(AssertionError) as cm:
-            Plone().assert_no_portal_messages()
-
-        self.assertEquals(
-            str(cm.exception),
-            "Expected no portal messages but got:"
-            " {'info': ['The portalMessage class, can also contain"
-            " links - used to give the user temporary status messages.'],"
-            " 'warning': [],"
-            " 'error': []}")
-
-    def test_assert_no_error_messages(self):
-        Plone().visit_portal('test_rendering')
-        Plone().assert_no_error_messages()
