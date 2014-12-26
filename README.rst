@@ -510,6 +510,40 @@ Usage example:
             path = self.layer['temp_directory']
 
 
+Console script testing layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The console script layer helps testing console scripts.
+On layer setup it creates and executes an isolated buildout with the package under
+development, which creates all console scripts of this package.
+This makes it easy to test console scripts by really executing them.
+
+Usage example:
+
+.. code:: python
+
+    # testing.py
+    from ftw.testing.layer import ConsoleScriptLayer
+
+    CONSOLE_SCRIPT_TESTING = ConsoleScriptLayer('my.package')
+
+
+    # test_*.py
+    from my.package.testing import CONSOLE_SCRIPT_TESTING
+    from unittest2 import TestCase
+
+
+    class TestConsoleScripts(TestCase):
+        layer = CONSOLE_SCRIPT_TESTING
+
+        def test_executing_command(self):
+            exitcode, output = self.layer['execute_script']('my-command args')
+            self.assertEqual('something\n', output)
+
+Be aware that the dependency ``zc.recipe.egg`` is required for building the
+console scripts. You may put the dependency into your ``tests`` extras require.
+
+
 Compatibility
 -------------
 
