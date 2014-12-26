@@ -62,6 +62,7 @@ setup(name='ftw.testing',
         'zope.configuration',
         'zope.interface',
         'zope.publisher',
+        'path.py'
         ],
 
       tests_require=tests_require,

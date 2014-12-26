@@ -1,7 +1,9 @@
+from path import Path
 from plone.app.testing import PLONE_FIXTURE
 from plone.testing import Layer
 from plone.testing import zca
 from zope.configuration import xmlconfig
+import tempfile
 import zope.component.testing
 
 
@@ -83,3 +85,15 @@ class ComponentRegistryIsolationLayer(Layer):
 
 
 COMPONENT_REGISTRY_ISOLATION = ComponentRegistryIsolationLayer()
+
+
+class TempDirectoryLayer(Layer):
+
+    def testSetUp(self):
+        self['temp_directory'] = Path(tempfile.mkdtemp('ftw.testing'))
+
+    def testTearDown(self):
+        self['temp_directory'].rmtree_p()
+
+
+TEMP_DIRECTORY = TempDirectoryLayer()

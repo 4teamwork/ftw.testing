@@ -487,7 +487,27 @@ Example:
             self.layer['load_zcml_string']('<configure>...</configure>')
 
 
+Temp directory layer
+~~~~~~~~~~~~~~~~~~~~
 
+The ``TEMP_DIRECTORY`` testing layer creates an empty temp directory for
+each test and removes it recursively on tear down.
+
+The path to the directory can be accessed with the ``temp_directory`` key.
+
+Usage example:
+
+.. code:: python
+
+    from unittest2 import TestCase
+    from ftw.testing.layer import TEMP_DIRECTORY
+
+
+    class TestSomething(TestCase):
+        layer = TEMP_DIRECTORY
+
+        def test(self):
+            path = self.layer['temp_directory']
 
 
 Compatibility

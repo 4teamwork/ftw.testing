@@ -5,7 +5,10 @@ Changelog
 1.7.1 (unreleased)
 ------------------
 
-- Implement component registry isolation layer.
+- Implement TEMP_DIRECTORY testing layer.
+  [jone]
+
+- Implement COMPONENT_REGISTRY_ISOLATION layer.
   [jone]
 
 
