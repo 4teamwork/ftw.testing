@@ -419,7 +419,8 @@ when the testrunner imports the tests:
 When testing quickinstaller snapshot related things, such as uninstalling,
 the snapshots can be re-enabled for a context manager or in general:
 
-.. code:: Python
+.. code:: python
+
   from ftw.testing.quickinstaller import snapshots
 
   snapshots.disable()
@@ -435,7 +436,112 @@ the snapshots can be re-enabled for a context manager or in general:
       # snapshotting is disabled only within this block
 
 
+Testing Layers
+--------------
 
+Component registry isolation layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``plone.app.testing``'s default testing layers (such as ``PLONE_FIXTURE``) do not
+isolate the component registry for each test.
+
+``ftw.testing``'s ``COMPONENT_REGISTRY_ISOLATION`` testing layer isolates the
+component registry for each test, provides a stacked ZCML configuration context
+and provides the methods ``load_zcml_string`` and ``load_zcml_file`` for loading
+ZCML.
+
+Example:
+
+.. code:: python
+
+    # testing.py
+    from ftw.testing.layer import COMPONENT_REGISTRY_ISOLATION
+    from plone.app.testing import IntegrationTesting
+    from plone.app.testing import PloneSandboxLayer
+    from zope.configuration import xmlconfig
+
+
+    class MyPackageLayer(PloneSandboxLayer):
+        defaultBases = (COMPONENT_REGISTRY_ISOLATION,)
+
+        def setUpZope(self, app, configurationContext):
+            import my.package
+            xmlconfig.file('configure.zcml', ftw.package,
+                           context=configurationContext)
+
+    MY_PACKAGE_FIXTURE = MyPackageLayer()
+    MY_PACKAGE_INTEGRATION = IntegrationTesting(
+        bases=(MY_PACKAGE_FIXTURE,
+               COMPONENT_REGISTRY_ISOLATION),
+        name='my.package:integration')
+
+
+    # ----------------------------
+    # test_*.py
+    from unittest2 import TestCase
+
+    class TestSomething(TestCase):
+        layer = MY_PACKAGE_INTEGRATION
+
+        def test(self):
+            self.layer['load_zcml_string']('<configure>...</configure>')
+
+
+Temp directory layer
+~~~~~~~~~~~~~~~~~~~~
+
+The ``TEMP_DIRECTORY`` testing layer creates an empty temp directory for
+each test and removes it recursively on tear down.
+
+The path to the directory can be accessed with the ``temp_directory`` key.
+
+Usage example:
+
+.. code:: python
+
+    from unittest2 import TestCase
+    from ftw.testing.layer import TEMP_DIRECTORY
+
+
+    class TestSomething(TestCase):
+        layer = TEMP_DIRECTORY
+
+        def test(self):
+            path = self.layer['temp_directory']
+
+
+Console script testing layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The console script layer helps testing console scripts.
+On layer setup it creates and executes an isolated buildout with the package under
+development, which creates all console scripts of this package.
+This makes it easy to test console scripts by really executing them.
+
+Usage example:
+
+.. code:: python
+
+    # testing.py
+    from ftw.testing.layer import ConsoleScriptLayer
+
+    CONSOLE_SCRIPT_TESTING = ConsoleScriptLayer('my.package')
+
+
+    # test_*.py
+    from my.package.testing import CONSOLE_SCRIPT_TESTING
+    from unittest2 import TestCase
+
+
+    class TestConsoleScripts(TestCase):
+        layer = CONSOLE_SCRIPT_TESTING
+
+        def test_executing_command(self):
+            exitcode, output = self.layer['execute_script']('my-command args')
+            self.assertEqual('something\n', output)
+
+Be aware that the dependency ``zc.recipe.egg`` is required for building the
+console scripts. You may put the dependency into your ``tests`` extras require.
 
 
 Compatibility

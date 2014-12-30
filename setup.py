@@ -13,10 +13,11 @@ extras_require = {
 
 tests_require = [
     'Acquisition<4.0a1',
-    'Products.PloneHotfix20121106',
     'Plone',
-    'plone.app.testing',
+    'Products.PloneHotfix20121106',
     'plone.app.dexterity',
+    'plone.app.testing',
+    'zc.recipe.egg',
     ] + extras_require['splinter']
 
 extras_require['tests'] = tests_require
@@ -62,6 +63,7 @@ setup(name='ftw.testing',
         'zope.configuration',
         'zope.interface',
         'zope.publisher',
+        'path.py'
         ],
 
       tests_require=tests_require,
