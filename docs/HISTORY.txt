@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.7.1 (unreleased)
+1.8.0 (2014-12-31)
 ------------------
 
 - Implement console script testing layer.
