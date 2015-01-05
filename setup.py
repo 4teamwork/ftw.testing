@@ -16,7 +16,6 @@ tests_require = [
     'Plone',
     'Products.PloneHotfix20121106',
     'plone.app.dexterity',
-    'plone.app.testing',
     'zc.recipe.egg',
     ] + extras_require['splinter']
 
@@ -56,6 +55,7 @@ setup(name='ftw.testing',
 
       install_requires=[
         'setuptools',
+        'plone.app.testing',
         'plone.mocktestcase',
         'plone.testing',
         'unittest2',

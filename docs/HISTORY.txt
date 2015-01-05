@@ -5,7 +5,9 @@ Changelog
 1.8.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Declare missing dependency to p.a.testing
+  required by the COMPONENT_REGISTRY_ISOLATION layer.
+  [jone]
 
 
 1.8.0 (2014-12-31)
