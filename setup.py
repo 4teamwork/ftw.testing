@@ -14,7 +14,6 @@ extras_require = {
 tests_require = [
     'Acquisition<4.0a1',
     'Plone',
-    'Products.PloneHotfix20121106',
     'plone.app.dexterity',
     'zc.recipe.egg',
     ] + extras_require['splinter']

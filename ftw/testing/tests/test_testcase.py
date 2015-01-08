@@ -236,33 +236,3 @@ class TestSetUpError(MockTestCase):
     def test_stub_response(self):
         with self.assertRaises(RuntimeError):
             self.stub_response()
-
-
-class TestToolMocking(MockTestCase):
-
-    def test_mock_tool_replaces_patch(self):
-        self.assertEquals(getToolByName.__name__, 'getToolByName')
-        self.assertEquals(utils.getToolByName.__name__, 'getToolByName')
-
-        import Products.PloneHotfix20121106
-        Products.PloneHotfix20121106  # pyflakes
-        self.assertEquals(utils.getToolByName.__name__,
-                          'wrapped_getToolByName')
-
-        catalog = self.mocker.mock()
-        self.expect(catalog()).result(['brains']).count(2)
-        self.mock_tool(catalog, 'portal_catalog')
-
-        self.assertNotEquals(type(getToolByName).__name__, 'Mock')
-        self.assertNotEquals(type(utils.getToolByName).__name__, 'Mock')
-
-        self.replay()
-
-        self.assertEquals(type(getToolByName).__name__, 'Mock')
-        self.assertEquals(type(utils.getToolByName).__name__, 'Mock')
-
-        self.assertEqual(utils.getToolByName(None, 'portal_catalog')(),
-                         ['brains'])
-
-        self.assertEqual(getToolByName(None, 'portal_catalog')(),
-                         ['brains'])
