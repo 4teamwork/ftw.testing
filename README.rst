@@ -300,6 +300,34 @@ and supports the Zope `DateTime` module. It removes the patches when exiting
 the context manager.
 
 
+Static UUIDS
+------------
+
+When asserting UUIDs it can be annoying that they change at each test run.
+The ``staticuid`` decorator helps to fix that by using static uuids which
+are prefixed and counted within a scope, usually a test case:
+
+.. code:: python
+
+  from ftw.testing import staticuid
+  from plone.app.testing import PLONE_INTEGRATION_TESTING
+  from unittest2 import TestCase
+
+  class MyTest(TestCase):
+      layer = PLONE_INTEGRATION_TESTING
+
+      @staticuid()
+      def test_all_the_things(self):
+          doc = self.portal.get(self.portal.invokeFactory('Document', 'the-document'))
+          self.assertEquals('testallthethings0000000000000001', IUUID(doc))
+
+      @staticuid('MyUIDS')
+      def test_a_prefix_can_be_set(self):
+          doc = self.portal.get(self.portal.invokeFactory('Document', 'the-document'))
+          self.assertEquals('MyUIDS00000000000000000000000001', IUUID(doc))
+
+
+
 Generic Setup uninstall test
 ----------------------------
 
