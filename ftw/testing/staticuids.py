@@ -1,19 +1,22 @@
-from plone.testing import zca
+from plone.app.testing import popGlobalRegistry
+from plone.app.testing import pushGlobalRegistry
 from plone.uuid.interfaces import IUUIDGenerator
 from zope.component import getGlobalSiteManager
 from zope.interface import implements
+from zope.site.hooks import getSite
 import re
 
 
 def staticuid(prefix=None):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            zca.pushGlobalRegistry()
+            site = getSite()
+            pushGlobalRegistry(site)
             try:
                 register_static_uid_uitility(prefix=prefix or func.__name__)
                 return func(*args, **kwargs)
             finally:
-                zca.popGlobalRegistry()
+                popGlobalRegistry(site)
         return wrapper
     return decorator
 

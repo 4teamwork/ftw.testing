@@ -4,6 +4,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.uuid.interfaces import IUUID
 from unittest2 import TestCase
+from zope.component.hooks import getSite
 
 
 class TestStaticUIDS(TestCase):
@@ -27,3 +28,7 @@ class TestStaticUIDS(TestCase):
     def test_that_a_very_long_method_name_used_as_prefix_is_cropped(self):
         doc = self.portal.get(self.portal.invokeFactory('Document', 'the-document'))
         self.assertEquals('testthataverylongmethodnam000001', IUUID(doc))
+
+    @staticuid()
+    def test_site_hook_is_set(self):
+        self.assertTrue(getSite(), 'The site hook (getSite) is not set.')
