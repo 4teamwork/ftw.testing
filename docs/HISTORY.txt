@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.8.2 (unreleased)
+1.9.0 (2015-05-15)
 ------------------
 
 - Add ``staticuid`` decorator for having static uids.
