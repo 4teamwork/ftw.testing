@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.9.1 (unreleased)
+1.9.1 (2015-05-15)
 ------------------
 
 - Fix site hook within ``staticuid`` decorated methods.
