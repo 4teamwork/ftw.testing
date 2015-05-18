@@ -88,3 +88,21 @@ class TestFreeze(TestCase):
         with freeze(datetime.datetime(2010, 10, 20)):
             self.assertTrue(isinstance(datetime.datetime.now(),
                                        datetime_class))
+
+    def test_update_freezed_time_forwards(self):
+        with freeze(datetime.datetime(2010, 10, 20)) as clock:
+            self.assertEquals(datetime.datetime(2010, 10, 20),
+                              datetime.datetime.now())
+
+            clock.forward(days=1)
+            self.assertEquals(datetime.datetime(2010, 10, 21),
+                              datetime.datetime.now())
+
+    def test_update_freezed_time_backwards(self):
+        with freeze(datetime.datetime(2010, 10, 20)) as clock:
+            self.assertEquals(datetime.datetime(2010, 10, 20),
+                              datetime.datetime.now())
+
+            clock.backward(days=2)
+            self.assertEquals(datetime.datetime(2010, 10, 18),
+                              datetime.datetime.now())

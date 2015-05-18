@@ -5,7 +5,8 @@ Changelog
 1.9.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update the freezed time with ``forward`` and ``backward``.
+  [jone]
 
 
 1.9.1 (2015-05-15)
