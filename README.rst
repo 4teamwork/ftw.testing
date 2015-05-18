@@ -299,6 +299,25 @@ The ``freeze`` context manager patches the `datetime` module, the `time` module
 and supports the Zope `DateTime` module. It removes the patches when exiting
 the context manager.
 
+**Updating the freezed time**
+
+.. code:: python
+
+    from ftw.testing import freeze
+    from datetime import datetime
+
+    with freeze(datetime(2014, 5, 7, 12, 30)) as clock:
+        # its 2014, 5, 7, 12, 30
+        clock.forward(days=2)
+        # its 2014, 5, 9, 12, 30
+        clock.backward(minutes=15)
+        # its 2014, 5, 9, 12, 15
+
+You can use the
+`timedelta arguments`(https://docs.python.org/2/library/datetime.html#datetime.timedelta)_
+for ``forward`` and ``backward``.
+
+
 
 Static UUIDS
 ------------

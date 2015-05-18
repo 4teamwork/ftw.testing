@@ -12,6 +12,16 @@ class FreezedClock(object):
     def __init__(self, new_now):
         self.new_now = new_now
 
+    def forward(self, **kwargs):
+        self.new_now = datetime.now() + timedelta(**kwargs)
+        self.__exit__(None, None, None)
+        self.__enter__()
+
+    def backward(self, **kwargs):
+        self.new_now = datetime.now() - timedelta(**kwargs)
+        self.__exit__(None, None, None)
+        self.__enter__()
+
     def __enter__(self):
         if type(self.new_now) != datetime:
             raise ValueError(
@@ -47,6 +57,7 @@ class FreezedClock(object):
         expect(time_class()).call(lambda: new_time).count(0, None)
 
         self.mocker.replay()
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.mocker.restore()
