@@ -106,3 +106,10 @@ class TestFreeze(TestCase):
             clock.backward(days=2)
             self.assertEquals(datetime.datetime(2010, 10, 18),
                               datetime.datetime.now())
+
+    def test_freeze_relative_to_current_time(self):
+        with freeze() as clock:
+            before = datetime.datetime.now()
+            clock.forward(hours=1)
+            after = datetime.datetime.now()
+            self.assertEquals(60 * 60, (after - before).seconds)

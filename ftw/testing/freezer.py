@@ -65,6 +65,6 @@ class FreezedClock(object):
 
 
 @contextmanager
-def freeze(new_now):
-    with FreezedClock(new_now) as clock:
+def freeze(new_now=None):
+    with FreezedClock(new_now or datetime.now()) as clock:
         yield clock
