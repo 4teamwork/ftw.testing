@@ -63,6 +63,7 @@ setup(name='ftw.testing',
         'zope.interface',
         'zope.publisher',
         'path.py',
+        'pytz',
         ],
 
       tests_require=tests_require,

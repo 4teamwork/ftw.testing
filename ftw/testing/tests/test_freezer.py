@@ -2,8 +2,8 @@ from DateTime import DateTime
 from ftw.testing import freeze
 from unittest2 import TestCase
 import datetime
+import pytz
 import time
-
 
 datetime_module = datetime
 datetime_class = datetime.datetime
@@ -88,6 +88,27 @@ class TestFreeze(TestCase):
         with freeze(datetime.datetime(2010, 10, 20)):
             self.assertTrue(isinstance(datetime.datetime.now(),
                                        datetime_class))
+
+    def test_handles_tzinfo_correctly(self):
+        with freeze(datetime.datetime(2015, 01, 01, 7, 15, tzinfo=pytz.UTC)):
+            self.assertEquals(
+                datetime.datetime(2015, 01, 01, 7, 15, tzinfo=pytz.UTC),
+                datetime.datetime.now(pytz.UTC))
+
+            self.assertEquals(
+                datetime.datetime(2015, 01, 01, 2, 15, tzinfo=pytz.timezone('US/Eastern')),
+                datetime.datetime.now(pytz.timezone('US/Eastern')))
+            self.assertEquals(pytz.timezone('US/Eastern'),
+                              datetime.datetime.now(pytz.timezone('US/Eastern')).tzinfo)
+
+    def test_now_without_tz_returns_timezone_naive_datetime(self):
+        freezed = datetime.datetime(2015, 01, 01, 7, 15,
+                                    tzinfo=pytz.timezone('US/Eastern'))
+
+        with freeze(freezed):
+            self.assertEquals(
+                datetime.datetime(2015, 01, 01, 7, 15),
+                datetime.datetime.now())
 
     def test_update_freezed_time_forwards(self):
         with freeze(datetime.datetime(2010, 10, 20)) as clock:
