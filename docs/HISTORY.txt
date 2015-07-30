@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.10.2 (unreleased)
+1.10.2 (2015-07-30)
 -------------------
 
 - Added timezone(`tz`) support for "freeze".
