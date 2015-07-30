@@ -33,7 +33,12 @@ class FreezedClock(object):
         # Manually create a proxy mock class for overwriting "now"
         class datetime_class(datetime):
             @staticmethod
-            def now():
+            def now(tz=None):
+                if not tz:
+                    return self.new_now.replace(tzinfo=None)
+                elif self.new_now.tzinfo != tz:
+                    return tz.normalize(self.new_now.astimezone(tz))
+
                 return self.new_now
             __mocker_object__ = datetime
             __mocker_replace__ = False
@@ -43,7 +48,8 @@ class FreezedClock(object):
 
         # Rebuild the new_now so that it is an instance of the mocked class
         self.new_now = datetime_class(*self.new_now.timetuple()[:-3]
-                                       + (self.new_now.microsecond,))
+                                      + (self.new_now.microsecond,),
+                                      tzinfo=self.new_now.tzinfo)
 
         # Replace "datetime" module
         datetime_module = self.mocker.replace('datetime', spec=False)
