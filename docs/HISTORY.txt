@@ -5,7 +5,11 @@ Changelog
 1.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Freezer: disable freezing while committing to database for preventing pickling errors.
+  [jone]
+
+- Freezer bugfix: replace datetime instances when leaving freeze context manager.
+  [jone]
 
 
 1.10.2 (2015-07-30)
