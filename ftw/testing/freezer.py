@@ -7,12 +7,14 @@ from mocker import Mocker
 from mocker import ProxyReplacer
 import calendar
 import gc
+import transaction
 
 
 class FreezedClock(object):
 
     def __init__(self, new_now):
         self.new_now = new_now
+        self.enabled = False
 
     def forward(self, **kwargs):
         self.new_now = datetime.now() + timedelta(**kwargs)
@@ -65,6 +67,8 @@ class FreezedClock(object):
         expect(time_class()).call(lambda: new_time).count(0, None)
 
         self.mocker.replay()
+        self.enabled = True
+        transaction.get().addBeforeCommitHook(self.transaction_before_commit_hook)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -87,6 +91,24 @@ class FreezedClock(object):
                 continue
             replacement = datetime(*referrer.timetuple()[:6] + (referrer.microsecond,))
             global_replace(referrer, replacement)
+
+        self.enabled = False
+
+    def transaction_before_commit_hook(self):
+        """Since a transaction.commit() will serialize the data, it tries
+        to serialize the datetime mock-class when freezing is active.
+        In order to fix pickling problems while committing we disable the
+        freezing temporarily while committing so that mock-based datetime
+        instances are replaced with real ones.
+        """
+        if not self.enabled:
+            return
+
+        self.__exit__(None, None, None)
+        transaction.get().addAfterCommitHook(self.transaction_after_commit_hook)
+
+    def transaction_after_commit_hook(self, status):
+        self.__enter__()
 
 
 @contextmanager
