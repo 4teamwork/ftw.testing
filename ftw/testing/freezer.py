@@ -2,9 +2,11 @@ from contextlib import contextmanager
 from datetime import datetime
 from datetime import timedelta
 from mocker import expect
+from mocker import global_replace
 from mocker import Mocker
 from mocker import ProxyReplacer
 import calendar
+import gc
 
 
 class FreezedClock(object):
@@ -66,8 +68,25 @@ class FreezedClock(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        datetime_mock_class = datetime
         self.mocker.restore()
         self.mocker.verify()
+
+        # The labix mocker does only replace pointers to the mock-class which
+        # are in dicts.
+        # This does not change the class of instances of our mock-class.
+        # In order to be able to commit while the time is freezed,
+        # we need to replace those classes manually.
+        # Since we cannot patch the class of existing instances,
+        # we need to construct new instances with the real datetime class and
+        # replace all mock instances.
+        for referrer in gc.get_referrers(datetime_mock_class):
+            if not isinstance(referrer, datetime_mock_class):
+                continue
+            if getattr(referrer, '__class__') != datetime_mock_class:
+                continue
+            replacement = datetime(*referrer.timetuple()[:6] + (referrer.microsecond,))
+            global_replace(referrer, replacement)
 
 
 @contextmanager

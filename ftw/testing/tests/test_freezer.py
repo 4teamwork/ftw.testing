@@ -1,9 +1,11 @@
 from DateTime import DateTime
 from ftw.testing import freeze
+from plone.mocktestcase.dummy import Dummy
 from unittest2 import TestCase
 import datetime
 import pytz
 import time
+import transaction
 
 datetime_module = datetime
 datetime_class = datetime.datetime
@@ -134,3 +136,17 @@ class TestFreeze(TestCase):
             clock.forward(hours=1)
             after = datetime.datetime.now()
             self.assertEquals(60 * 60, (after - before).seconds)
+
+    def test_patches_are_removed_from_freezed_instances(self):
+        with freeze():
+            dummy = Dummy(datetime_class=datetime.datetime,
+                          date=datetime.datetime.now())
+
+        self.assertEquals(
+            {'class': 'datetime.datetime',
+             'instance': 'datetime.datetime'},
+
+            {'class': '.'.join((dummy.datetime_class.__module__,
+                                dummy.datetime_class.__name__)),
+             'instance': '.'.join((type(dummy.date).__module__,
+                                   type(dummy.date).__name__))})

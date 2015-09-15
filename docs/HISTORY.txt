@@ -5,7 +5,8 @@ Changelog
 1.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Freezer bugfix: replace datetime instances when leaving freeze context manager.
+  [jone]
 
 
 1.10.2 (2015-07-30)
