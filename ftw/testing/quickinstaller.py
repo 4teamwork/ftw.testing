@@ -24,7 +24,8 @@ class QuickInstallerSnapshots(object):
         self._current_version = 'original'
         self._functions = {}
 
-        self._prepare(events.handleBeforeProfileImportEvent, noop_event_handler)
+        self._prepare(events.handleBeforeProfileImportEvent,
+                      noop_event_handler)
         self._prepare(events.handleProfileImportedEvent, noop_event_handler)
 
     def is_enabled(self):

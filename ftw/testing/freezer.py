@@ -68,7 +68,8 @@ class FreezedClock(object):
 
         self.mocker.replay()
         self.enabled = True
-        transaction.get().addBeforeCommitHook(self.transaction_before_commit_hook)
+        transaction.get().addBeforeCommitHook(
+            self.transaction_before_commit_hook)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -89,7 +90,8 @@ class FreezedClock(object):
                 continue
             if getattr(referrer, '__class__') != datetime_mock_class:
                 continue
-            replacement = datetime(*referrer.timetuple()[:6] + (referrer.microsecond,))
+            replacement = datetime(*referrer.timetuple()[:6] + (
+                referrer.microsecond,))
             global_replace(referrer, replacement)
 
         self.enabled = False
@@ -105,7 +107,8 @@ class FreezedClock(object):
             return
 
         self.__exit__(None, None, None)
-        transaction.get().addAfterCommitHook(self.transaction_after_commit_hook)
+        transaction.get().addAfterCommitHook(
+            self.transaction_after_commit_hook)
 
     def transaction_after_commit_hook(self, status):
         self.__enter__()

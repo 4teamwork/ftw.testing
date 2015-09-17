@@ -53,7 +53,6 @@ CURRENT_BROWSER_INSTANCE = None
 BROWSER_CACHE = {}
 
 
-
 def javascript(func):
     """Decorator for marking a test method to require javascript.
     """

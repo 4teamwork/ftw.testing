@@ -1,6 +1,4 @@
 from Acquisition import aq_inner, aq_parent
-from Products.CMFCore import utils
-from Products.CMFCore.utils import getToolByName
 from ftw.testing.testcase import MockTestCase
 from unittest2 import TestResult
 from zope.interface import Interface

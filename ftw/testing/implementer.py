@@ -21,7 +21,8 @@ class Implementer(object):
         class Implementation(object):
             pass
 
-        Implementation.__name__ = 'Implementation: %s' % self.interface.__name__
+        Implementation.__name__ = 'Implementation: %s' % (
+            self.interface.__name__)
         return Implementation
 
     def _add_attributes(self, impl):

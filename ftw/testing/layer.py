@@ -120,6 +120,7 @@ interpreter = py
 {versions}
 """
 
+
 class ConsoleScriptLayer(Layer):
 
     def __init__(self,
@@ -130,7 +131,9 @@ class ConsoleScriptLayer(Layer):
                  name=None,
                  module=None):
 
-        super(ConsoleScriptLayer, self).__init__(bases=bases, name=name, module=module)
+        super(ConsoleScriptLayer, self).__init__(bases=bases,
+                                                 name=name,
+                                                 module=module)
         self.package_name = package_name
         self.extras = extras
         self.buildout_template = buildout_template

@@ -51,7 +51,7 @@ class MockMailHost(DefaultMockMailHost):
 
         result = dict()
         for each in self.messages:
-            if not each.mfrom in result:
+            if each.mfrom not in result:
                 result[each.mfrom] = []
             result[each.mfrom].append(each.messageText)
         return result
@@ -63,7 +63,7 @@ class MockMailHost(DefaultMockMailHost):
         result = dict()
         for each in self.messages:
             for recipient in each.mto:
-                if not recipient in result:
+                if recipient not in result:
                     result[recipient] = []
                 result[recipient].append(each.messageText)
         return result

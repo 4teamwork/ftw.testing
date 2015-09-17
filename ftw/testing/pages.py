@@ -187,7 +187,8 @@ class Plone(PageObject):
 
         info_messages = map(item_to_text, messages['info'])
 
-        # remove the empty & invisble KSS info message - we never should assert it.
+        # remove the empty & invisble KSS info message - we never should
+        # assert it.
         if '' in info_messages:
             info_messages.remove('')
 
@@ -381,9 +382,10 @@ class ATFormPage(FormPage):
                         continue
 
                 label_node = div.find_by_css('label, .formQuestion').first
-                # Use ._element for getting the lxml representation, of which the
-                # .text does not include childrens. This is necessary because we
-                # have no seperate tag for the label.
+                # Use ._element for getting the lxml representation,
+                # of which the  .text does not include childrens.
+                # This is necessary because we have
+                # no seperate tag for the label.
                 label = label_node._element.text.strip()
                 fields.append({
                         'label': label,
