@@ -53,7 +53,7 @@ setup(name='ftw.testing',
       zip_safe=False,
 
       install_requires=[
-        'forbiddenfruit',
+        'forbiddenfruit>=0.1.2',
         'path.py',
         'plone.app.testing',
         'plone.mocktestcase',
