@@ -594,7 +594,7 @@ console scripts. You may put the dependency into your ``tests`` extras require.
 Compatibility
 -------------
 
-Runs with `Plone <http://www.plone.org/>`_ `4.1`, `4.2` or `4.3`.
+Runs with `Plone <http://www.plone.org/>`_ `4.2` or `4.3`.
 
 
 Links
