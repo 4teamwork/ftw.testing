@@ -12,7 +12,6 @@ extras_require = {
         'cssselect']}
 
 tests_require = [
-    'Acquisition<4.0a1',
     'Plone',
     'plone.app.dexterity',
     'zc.recipe.egg',
