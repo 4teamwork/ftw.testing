@@ -1,24 +1,28 @@
-from ftw.testing import FunctionalSplinterTesting
+from ftw.testing import IS_PLONE_5
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import applyProfile
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing.layers import FunctionalTesting
 from zope.configuration import xmlconfig
 
 
 snapshots.disable()
 
 
-class PageObjectLayer(PloneSandboxLayer):
+class TestingLayer(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        import plone.app.dexterity
-        xmlconfig.file('configure.zcml',
-                       plone.app.dexterity,
-                       context=configurationContext)
+        xmlconfig.string(
+            '<configure xmlns="http://namespaces.zope.org/zope">'
+            '  <include package="z3c.autoinclude" file="meta.zcml" />'
+            '  <includePlugins package="plone" />'
+            '  <includePluginsOverrides package="plone" />'
+            '</configure>',
+            context=configurationContext)
 
         import ftw.testing.tests
         xmlconfig.file('profiles/dxtype.zcml',
@@ -30,11 +34,13 @@ class PageObjectLayer(PloneSandboxLayer):
                        context=configurationContext)
 
     def setUpPloneSite(self, portal):
-        applyProfile(
-            portal, 'ftw.testing.tests:dxtype')
+        applyProfile(portal, 'ftw.testing.tests:dxtype')
+
+        if IS_PLONE_5:
+            applyProfile(portal, 'plone.app.contenttypes:default')
 
 
-PAGE_OBJECT_FIXTURE = PageObjectLayer()
-PAGE_OBJECT_FUNCTIONAL = FunctionalSplinterTesting(
-    bases=(PAGE_OBJECT_FIXTURE, PLONE_ZSERVER, ),
-    name="ftw.testing:pageobject:functional")
+FTW_TESTING_FIXTURE = TestingLayer()
+FTW_TESTING_FUNCTIONAL = FunctionalTesting(
+    bases=(FTW_TESTING_FIXTURE, PLONE_ZSERVER, ),
+    name="ftw.testing:functional")

@@ -4,19 +4,12 @@ import os
 version = '1.11.1.dev0'
 maintainer = 'Jonas Baumann'
 
-extras_require = {
-    'splinter': [
-        'plone.app.testing',
-        'splinter >= 0.5.1',
-        'lxml',
-        'cssselect']}
-
+extras_require = {}
 tests_require = [
-    'Acquisition<4.0a1',
     'Plone',
     'plone.app.dexterity',
     'zc.recipe.egg',
-    ] + extras_require['splinter']
+    ]
 
 extras_require['tests'] = tests_require
 
@@ -35,6 +28,7 @@ setup(name='ftw.testing',
         'Framework :: Plone',
         'Framework :: Plone :: 4.2',
         'Framework :: Plone :: 4.3',
+        'Framework :: Plone :: 5.1',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],

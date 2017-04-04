@@ -1,13 +1,13 @@
 from Products.MailHost.interfaces import IMailHost
 from ftw.testing.mailing import Mailing
-from ftw.testing.testing import PAGE_OBJECT_FUNCTIONAL
+from ftw.testing.testing import FTW_TESTING_FUNCTIONAL
 from unittest2 import TestCase
 from zope.component import getUtility
 
 
 class TestMailing(TestCase):
 
-    layer = PAGE_OBJECT_FUNCTIONAL
+    layer = FTW_TESTING_FUNCTIONAL
 
     def setUp(self):
         self.mailing = Mailing(self.layer['portal'])
