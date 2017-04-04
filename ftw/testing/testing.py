@@ -1,3 +1,4 @@
+from ftw.testing import IS_PLONE_5
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import applyProfile
 from plone.app.testing import PLONE_FIXTURE
@@ -15,10 +16,13 @@ class TestingLayer(PloneSandboxLayer):
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        import plone.app.dexterity
-        xmlconfig.file('configure.zcml',
-                       plone.app.dexterity,
-                       context=configurationContext)
+        xmlconfig.string(
+            '<configure xmlns="http://namespaces.zope.org/zope">'
+            '  <include package="z3c.autoinclude" file="meta.zcml" />'
+            '  <includePlugins package="plone" />'
+            '  <includePluginsOverrides package="plone" />'
+            '</configure>',
+            context=configurationContext)
 
         import ftw.testing.tests
         xmlconfig.file('profiles/dxtype.zcml',
@@ -30,8 +34,10 @@ class TestingLayer(PloneSandboxLayer):
                        context=configurationContext)
 
     def setUpPloneSite(self, portal):
-        applyProfile(
-            portal, 'ftw.testing.tests:dxtype')
+        applyProfile(portal, 'ftw.testing.tests:dxtype')
+
+        if IS_PLONE_5:
+            applyProfile(portal, 'plone.app.contenttypes:default')
 
 
 FTW_TESTING_FIXTURE = TestingLayer()
