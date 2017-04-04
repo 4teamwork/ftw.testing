@@ -1,3 +1,5 @@
+from datetime import datetime
+from ftw.testing import IS_PLONE_5
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import login
@@ -6,9 +8,11 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
+from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import installProduct
 from Products.CMFCore.utils import getToolByName
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from zope.component import getUtility
 from zope.configuration import xmlconfig
 
 
@@ -83,6 +87,8 @@ class GenericSetupUninstallMixin(object):
     install_profile_name = 'default'
     skip_files = ()
 
+    datetime = datetime.now()
+
     def _make_profile_name(self, name):
         return 'profile-{0}:{1}'.format(self.package, name)
 
@@ -120,11 +126,19 @@ class GenericSetupUninstallMixin(object):
         self.setup_tool.runAllImportStepsFromProfile(self.uninstall_profile_id)
 
     def _create_before_snapshot(self, id_='before-install'):
+        self._prepare_registry()
         self.setup_tool.createSnapshot(id_)
 
     def _create_after_shapshot(self, id_='after-uninstall'):
+        self._prepare_registry()
         self.setup_tool.createSnapshot(id_)
 
+    def _prepare_registry(self):
+        if IS_PLONE_5:
+            registry = getUtility(IRegistry)
+            registry.records['plone.resources.last_legacy_import'].value = self.datetime
+            registry.records['plone.bundles/plone-legacy.last_compilation'].value = self.datetime
+        
     def assertSnapshotsEqual(self, before_id='before-install',
                              after_id='after-uninstall',
                              msg=None):
@@ -154,7 +168,7 @@ class GenericSetupUninstallMixin(object):
         self._create_after_shapshot()
 
         self.assertSnapshotsEqual(
-                msg='Quickinstaller seems not to uninstall everything.')
+            msg='Quickinstaller seems not to uninstall everything.')
 
     def test_setup_tool_uninstall_profile_removes_resets_configuration(self):
         self._install_dependencies()
@@ -166,7 +180,7 @@ class GenericSetupUninstallMixin(object):
         self._create_after_shapshot()
 
         self.assertSnapshotsEqual(
-                msg='The uninstall profile seems not to uninstall everything.')
+            msg='The uninstall profile seems not to uninstall everything.')
 
     def test_uninstall_method_is_available(self):
         product = InstalledProduct(self.package)
