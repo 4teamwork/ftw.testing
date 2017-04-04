@@ -13,3 +13,6 @@ except pkg_resources.DistributionNotFound:
 else:
     from ftw.testing.browser import FunctionalSplinterTesting
     from ftw.testing.browser import browser
+
+
+IS_PLONE_5 = pkg_resources.get_distribution('Plone').version >= '5'
