@@ -63,24 +63,18 @@ class TestFreeze(TestCase):
             ' instance, got int')
 
     def test_handles_tzinfo_correctly(self):
-        with freeze(datetime.datetime(2015, 01, 01, 7, 15, tzinfo=pytz.UTC)):
+        with freeze(datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC)):
             self.assertEquals(
-                datetime.datetime(2015, 01, 01, 7, 15, tzinfo=pytz.UTC),
+                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC),
                 datetime.datetime.now(pytz.UTC))
 
-            self.assertEquals(
-                datetime.datetime(2015, 01, 01, 2, 15, tzinfo=pytz.timezone('US/Eastern')),
-                datetime.datetime.now(pytz.timezone('US/Eastern')))
-            self.assertEquals(pytz.timezone('US/Eastern'),
-                              datetime.datetime.now(pytz.timezone('US/Eastern')).tzinfo)
-
     def test_now_without_tz_returns_timezone_naive_datetime(self):
-        freezed = datetime.datetime(2015, 01, 01, 7, 15,
+        freezed = datetime.datetime(2015, 1, 1, 7, 15,
                                     tzinfo=pytz.timezone('US/Eastern'))
 
         with freeze(freezed):
             self.assertEquals(
-                datetime.datetime(2015, 01, 01, 7, 15),
+                datetime.datetime(2015, 1, 1, 7, 15),
                 datetime.datetime.now())
 
     def test_update_freezed_time_forwards(self):
