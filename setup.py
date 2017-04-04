@@ -4,18 +4,12 @@ import os
 version = '1.11.1.dev0'
 maintainer = 'Jonas Baumann'
 
-extras_require = {
-    'splinter': [
-        'plone.app.testing',
-        'splinter >= 0.5.1',
-        'lxml',
-        'cssselect']}
-
+extras_require = {}
 tests_require = [
     'Plone',
     'plone.app.dexterity',
     'zc.recipe.egg',
-    ] + extras_require['splinter']
+    ]
 
 extras_require['tests'] = tests_require
 

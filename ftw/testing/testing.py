@@ -1,16 +1,16 @@
-from ftw.testing import FunctionalSplinterTesting
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import applyProfile
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing.layers import FunctionalTesting
 from zope.configuration import xmlconfig
 
 
 snapshots.disable()
 
 
-class PageObjectLayer(PloneSandboxLayer):
+class TestingLayer(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
 
@@ -34,7 +34,7 @@ class PageObjectLayer(PloneSandboxLayer):
             portal, 'ftw.testing.tests:dxtype')
 
 
-PAGE_OBJECT_FIXTURE = PageObjectLayer()
-PAGE_OBJECT_FUNCTIONAL = FunctionalSplinterTesting(
-    bases=(PAGE_OBJECT_FIXTURE, PLONE_ZSERVER, ),
-    name="ftw.testing:pageobject:functional")
+FTW_TESTING_FIXTURE = TestingLayer()
+FTW_TESTING_FUNCTIONAL = FunctionalTesting(
+    bases=(FTW_TESTING_FIXTURE, PLONE_ZSERVER, ),
+    name="ftw.testing:functional")

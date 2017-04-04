@@ -5,6 +5,8 @@ Changelog
 1.11.1 (unreleased)
 -------------------
 
+- Support Plone 5.1 [mathias.leimgruber, jone]
+- Remove splinter browser. Use ftw.testbrowser instead. [mathias.leimgruber, jone]
 - Drop Plone 4.1 support. [jone]
 
 
