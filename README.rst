@@ -353,6 +353,39 @@ the snapshots can be re-enabled for a context manager or in general:
       # snapshotting is disabled only within this block
 
 
+Transaction interceptor
+-----------------------
+
+The ``TransactionInterceptor`` patches Zope's transaction manager in
+order to prevent code from interacting with the transaction.
+
+This can be used for example for making sure that no tests commit transactions
+when they are running on an integration testing layer.
+
+The interceptor needs to be installed manually with ``install()`` and removed
+at the end with ``uninstall()``. It is the users responsibility to ensure
+proper uninstallation.
+
+When the interceptor is installed, it is not yet active and passes through all
+calls.
+The intercepting begins with ``intercept()`` and ends when ``clear()`` is
+called.
+
+.. code:: python
+
+    from ftw.testing import TransactionInterceptor
+
+    interceptor = TransactionInterceptor().install()
+    try:
+        interceptor.intercept(interceptor.BEGIN | interceptor.COMMIT
+                              | interceptor.ABORT)
+        # ...
+        interceptor.clear()
+        transaction.abort()
+    finally:
+        interceptor.uninstall()
+
+
 Testing Layers
 --------------
 

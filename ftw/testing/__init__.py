@@ -2,6 +2,7 @@ from ftw.testing.freezer import freeze
 from ftw.testing.layer import ComponentRegistryLayer
 from ftw.testing.staticuids import staticuid
 from ftw.testing.testcase import MockTestCase
+from ftw.testing.transaction_interceptor import TransactionInterceptor
 import pkg_resources
 
 
