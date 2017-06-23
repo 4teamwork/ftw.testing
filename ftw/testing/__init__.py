@@ -6,4 +6,4 @@ from ftw.testing.transaction_interceptor import TransactionInterceptor
 import pkg_resources
 
 
-IS_PLONE_5 = pkg_resources.get_distribution('Plone').version >= '5'
+IS_PLONE_5 = pkg_resources.get_distribution('Products.CMFPlone').version >= '5'

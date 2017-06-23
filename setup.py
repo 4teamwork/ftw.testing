@@ -6,7 +6,6 @@ maintainer = 'Jonas Baumann'
 
 extras_require = {}
 tests_require = [
-    'Plone',
     'plone.app.dexterity',
     'zc.recipe.egg',
     ]
