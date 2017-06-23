@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.13.1 (unreleased)
+1.14.0 (2017-06-23)
 -------------------
 
 - Do not require "Plone" egg. [jone]
