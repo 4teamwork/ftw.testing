@@ -83,6 +83,7 @@ class TransactionInterceptor(object):
 
     def stop_savepoint_simulation(self):
         self._savepoint_simulation = False
+        self._savepoint = None
 
     @contextmanager
     def savepoint_simulation(self):

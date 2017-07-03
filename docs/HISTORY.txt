@@ -5,7 +5,7 @@ Changelog
 1.15.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix savepoint simulation to cleanup savepoints. [jone]
 
 
 1.15.0 (2017-07-03)
