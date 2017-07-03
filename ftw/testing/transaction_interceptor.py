@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from ftw.testing.exceptions import Intercepted
 import transaction
 
@@ -17,6 +18,10 @@ class TransactionInterceptor(object):
     calls.
     The intercepting begins with ``intercept()`` and ends when ``clear()`` is
     called.
+
+    The intercepter can also simluate a transaction with a savepoint.
+    The savepoint simulation mode creates a savepoint when ``begin()`` is called
+    and rolls it back on an ``abort()``.
     """
 
     BEGIN = 1
@@ -26,6 +31,8 @@ class TransactionInterceptor(object):
     def __init__(self):
         self._intercepting = 0
         self._manager = None
+        self._savepoint_simulation = False
+        self._savepoint = None
 
     def install(self):
         """Patch the interceptor into Zope's transaction module.
@@ -71,24 +78,60 @@ class TransactionInterceptor(object):
         self._intercepting |= methods
         return self
 
+    def begin_savepoint_simulation(self):
+        self._savepoint_simulation = True
+
+    def stop_savepoint_simulation(self):
+        self._savepoint_simulation = False
+
+    @contextmanager
+    def savepoint_simulation(self):
+        self.begin_savepoint_simulation()
+        try:
+            yield self
+        finally:
+            self.stop_savepoint_simulation()
+
     def clear(self):
         self._intercepting = 0
         return self
 
     def begin(self):
-        if self._intercepting & self.BEGIN:
+        if self._savepoint_simulation:
+            if self._savepoint:
+                self._savepoint.rollback()
+            else:
+                self._savepoint = self._manager.savepoint()
+                return self.get()
+        elif self._intercepting & self.BEGIN:
             raise Intercepted('Not allowed to transaction.begin() at the moment.')
-        return self._manager.begin()
+        else:
+            return self._manager.begin()
 
     def commit(self):
-        if self._intercepting & self.COMMIT:
+        if self._savepoint_simulation:
+            if self._savepoint:
+                self._savepoint = None
+                self.begin()
+            else:
+                raise Intercepted('Cannot commit() before begin()')
+        elif self._intercepting & self.COMMIT:
             raise Intercepted('Not allowed to transaction.commit() at the moment.')
-        return self._manager.commit()
+        else:
+            return self._manager.commit()
 
     def abort(self):
-        if self._intercepting & self.ABORT:
+        if self._savepoint_simulation:
+            if self._savepoint:
+                self._savepoint.rollback()
+                self._savepoint = None
+                self.begin()
+            else:
+                raise Intercepted('Cannot abort() before begin()')
+        elif self._intercepting & self.ABORT:
             raise Intercepted('Not allowed to transaction.abort() at the moment.')
-        return self._manager.abort()
+        else:
+            return self._manager.abort()
 
     def get(self):
         return TransactionWrapper(self._manager.get(), self)

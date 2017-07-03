@@ -5,7 +5,7 @@ Changelog
 1.14.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add savepoint simulation to transaction interceptor. [jone]
 
 
 1.14.0 (2017-06-23)

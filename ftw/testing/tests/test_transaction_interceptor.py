@@ -8,6 +8,9 @@ import transaction
 class TestTransactionInterceptor(TestCase):
     layer = FTW_TESTING_FUNCTIONAL
 
+    def setUp(self):
+        self.portal = self.layer['portal']
+
     def tearDown(self):
         if hasattr(transaction.manager, 'uninstall'):
             transaction.manager.uninstall()
@@ -118,3 +121,86 @@ class TestTransactionInterceptor(TestCase):
         self.assertEqual('Cannot install TransactionInterceptor,'
                          ' there is already one installed.',
                          str(cm.exception))
+
+    def test_savepoint_simulation_abort(self):
+        """Aborting in savepoint simulation rolls back to the last begin state.
+        """
+        self.portal.foo = 'One'
+        interceptor = TransactionInterceptor().install()
+        interceptor.begin_savepoint_simulation()
+        transaction.begin()
+        self.portal.foo = 'Two'
+        self.assertEquals('Two', self.portal.foo)
+
+        transaction.abort()
+        self.assertEquals('One', self.portal.foo)
+
+    def test_savepoint_simulation_abort_without_begin(self):
+        """An error occurs when aborting without beginning.
+        """
+        interceptor = TransactionInterceptor().install()
+        interceptor.begin_savepoint_simulation()
+        with self.assertRaises(Intercepted):
+            interceptor.abort()
+
+    def test_savepoint_simulation_commit(self):
+        """Committing in savepoint simulation does not commit nor fail.
+        """
+        self.portal.foo = 'One'
+        interceptor = TransactionInterceptor().install()
+        interceptor.begin_savepoint_simulation()
+        transaction.begin()
+        self.portal.foo = 'Two'
+        self.assertEquals('Two', self.portal.foo)
+        transaction.commit()
+        self.assertEquals('Two', self.portal.foo)
+
+        interceptor.uninstall()
+        transaction.begin()  # reset to actual committed state
+        self.assertFalse(hasattr(self.portal, 'foo'))
+
+    def test_savepoint_simulation_commit_without_begin(self):
+        """An error occurs when commiting without beginning.
+        """
+        interceptor = TransactionInterceptor().install()
+        interceptor.begin_savepoint_simulation()
+        with self.assertRaises(Intercepted):
+            interceptor.commit()
+
+    def test_savepoint_simulation_two_begins(self):
+        """A begin should abort existing transactions when there is one.
+        """
+        self.portal.foo = 'One'
+        interceptor = TransactionInterceptor().install()
+        interceptor.begin_savepoint_simulation()
+        transaction.begin()
+        self.portal.foo = 'Two'
+        self.assertEquals('Two', self.portal.foo)
+        transaction.begin()
+        self.assertEquals('One', self.portal.foo)
+
+    def test_savepoint_simulation_while_intercepting(self):
+        """When the interceptor is configured to intercept, it will
+        keep intercepting after an intermediate savepoint simulation is stopped.
+        """
+        interceptor = TransactionInterceptor().install()
+        interceptor.intercept(interceptor.COMMIT)
+
+        interceptor.begin_savepoint_simulation()
+        transaction.begin()
+        transaction.commit()
+        interceptor.stop_savepoint_simulation()
+
+        with self.assertRaises(Intercepted):
+            transaction.commit()
+
+    def test_savepoint_simulation_as_context_manager(self):
+        interceptor = TransactionInterceptor().install()
+        interceptor.intercept(interceptor.COMMIT)
+
+        with interceptor.savepoint_simulation():
+            transaction.begin()
+            transaction.commit()
+
+        with self.assertRaises(Intercepted):
+            transaction.commit()
