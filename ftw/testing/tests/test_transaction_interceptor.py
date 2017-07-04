@@ -204,3 +204,13 @@ class TestTransactionInterceptor(TestCase):
 
         with self.assertRaises(Intercepted):
             transaction.commit()
+
+    def test_savepoint_simulation_resets_savepoint_on_exit(self):
+        interceptor = TransactionInterceptor().install()
+        interceptor.intercept(interceptor.COMMIT)
+
+        with interceptor.savepoint_simulation():
+            transaction.begin()
+            self.assertTrue(interceptor._savepoint)
+
+        self.assertIsNone(interceptor._savepoint)
