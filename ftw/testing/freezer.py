@@ -13,12 +13,12 @@ class FreezedClock(object):
         self.new_now = new_now
 
     def forward(self, **kwargs):
-        self.new_now = datetime.now() + timedelta(**kwargs)
+        self.new_now += timedelta(**kwargs)
         self.__exit__(None, None, None)
         self.__enter__()
 
     def backward(self, **kwargs):
-        self.new_now = datetime.now() - timedelta(**kwargs)
+        self.new_now -= timedelta(**kwargs)
         self.__exit__(None, None, None)
         self.__enter__()
 

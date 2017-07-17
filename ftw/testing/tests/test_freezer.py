@@ -63,7 +63,17 @@ class TestFreeze(TestCase):
             ' instance, got int')
 
     def test_handles_tzinfo_correctly(self):
-        with freeze(datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC)):
+        with freeze(datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC)) as clock:
+            self.assertEquals(
+                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC),
+                datetime.datetime.now(pytz.UTC))
+
+            clock.forward(days=1)
+            self.assertEquals(
+                datetime.datetime(2015, 1, 2, 7, 15, tzinfo=pytz.UTC),
+                datetime.datetime.now(pytz.UTC))
+
+            clock.backward(days=1)
             self.assertEquals(
                 datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC),
                 datetime.datetime.now(pytz.UTC))
