@@ -25,7 +25,7 @@ class TestFreeze(TestCase):
 
     def test_time_module_is_patched(self):
         the_date = datetime.datetime(2010, 10, 20)
-        the_time = 1287529200.0
+        the_time = time.mktime(the_date.timetuple())
 
         self.assertLess(the_time, time_module.time())
         with freeze(the_date):
@@ -35,7 +35,7 @@ class TestFreeze(TestCase):
 
     def test_time_function_is_patched(self):
         the_date = datetime.datetime(2010, 10, 20)
-        the_time = 1287529200.0
+        the_time = time.mktime(the_date.timetuple())
 
         self.assertLess(the_time, time_function())
         with freeze(the_date):
@@ -101,6 +101,18 @@ class TestFreeze(TestCase):
             clock.forward(hours=1)
             after = datetime.datetime.now()
             self.assertEquals(60 * 60, (after - before).seconds)
+
+    def test_today_is_now_in_summer(self):
+        now = datetime.datetime(2010, 6, 1)
+        with freeze(now):
+            self.assertEquals(now, datetime.datetime.now())
+            self.assertEquals(now, datetime.datetime.today())
+
+    def test_today_is_now_in_winter(self):
+        now = datetime.datetime(2010, 12, 1)
+        with freeze(now):
+            self.assertEquals(now, datetime.datetime.now())
+            self.assertEquals(now, datetime.datetime.today())
 
 
 class TestFreezeIntegration(TestCase):
