@@ -4,7 +4,7 @@ from datetime import timedelta
 from forbiddenfruit import curse
 from mocker import expect
 from mocker import Mocker
-import calendar
+from time import mktime
 
 
 class FreezedClock(object):
@@ -45,9 +45,7 @@ class FreezedClock(object):
         curse(datetime, 'now', freezed_now)
 
         # Replace "time.time" function
-        new_time = (calendar.timegm(self.new_now.timetuple()) +
-                    (self.new_now.timetuple().tm_isdst * 60 * 60) +
-                    (self.new_now.microsecond * 0.000001))
+        new_time = mktime(self.new_now.timetuple())
         time_class = self.mocker.replace('time.time')
         expect(time_class()).call(lambda: new_time).count(0, None)
 
