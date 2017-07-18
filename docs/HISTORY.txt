@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.15.2 (unreleased)
+1.15.2 (2017-07-18)
 -------------------
 
 - Freezer: keep timezone info when moving clock forward / backward. [jone]
