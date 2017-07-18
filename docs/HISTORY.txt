@@ -5,7 +5,7 @@ Changelog
 1.15.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Freezer: Fix DST-bug in today() and time(). [jone]
 
 
 1.15.1 (2017-07-04)
