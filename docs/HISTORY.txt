@@ -5,6 +5,7 @@ Changelog
 1.15.2 (unreleased)
 -------------------
 
+- Freezer: keep timezone info when moving clock forward / backward. [jone]
 - Freezer: Fix DST-bug in today() and time(). [jone]
 
 
