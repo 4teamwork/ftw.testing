@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.15.3 (unreleased)
+1.16.0 (2017-08-08)
 -------------------
 
 - Support Plone 5.1 for ConsoleScriptLayer. [jone]
