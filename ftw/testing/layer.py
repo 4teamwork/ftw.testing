@@ -204,6 +204,8 @@ class ConsoleScriptLayer(Layer):
         if getFSVersionTuple() < (4, 3):
             self.resolve_dependency_versions('manuel', dependencies)
             self.resolve_dependency_versions('zope.hookable', dependencies)
+        if getFSVersionTuple() > (5, 1):
+            self.resolve_dependency_versions('zope.untrustedpython', dependencies)
         return dependencies
 
     def resolve_dependency_versions(self, pkgname, result=None, extras=()):
