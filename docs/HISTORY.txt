@@ -5,8 +5,7 @@ Changelog
 1.16.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Add ``FTWIntegrationTesting`` and ``FTWIntegrationTestCase``. [jone]
 
 1.16.0 (2017-08-08)
 -------------------

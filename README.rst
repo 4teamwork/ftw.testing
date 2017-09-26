@@ -7,6 +7,74 @@ This package provides helpers for writing tests.
 .. contents:: Table of Contents
 
 
+IntegrationTesting
+------------------
+
+FTWIntegrationTesting layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``FTWIntegrationTesting`` is an opinionated extension of Plone's
+default integration testing layer.
+
+The primary goal is to be able to run ``ftw.testbrowser``s traversal
+driver with integration testing.
+
+**Database isolation and transactions**
+
+The Plone default integration testing layer does support transactions:
+when changes are committed in tests, no isolation is provided
+and the committed changes will apear in the next layer.
+
+- We isolate between tests by making a savepoint in the test setup and
+  rolling back to the savepoint in test tear down.
+- With a transaction interceptor we make sure that no code in the test
+  can commit or abort a transaction. Transactional behavior is simulated
+  by using savepoints.
+
+
+**Usage example:**
+
+.. code:: python
+
+    from ftw.testing import FTWIntegrationTesting
+    from plone.app.testing import PLONE_FIXTURE
+    from plone.app.testing import PloneSandboxLayer
+
+    class TestingLayer(PloneSandboxLayer):
+        defaultBases = (PLONE_FIXTURE,)
+
+
+    TESTING_FIXTURE = TestingLayer()
+    INTEGRATION_TESTING = FTWIntegrationTesting(
+        bases=(TESTING_FIXTURE,),
+        name='my.package:integration')
+
+
+
+FTWIntegrationTestCase
+~~~~~~~~~~~~~~~~~~~~~~
+
+The integration test case is an test case base class providing sane defaults
+and practical helpers for testing Plone addons with an ``FTWIntegrationTesting``
+testing layer.
+
+You may make your own base class in your package, setting the default testing
+layer and extending the behavior and helpers for your needs.
+
+
+**Usage example:**
+
+.. code:: python
+
+    # my/package/tests/test_case.py
+    from ftw.testing import FTWIntegrationTestCase
+    from my.package.testing import INTEGRATION_TESTING
+
+    class IntegrationTestCase(FTWIntegrationTestCase):
+        layer = INTEGRATION_TESTING
+
+
+
 MockTestCase
 ------------
 

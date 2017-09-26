@@ -1,3 +1,4 @@
+from ftw.testing import FTWIntegrationTesting
 from ftw.testing import IS_PLONE_5
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import applyProfile
@@ -44,3 +45,6 @@ FTW_TESTING_FIXTURE = TestingLayer()
 FTW_TESTING_FUNCTIONAL = FunctionalTesting(
     bases=(FTW_TESTING_FIXTURE, PLONE_ZSERVER, ),
     name="ftw.testing:functional")
+FTW_TESTING_INTEGRATION = FTWIntegrationTesting(
+    bases=(FTW_TESTING_FIXTURE, ),
+    name="ftw.testing:integration")
