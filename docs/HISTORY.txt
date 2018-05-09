@@ -5,7 +5,7 @@ Changelog
 1.17.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Also freeze ``datetime.utcnow()``. [Rotonen]
 
 
 1.17.0 (2017-10-02)
