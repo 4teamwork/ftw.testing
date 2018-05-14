@@ -20,7 +20,7 @@ class TestFreeze(TestCase):
         self.assertLess(the_date, datetime.datetime.now())
         with freeze(the_date):
             self.assertEquals(the_date, datetime.datetime.now(),
-                              'Existing dateitme MODULE pointers are not patched.')
+                              'Existing datetime MODULE pointers are not patched.')
         self.assertLess(the_date, datetime.datetime.now())
 
     def test_datetime_utcnow_is_patched(self):
@@ -29,7 +29,7 @@ class TestFreeze(TestCase):
         self.assertLess(the_date, datetime.datetime.utcnow())
         with freeze(the_date):
             self.assertEquals(the_date, datetime.datetime.utcnow(),
-                              'Existing dateitme MODULE pointers are not patched.')
+                              'Existing datetime MODULE pointers are not patched.')
         self.assertLess(the_date, datetime.datetime.utcnow())
 
     def test_time_module_is_patched(self):
