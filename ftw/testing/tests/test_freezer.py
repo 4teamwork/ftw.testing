@@ -20,8 +20,17 @@ class TestFreeze(TestCase):
         self.assertLess(the_date, datetime.datetime.now())
         with freeze(the_date):
             self.assertEquals(the_date, datetime.datetime.now(),
-                              'Existing dateitme MODULE pointers are not patched.')
+                              'Existing datetime MODULE pointers are not patched.')
         self.assertLess(the_date, datetime.datetime.now())
+
+    def test_datetime_utcnow_is_patched(self):
+        the_date = datetime.datetime(2010, 10, 20)
+
+        self.assertLess(the_date, datetime.datetime.utcnow())
+        with freeze(the_date):
+            self.assertEquals(the_date, datetime.datetime.utcnow(),
+                              'Existing datetime MODULE pointers are not patched.')
+        self.assertLess(the_date, datetime.datetime.utcnow())
 
     def test_time_module_is_patched(self):
         the_date = datetime.datetime(2010, 10, 20)
@@ -63,20 +72,27 @@ class TestFreeze(TestCase):
             ' instance, got int')
 
     def test_handles_tzinfo_correctly(self):
-        with freeze(datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC)) as clock:
-            self.assertEquals(
-                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC),
-                datetime.datetime.now(pytz.UTC))
+        dt_naive = datetime.datetime(2018, 5, 9, 18, 15)
+        dt_naive_plusone = datetime.datetime(2018, 5, 10, 18, 15)
 
-            clock.forward(days=1)
-            self.assertEquals(
-                datetime.datetime(2015, 1, 2, 7, 15, tzinfo=pytz.UTC),
-                datetime.datetime.now(pytz.UTC))
+        for timezone in (pytz.UTC, pytz.timezone('US/Eastern'), pytz.timezone('Europe/Zurich'), ):
+            dt = dt_naive.replace(tzinfo=timezone)
+            dt_utc = pytz.UTC.normalize(dt.astimezone(pytz.UTC))
 
-            clock.backward(days=1)
-            self.assertEquals(
-                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.UTC),
-                datetime.datetime.now(pytz.UTC))
+            dt_plusone = dt_naive_plusone.replace(tzinfo=timezone)
+            dt_plusone_utc = pytz.UTC.normalize(dt_plusone.astimezone(pytz.UTC))
+
+            with freeze(dt) as clock:
+                self.assertEquals(dt, datetime.datetime.now(timezone))
+                self.assertEquals(dt_utc, datetime.datetime.utcnow())
+
+                clock.forward(days=1)
+                self.assertEquals(dt_plusone, datetime.datetime.now(timezone))
+                self.assertEquals(dt_plusone_utc, datetime.datetime.utcnow())
+
+                clock.backward(days=1)
+                self.assertEquals(dt, datetime.datetime.now(timezone))
+                self.assertEquals(dt_utc, datetime.datetime.utcnow())
 
     def test_now_without_tz_returns_timezone_naive_datetime(self):
         freezed = datetime.datetime(2015, 1, 1, 7, 15,
