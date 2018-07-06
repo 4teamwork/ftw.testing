@@ -5,6 +5,7 @@ Changelog
 1.17.1 (unreleased)
 -------------------
 
+- Extend ``staticuid`` to also be a context manager. [jone]
 - Also freeze ``datetime.utcnow()``. [Rotonen]
 
 
