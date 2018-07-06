@@ -1,3 +1,4 @@
+from functools import wraps
 from plone.app.testing import popGlobalRegistry
 from plone.app.testing import pushGlobalRegistry
 from plone.uuid.interfaces import IUUIDGenerator
@@ -8,17 +9,40 @@ import re
 
 
 def staticuid(prefix=None):
-    def decorator(func):
+    """Generate a function decorator or a context manager for static uuids.
+    """
+    return StaticUUIDActivator(prefix)
+
+
+class StaticUUIDActivator(object):
+    """A utility for configuring and registering a StaticUUIDActivator temporarily
+    while caring for proper isolation and teardown.
+    The object can be used either as raw context manager or as function decorator.
+    """
+
+    def __init__(self, prefix=None):
+        self.prefix = prefix
+
+    def __enter__(self):
+        if self.prefix is None:
+            raise ValueError(
+                'A prefix must be defined when using staticuid as a context manager.')
+        pushGlobalRegistry(getSite())
+        register_static_uid_uitility(prefix=self.prefix)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        popGlobalRegistry(getSite())
+
+    def __call__(self, func):
+        # The object is used as decorator.
+        if self.prefix is None:
+            self.prefix = func.__name__
+
+        @wraps(func)
         def wrapper(*args, **kwargs):
-            site = getSite()
-            pushGlobalRegistry(site)
-            try:
-                register_static_uid_uitility(prefix=prefix or func.__name__)
+            with self:
                 return func(*args, **kwargs)
-            finally:
-                popGlobalRegistry(site)
         return wrapper
-    return decorator
 
 
 class StaticUUIDGenerator(object):
