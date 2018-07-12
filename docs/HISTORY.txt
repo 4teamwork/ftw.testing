@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.17.1 (unreleased)
+1.18.0 (2018-07-12)
 -------------------
 
 - Extend ``staticuid`` to also be a context manager. [jone]
