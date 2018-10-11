@@ -48,8 +48,15 @@ class FreezedClock(object):
         def freezed_now(klass, tz=None):
             if not tz:
                 return self.new_now.replace(tzinfo=None)
+
+            # Time was frozen to a naive DT, but a TZ-aware time is being requested
+            # from now(). We assume the same TZ for freezing as requested by now.
+            elif self.new_now.tzinfo is None:
+                return self.new_now.replace(tzinfo=tz)
+
             elif self.new_now.tzinfo != tz:
                 return tz.normalize(self.new_now.astimezone(tz))
+
             return self.new_now
 
         @classmethod
