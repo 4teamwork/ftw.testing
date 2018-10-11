@@ -5,7 +5,7 @@ Changelog
 1.18.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Drop support for plone 4.2. [jone]
 
 
 1.18.0 (2018-07-12)
