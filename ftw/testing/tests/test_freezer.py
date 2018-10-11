@@ -103,6 +103,20 @@ class TestFreeze(TestCase):
                 datetime.datetime(2015, 1, 1, 7, 15),
                 datetime.datetime.now())
 
+    def test_now_with_tz_for_freeze_without_tz_returns_timezone_aware_datetime(self):
+        """If Time is frozen with a naive DT, but a TZ-aware time is being requested
+        from now(), we assume the same TZ for freezing as requested by now."""
+        freezed = datetime.datetime(2015, 1, 1, 7, 15)
+
+        with freeze(freezed):
+            self.assertNotEquals(
+                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.timezone('Europe/Zurich')),
+                datetime.datetime.now(pytz.timezone('US/Eastern')))
+
+            self.assertEquals(
+                datetime.datetime(2015, 1, 1, 7, 15, tzinfo=pytz.timezone('US/Eastern')),
+                datetime.datetime.now(pytz.timezone('US/Eastern')))
+
     def test_update_freezed_time_forwards(self):
         with freeze(datetime.datetime(2010, 10, 20)) as clock:
             self.assertEquals(datetime.datetime(2010, 10, 20),

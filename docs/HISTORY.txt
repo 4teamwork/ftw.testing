@@ -6,6 +6,7 @@ Changelog
 -------------------
 
 - Drop support for plone 4.2. [jone]
+- Fix bug with getting a timezone aware "now". [njohner]
 
 
 1.18.0 (2018-07-12)
