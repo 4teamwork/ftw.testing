@@ -5,7 +5,7 @@ Changelog
 1.19.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix invalid reST in README.rst [Nachtalb]
 
 
 1.19.0 (2018-10-15)

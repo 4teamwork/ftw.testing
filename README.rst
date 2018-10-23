@@ -16,7 +16,7 @@ FTWIntegrationTesting layer
 The ``FTWIntegrationTesting`` is an opinionated extension of Plone's
 default integration testing layer.
 
-The primary goal is to be able to run ``ftw.testbrowser``s traversal
+The primary goal is to be able to run ``ftw.testbrowser``\s traversal
 driver with integration testing.
 
 **Database isolation and transactions**
