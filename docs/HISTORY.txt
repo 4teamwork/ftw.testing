@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.19.2 (unreleased)
+1.19.2 (2018-11-05)
 -------------------
 
 - Fix in timezone aware freezing for Zope DateTime. [njohner]
