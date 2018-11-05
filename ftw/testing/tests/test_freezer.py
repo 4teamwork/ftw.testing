@@ -85,14 +85,20 @@ class TestFreeze(TestCase):
             with freeze(dt) as clock:
                 self.assertEquals(dt, datetime.datetime.now(timezone))
                 self.assertEquals(dt_utc, datetime.datetime.utcnow())
+                self.assertEquals(dt, timezone.normalize(DateTime().asdatetime().astimezone(timezone)))
+                self.assertEquals(dt_utc, pytz.UTC.normalize(DateTime().asdatetime()))
 
                 clock.forward(days=1)
                 self.assertEquals(dt_plusone, datetime.datetime.now(timezone))
                 self.assertEquals(dt_plusone_utc, datetime.datetime.utcnow())
+                self.assertEquals(dt_plusone, timezone.normalize(DateTime().asdatetime().astimezone(timezone)))
+                self.assertEquals(dt_plusone_utc, pytz.UTC.normalize(DateTime().asdatetime()))
 
                 clock.backward(days=1)
                 self.assertEquals(dt, datetime.datetime.now(timezone))
                 self.assertEquals(dt_utc, datetime.datetime.utcnow())
+                self.assertEquals(dt, timezone.normalize(DateTime().asdatetime().astimezone(timezone)))
+                self.assertEquals(dt_utc, pytz.UTC.normalize(DateTime().asdatetime()))
 
     def test_now_without_tz_returns_timezone_naive_datetime(self):
         freezed = datetime.datetime(2015, 1, 1, 7, 15,

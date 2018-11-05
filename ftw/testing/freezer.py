@@ -5,6 +5,7 @@ from forbiddenfruit import curse
 from mocker import expect
 from mocker import Mocker
 from time import mktime
+from time import tzname
 import pytz
 
 
@@ -69,7 +70,15 @@ class FreezedClock(object):
         curse(datetime, 'utcnow', freezed_utcnow)
 
         # Replace "time.time" function
-        new_time = mktime(self.new_now.timetuple())
+        # datetime.timetuple does not contain any timezone information, so this
+        # information will be lost. Moreover time.time should be in the system
+        # timezone, so we need to correct for the offset of timezone used in
+        # the freezing relative to the system timezone.
+        local_tz = pytz.timezone(tzname[0])
+        if self.new_now.tzinfo is None:
+            new_time = mktime(self.new_now.timetuple())
+        else:
+            new_time = mktime(self.new_now.tzinfo.normalize(self.new_now + local_tz._utcoffset).utctimetuple())
         time_class = self.mocker.replace('time.time')
         expect(time_class()).call(lambda: new_time).count(0, None)
 
