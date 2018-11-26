@@ -82,6 +82,9 @@ class FreezedClock(object):
         time_class = self.mocker.replace('time.time')
         expect(time_class()).call(lambda: new_time).count(0, None)
 
+        localtime_class = self.mocker.replace('time.localtime')
+        expect(localtime_class()).call(lambda: self.new_now.timetuple()).count(0, None)
+
         self.mocker.replay()
         return self
 

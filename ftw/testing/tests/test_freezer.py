@@ -10,6 +10,7 @@ import transaction
 
 time_module = time
 time_function = time.time
+localtime_function = time.localtime
 
 
 class TestFreeze(TestCase):
@@ -51,6 +52,16 @@ class TestFreeze(TestCase):
             self.assertEquals(the_time, time_function(),
                               'Existing time FUNCTION pointers are not patched.')
         self.assertLess(the_time, time_function())
+
+    def test_localtime_function_is_patched(self):
+        the_date = datetime.datetime(2010, 10, 20)
+        the_time = the_date.timetuple()
+
+        self.assertLess(the_time, localtime_function())
+        with freeze(the_date):
+            self.assertEquals(the_time, localtime_function(),
+                              'Existing localtime FUNCTION pointers are not patched.')
+        self.assertLess(the_time, localtime_function())
 
     def test_zope_datetime_freezing(self):
         the_date = datetime.datetime(2010, 1, 1, 1)
