@@ -251,6 +251,18 @@ the context manager.
         clock.backward(minutes=15)
         # its 2014, 5, 9, 12, 15
 
+
+It is possible to ignore modules, so that all calls to date / time functions from
+this module are responded with the real current values instead of the frozen ones:
+
+.. code:: python
+
+    from ftw.testing import freeze
+    from datetime import datetime
+
+    with freeze(datetime(2014, 5, 7, 12, 30), ignore_modules=['my.package.realtime']):
+        pass
+
 You can use the
 `timedelta arguments`(https://docs.python.org/2/library/datetime.html#datetime.timedelta)_
 for ``forward`` and ``backward``.

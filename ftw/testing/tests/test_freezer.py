@@ -160,6 +160,45 @@ class TestFreeze(TestCase):
             self.assertEquals(now, datetime.datetime.now())
             self.assertEquals(now, datetime.datetime.today())
 
+    def test_ignore_modules(self):
+        dt_now = datetime.datetime(2010, 12, 1)
+        time_now = time.mktime(dt_now.timetuple())
+
+        with freeze(dt_now):
+            self.assertEquals(dt_now, datetime.datetime.now())
+            self.assertEquals(dt_now, datetime.datetime.today())
+            self.assertEquals(time_now, time_function())
+
+        with freeze(dt_now, ignore_modules=('ftw.testing.tests.test_freezer',)):
+            self.assertNotEquals(dt_now, datetime.datetime.now())
+            self.assertNotEquals(dt_now, datetime.datetime.today())
+            self.assertNotEquals(time_now, time_function())
+
+    def test_ignore_modules_real_time_is_correct(self):
+        """This test makes sure that the correct current time is used when
+        a module is ignored and should fall back to real time while a freezer is active.
+        This is tested by using a wrapping freezer and assuming that freezing behaves correctly.
+        """
+        dt_now = datetime.datetime(2010, 12, 1)
+        time_now = time.mktime(dt_now.timetuple())
+
+        with freeze(dt_now):
+            with freeze(datetime.datetime(2000, 1, 1), ignore_modules=('ftw.testing.tests.test_freezer',)):
+                self.assertEquals(dt_now, datetime.datetime.now())
+                self.assertEquals(dt_now, datetime.datetime.today())
+                self.assertEquals(time_now, time_function())
+
+    def test_ignore_modules_real_time_supports_timezones(self):
+        timezone = pytz.timezone('Europe/Zurich')
+        dt_now = datetime.datetime(2010, 12, 1).replace(tzinfo=timezone)
+        time_now = time.mktime(dt_now.timetuple())
+
+        with freeze(dt_now):
+            with freeze(datetime.datetime(2000, 1, 1),
+                        ignore_modules=('ftw.testing.tests.test_freezer',)):
+                self.assertEquals(dt_now, datetime.datetime.now(timezone))
+                self.assertEquals(time_now, time_function())
+
 
 class TestFreezeIntegration(TestCase):
     layer = PLONE_FUNCTIONAL_TESTING
