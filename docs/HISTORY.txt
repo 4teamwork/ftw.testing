@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.19.3 (unreleased)
+1.20.0 (2019-01-25)
 -------------------
 
 - Add "ignore_modules" support to freezer. [jone]
