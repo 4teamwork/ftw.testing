@@ -6,6 +6,7 @@ from mocker import expect
 from mocker import Mocker
 from time import mktime
 from time import tzname
+import inspect
 import pytz
 
 
@@ -18,8 +19,9 @@ class FreezedClock(object):
       datetime.utcnow()
     """
 
-    def __init__(self, new_now):
+    def __init__(self, new_now, ignore_modules):
         self.new_now = new_now
+        self.ignore_modules = ignore_modules or ()
 
     def forward(self, **kwargs):
         self.new_now += timedelta(**kwargs)
@@ -37,6 +39,11 @@ class FreezedClock(object):
                 'The freeze_date argument must be a datetime.datetime'
                 ' instance, got %s' % type(self.new_now).__name__)
 
+        def is_caller_ignored(frames_up):
+            caller_frame = inspect.stack()[frames_up][0]
+            module_name = inspect.getmodule(caller_frame).__name__
+            return module_name in self.ignore_modules
+
         self.mocker = Mocker()
 
         # Replace "datetime.datetime.now" classmethod
@@ -47,6 +54,9 @@ class FreezedClock(object):
 
         @classmethod
         def freezed_now(klass, tz=None):
+            if is_caller_ignored(2):
+                return self._previous_datetime_now(tz)
+
             if not tz:
                 return self.new_now.replace(tzinfo=None)
 
@@ -62,6 +72,9 @@ class FreezedClock(object):
 
         @classmethod
         def freezed_utcnow(klass):
+            if is_caller_ignored(2):
+                return self._previous_datetime_utcnow()
+
             if self.new_now.tzinfo and self.new_now.tzinfo != pytz.UTC:
                 return pytz.UTC.normalize(self.new_now.astimezone(pytz.UTC))
             return self.new_now
@@ -80,7 +93,17 @@ class FreezedClock(object):
         else:
             new_time = mktime(self.new_now.tzinfo.normalize(self.new_now + local_tz._utcoffset).utctimetuple())
         time_class = self.mocker.replace('time.time')
-        expect(time_class()).call(lambda: new_time).count(0, None)
+
+        def frozen_time():
+            if is_caller_ignored(7):
+                if self.new_now.tzinfo is None:
+                    return mktime(self._previous_datetime_now().timetuple())
+                else:
+                    return mktime(self._previous_datetime_now().tzinfo.normalize(
+                        self.new_now + local_tz._utcoffset).utctimetuple())
+            return new_time
+
+        expect(time_class()).call(frozen_time).count(0, None)
 
         self.mocker.replay()
         return self
@@ -93,6 +116,7 @@ class FreezedClock(object):
 
 
 @contextmanager
-def freeze(new_now=None):
-    with FreezedClock(new_now or datetime.now()) as clock:
+def freeze(new_now=None, ignore_modules=None):
+    with FreezedClock(new_now or datetime.now(),
+                      ignore_modules=ignore_modules) as clock:
         yield clock
