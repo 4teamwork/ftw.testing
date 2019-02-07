@@ -12,8 +12,10 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import installProduct
 from Products.CMFCore.utils import getToolByName
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.configuration import xmlconfig
+from zope.component.interfaces import ComponentLookupError
 
 
 class ZCMLLayer(PloneSandboxLayer):
@@ -118,9 +120,23 @@ class GenericSetupUninstallMixin(object):
                                                      ignore_dependencies=True)
 
     def _quickinstaller_uninstall_package(self):
-        quick_installer_tool = getToolByName(self.layer['portal'],
-                                             'portal_quickinstaller')
-        quick_installer_tool.uninstallProducts([self.package])
+        try:
+            # Plone 5.1 and newer
+            quick_installer_tool = getMultiAdapter(
+                (self.layer['portal'], self.layer['portal'].REQUEST),
+                name='installer',
+            )
+        except ComponentLookupError:
+            # Plone 5.0, 4.3 and older
+            quick_installer_tool = getToolByName(
+                self.layer['portal'], 'portal_quickinstaller')
+
+        try:
+            # Plone 5.1 and newer
+            quick_installer_tool.uninstall_product(self.package)
+        except AttributeError:
+            # Plone 5.0, 4.3 and older
+            quick_installer_tool.uninstallProducts([self.package])
 
     def _setuptool_uninstall_package(self):
         self.setup_tool.runAllImportStepsFromProfile(self.uninstall_profile_id)
@@ -138,7 +154,7 @@ class GenericSetupUninstallMixin(object):
             registry = getUtility(IRegistry)
             registry.records['plone.resources.last_legacy_import'].value = self.datetime
             registry.records['plone.bundles/plone-legacy.last_compilation'].value = self.datetime
-        
+
     def assertSnapshotsEqual(self, before_id='before-install',
                              after_id='after-uninstall',
                              msg=None):
