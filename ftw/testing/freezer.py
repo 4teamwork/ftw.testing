@@ -40,9 +40,18 @@ class FreezedClock(object):
                 ' instance, got %s' % type(self.new_now).__name__)
 
         def is_caller_ignored(frames_up):
-            caller_frame = inspect.stack()[frames_up][0]
-            module_name = inspect.getmodule(caller_frame).__name__
-            return module_name in self.ignore_modules
+            """Inspect the stack for n frames up for a blacklisted caller.
+
+            Stack inspection is very expensive, so we skip this per default as
+            we hit this on every access to a frozen time. A fine case example
+            of catastrophic access density is a bunch of Plone workflow event
+            handlers firing off a Dexterity ``createdInContainer`` event.
+            """
+            if self.ignore_modules:
+                caller_frame = inspect.stack()[frames_up][0]
+                module_name = inspect.getmodule(caller_frame).__name__
+                return module_name in self.ignore_modules
+            return False
 
         self.mocker = Mocker()
 
