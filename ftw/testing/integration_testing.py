@@ -7,6 +7,7 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import login
 from plone.app.testing import logout
 from plone.app.testing import SITE_OWNER_NAME
+from six.moves import filter
 from unittest2 import TestCase
 import timeit
 import transaction
@@ -102,11 +103,11 @@ class FTWIntegrationTestCase(TestCase):
                 return func(self, *args, **kwargs)
             finally:
                 end = timer()
-                print ''
-                print '{}.{} took {:.3f} ms'.format(
+                print('')
+                print('{}.{} took {:.3f} ms'.format(
                     type(self).__name__,
                     func.__name__,
-                    (end - start) * 1000)
+                    (end - start) * 1000))
         return wrapper
 
     def login(self, user, browser=None):
@@ -149,9 +150,10 @@ class FTWIntegrationTestCase(TestCase):
             login(self.portal, userid)
 
         if browser is not None:
-            browser_auth_headers = filter(
-                lambda item: item[0] == 'Authorization',
-                browser.session_headers)
+            browser_auth_headers = [
+                item for item in browser.session_headers
+                if item[0] == 'Authorization'
+            ]
             browser.login(userid)
 
         @contextmanager
@@ -188,8 +190,8 @@ class FTWIntegrationTestCase(TestCase):
             def allowed(obj):
                 return True
 
-        children = {'before': filter(allowed, obj.objectValues())}
+        children = {'before': list(filter(allowed, obj.objectValues()))}
         yield children
-        children['after'] = filter(allowed, obj.objectValues())
+        children['after'] = list(filter(allowed, obj.objectValues()))
         children['added'] = set(children['after']) - set(children['before'])
         children['removed'] = set(children['before']) - set(children['after'])
