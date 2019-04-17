@@ -8,10 +8,10 @@ from zope.interface import classImplements
 from zope.interface import directlyProvides
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-import unittest2
+import unittest
 
 
-class MockTestCase(mocktestcase.MockTestCase, unittest2.TestCase):
+class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
     """Advanced mock test case.
     """
 

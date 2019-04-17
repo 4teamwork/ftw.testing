@@ -1,5 +1,5 @@
 from ftw.testing.layer import ConsoleScriptLayer
-from unittest2 import TestCase
+from unittest import TestCase
 
 
 CONSOLE_SCRIPT_TESTING = ConsoleScriptLayer('ftw.testing')

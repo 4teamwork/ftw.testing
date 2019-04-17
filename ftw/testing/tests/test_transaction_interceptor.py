@@ -1,7 +1,7 @@
 from ftw.testing import TransactionInterceptor
 from ftw.testing.exceptions import Intercepted
 from ftw.testing.testing import FTW_TESTING_FUNCTIONAL
-from unittest2 import TestCase
+from unittest import TestCase
 import transaction
 
 

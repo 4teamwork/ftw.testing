@@ -1,6 +1,5 @@
 from ftw.testing.layer import TEMP_DIRECTORY
-from unittest2 import TestCase
-
+from unittest import TestCase
 
 
 class TestTempDirectoryLayer(TestCase):

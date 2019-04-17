@@ -1,7 +1,7 @@
 from Products.MailHost.interfaces import IMailHost
 from ftw.testing.mailing import Mailing
 from ftw.testing.testing import FTW_TESTING_FUNCTIONAL
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.component import getUtility
 
 

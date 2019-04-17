@@ -1,5 +1,5 @@
 from ftw.testing.implementer import Implementer
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.interface import Interface, Attribute
 from zope.interface import implements
 import inspect

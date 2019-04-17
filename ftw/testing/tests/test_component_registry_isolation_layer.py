@@ -1,7 +1,7 @@
 from ftw.testing.layer import COMPONENT_REGISTRY_ISOLATION
 from plone.app.testing import IntegrationTesting
 from Products.CMFCore.utils import getToolByName
-from unittest2 import TestCase
+from unittest import TestCase
 
 
 COMPONENT_REGISTRY_ISOLATION_INTEGRATION = IntegrationTesting(

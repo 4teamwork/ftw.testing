@@ -8,7 +8,7 @@ from plone.app.testing import login
 from plone.app.testing import logout
 from plone.app.testing import SITE_OWNER_NAME
 from six.moves import filter
-from unittest2 import TestCase
+from unittest import TestCase
 import timeit
 import transaction
 

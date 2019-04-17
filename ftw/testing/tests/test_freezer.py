@@ -1,7 +1,7 @@
 from DateTime import DateTime
 from ftw.testing import freeze
 from plone.app.testing import PLONE_FUNCTIONAL_TESTING
-from unittest2 import TestCase
+from unittest import TestCase
 import datetime
 import pytz
 import time

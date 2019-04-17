@@ -1,6 +1,6 @@
 from Acquisition import aq_inner, aq_parent
 from ftw.testing.testcase import MockTestCase
-from unittest2 import TestResult
+from unittest import TestResult
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
