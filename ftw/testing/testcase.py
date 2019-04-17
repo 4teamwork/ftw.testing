@@ -1,29 +1,115 @@
-from Acquisition import aq_inner, aq_parent
 from ftw.testing.implementer import Implementer
-from mocker import expect, ANY
-from plone import mocktestcase
-from zope.interface import Interface
+from ftw.testing.patch import patch_refs
+from Products.CMFCore import utils as cmf_utils
+from unittest.mock import create_autospec
+from unittest.mock import Mock
 from zope.interface import alsoProvides
 from zope.interface import classImplements
 from zope.interface import directlyProvides
+from zope.interface import Interface
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 import unittest
+import zope.component
+import zope.component.testing
+import zope.proxy
 
 
-class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
+class Dummy(object):
+    """Dummy object with arbitrary attributes
+    """
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
+
+class ComponentProxy(zope.proxy.ProxyBase):
+
+    @property
+    def __component_name__(self):
+        raise AttributeError('mock attribute error')
+
+
+class BaseMockTestCase(unittest.TestCase):
+    """Base class for Plone mock tests.
+
+       Copied over from plone.mocktestcase which is no longer maintained.
+       Uses unittest.mock instead of mocker.
+    """
+
+    def __init__(self, methodName='runTest'):
+        super(BaseMockTestCase, self).__init__(methodName=methodName)
+        self._mocked_tools = {}
+        self.__patch_refs__ = False
+
+    def setUp(self):
+        super(BaseMockTestCase, self).setUp()
+
+        def getToolByName(context, name):
+            if name in self._mocked_tools:
+                return self._mocked_tools[name]
+            return self._original_getToolByName(context, name)
+        self._original_getToolByName = cmf_utils.getToolByName
+        patch_refs(cmf_utils, 'getToolByName', getToolByName)
+
+    def tearDown(self):
+        super(BaseMockTestCase, self).tearDown()
+        zope.component.testing.tearDown(self)
+        self._mocked_tools = {}
+        patch_refs(cmf_utils, 'getToolByName', self._original_getToolByName)
+
+    def create_dummy(self, **kw):
+        return Dummy(**kw)
+
+    def mock(self):
+        return Mock()
+
+    def mock_utility(self, mock, provides, name=u""):
+        """Register the mock as a utility providing the given interface
+        """
+        if not name:
+            mock = ComponentProxy(mock)
+        zope.component.provideUtility(
+            provides=provides, component=mock, name=name)
+
+    def mock_adapter(self, mock, provides, adapts, name=u""):
+        """Register the mock as an adapter providing the given interface
+        and adapting the given interface(s)
+        """
+        if not name:
+            mock = ComponentProxy(mock)
+        zope.component.provideAdapter(
+            factory=mock, adapts=adapts, provides=provides, name=name)
+
+    def mock_subscription_adapter(self, mock, provides, adapts):
+        """Register the mock as a utility providing the given interface
+        """
+        zope.component.provideSubscriptionAdapter(
+            factory=mock, provides=provides, adapts=adapts)
+
+    def mock_handler(self, mock, adapts):
+        """Register the mock as a utility providing the given interface
+        """
+        zope.component.provideHandler(factory=mock, adapts=adapts)
+
+    def mock_tool(self, mock, name):
+        """Register a mock tool that will be returned when getToolByName()
+        is called.
+        """
+        self._mocked_tools[name] = mock
+
+
+class MockTestCase(BaseMockTestCase):
     """Advanced mock test case.
     """
 
     def setUp(self):
-        super(mocktestcase.MockTestCase, self).setUp()
+        super(MockTestCase, self).setUp()
         self._MockTestCase_setup = True
-        self._getToolByName_replacements = None
 
     def tearDown(self):
         self._check_super_setup()
-        super(mocktestcase.MockTestCase, self).tearDown()
-        self._getToolByName_replacements = None
+        super(MockTestCase, self).tearDown()
 
     def _check_super_setup(self):
         # We need subclassing tests to execute our setUp
@@ -37,7 +123,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
         provided, the rest are also-provided.
         """
         self._check_super_setup()
-        dummy = self.create_dummy()
+        mock = Mock()
 
         if isinstance(interfaces, (list, tuple, set)):
             first_interface = interfaces.pop(0)
@@ -46,12 +132,12 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
             first_interface = interfaces
             interfaces = []
 
-        directlyProvides(dummy, first_interface)
+        directlyProvides(mock, first_interface)
 
         for iface in interfaces:
-            alsoProvides(dummy, iface)
+            alsoProvides(mock, iface)
 
-        return self.mocker.proxy(dummy, False, *args, **kwargs)
+        return mock
 
     def mock_interface(self, interface, provides=None, *args, **kwargs):
         """Creates and returns a new mock object implementing `interface`.
@@ -63,7 +149,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
         spec = Implementer(interface)()
         if provides:
             classImplements(spec, provides)
-        return self.mocker.mock(spec, *args, **kwargs)
+        return create_autospec(spec)
 
     def stub(self, *args, **kwargs):
         """Creates a stub object, which does not assert the applied
@@ -71,7 +157,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
         """
         self._check_super_setup()
         kwargs['count'] = False
-        return self.mocker.mock(*args, **kwargs)
+        return unittest.mock.Mock()
 
     def providing_stub(self, interfaces, *args, **kwargs):
         """Creates a stub object providing a list of interfaces.
@@ -92,47 +178,18 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
         """Set the acquisition parent of `context` to `parent_context`.
         """
         self._check_super_setup()
-        expect(aq_parent(aq_inner(context))).result(
-            parent_context).count(0, None)
+        context.__parent__ = parent_context
+        context.aq_parent = parent_context
+        context.aq_inner = context
+
         return context
-
-    def assertRaises(self, *args, **kwargs):
-        """Use assertRaises from unittest2. This allows us to use it
-        with python (>=2.6) `with` statement.
-
-        >>> with self.assertRaises(TypeError) as cm:
-        ...     1 + 'foo'
-        >>> self.assertEqual(
-        ...     str(cm.exception),
-        ...     "unsupported operand type(s) for +: 'int' and 'str'")
-        """
-        return unittest2.TestCase.assertRaises(self, *args, **kwargs)
 
     def mock_tool(self, mock, name):
         """Register a mock tool that will be returned when getToolByName()
         is called.
         """
         self._check_super_setup()
-
-        if self._getToolByName_replacements is None:
-            self._getToolByName_replacements = []
-            self._getToolByName_replacements.append(self.mocker.replace(
-                    'Products.CMFCore.utils.getToolByName'))
-
-            import pkg_resources
-            try:
-                pkg_resources.get_distribution(
-                    'Products.PloneHotfix20121106')
-            except pkg_resources.DistributionNotFound:
-                pass
-            else:
-                self._getToolByName_replacements.append(self.mocker.replace(
-                        'Products.PloneHotfix20121106.gtbn.gtbn'))
-
-        # patch: do not count.
-        for replacement in self._getToolByName_replacements:
-            self.expect(replacement(ANY, name)).result(
-                mock).count(0, None)
+        return super(MockTestCase, self).mock_tool()
 
     def stub_request(self, interfaces=[], stub_response=True,
                      content_type='text/html', status=200):
@@ -155,7 +212,7 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
             interfaces = default_interfaces + [interfaces]
 
         request = self.providing_stub(interfaces)
-        self.expect(request.debug).result(False)
+        request.debug = False
 
         if stub_response:
             self.stub_response(request=request, content_type=content_type,
@@ -177,11 +234,13 @@ class MockTestCase(mocktestcase.MockTestCase, unittest.TestCase):
 
         response = self.stub()
         if request:
-            self.expect(request.response).result(response)
-            self.expect(request.RESPONSE).result(response)
+            request.response = response
+            request.RESPONSE = response
 
-        self.expect(response.getStatus()).result(status)
-        self.expect(response.getHeader('Content-Type')).result(
-            content_type)
+        response.getStatus.return_value = status
+
+        def getHeader(name):
+            return {'Content-Type': content_type}.get(name)
+        response.getHeader.side_effect = getHeader
 
         return response

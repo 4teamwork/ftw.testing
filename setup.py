@@ -47,7 +47,6 @@ setup(name='ftw.testing',
       install_requires=[
         'path.py',
         'plone.app.testing',
-        'plone.mocktestcase',
         'plone.testing',
         'pytz',
         'setuptools',
