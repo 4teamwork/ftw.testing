@@ -78,15 +78,47 @@ layer and extending the behavior and helpers for your needs.
 MockTestCase
 ------------
 
-``ftw.testing`` provides an advanced MockTestCase which provides bases on
-the `plone.mocktestcase`_ ``MockTestCase``.
+``ftw.testing`` provides an advanced MockTestCase with support for registering
+Zope components (utilities, adapters, subscription adapters and event handlers)
+from mocks and tearing down the global component registry during test tear-down.
+Some functionality was formerly provided by plone.mocktestcase, which is no
+longer maintained. Thus it has been copied over into this package. 
 
 .. code:: python
 
     from ftw.testing import MockTestCase
 
 
-The following additional methods are available:
+The following methods are available:
+
+``self.create_dummy(**kw)``
+      Return a dummy object that is *not* a mock object, just a dumb object
+      with whatever attributes or methods you pass as keyword arguments.
+      To make a dummy method, pass a function object or a lambda, e.g.
+      self.create_dummy(id="foo", absolute_url=lambda:'http://example.org/foo')
+
+``self.mock_utility(mock, provides, name=u"")```
+      Register the given mock object as a global utility providing the given
+      interface, with the given name (defaults to the unnamed default utility).
+
+``self.mock_adapter(mock, provides, adapts, name=u"")```
+      Register the given mock object as a global adapter providing the given
+      interface and adapting the given interfaces, with the given name
+      (defaults to the unnamed default adapter).
+
+``self.mock_subscription_adapter(mock, provides, adapts)``
+      Register the given mock object as a global subscription adapter providing
+      the given interface and adapting the given interfaces.
+
+``self.mock_handler(mock, adapts)``
+      Register the given mock object as a global event subscriber for the
+      given event types.
+
+``self.mock_tool(mock, name)``
+      Create a getToolByName() mock (using 'replace' mode) and configure it so
+      that code calling getToolByName(context, name) obtains the given mock
+      object. Can be used multiple times: the getToolByName() mock is created
+      lazily the first time this method is called in any one test fixture.
 
 ``self.providing_mock(interfaces, *args, **kwargs)``
       Creates a mock which provides ``interfaces``.
