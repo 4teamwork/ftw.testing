@@ -1,18 +1,24 @@
 from ftw.testing.implementer import Implementer
 from ftw.testing.patch import patch_refs
 from Products.CMFCore import utils as cmf_utils
-from unittest.mock import create_autospec
-from unittest.mock import Mock
 from zope.interface import alsoProvides
 from zope.interface import classImplements
 from zope.interface import directlyProvides
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+import six
 import unittest
 import zope.component
 import zope.component.testing
 import zope.proxy
+
+if six.PY2:
+    from mock import create_autospec
+    from mock import Mock
+else:
+    from unittest.mock import create_autospec
+    from unittest.mock import Mock
 
 
 class Dummy(object):
@@ -157,7 +163,7 @@ class MockTestCase(BaseMockTestCase):
         """
         self._check_super_setup()
         kwargs['count'] = False
-        return unittest.mock.Mock()
+        return self.mock()
 
     def providing_stub(self, interfaces, *args, **kwargs):
         """Creates a stub object providing a list of interfaces.

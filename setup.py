@@ -48,11 +48,12 @@ setup(name='ftw.testing',
       zip_safe=False,
 
       install_requires=[
+        'mock;python_version<"3.3"',
         'path.py',
         'plone.app.testing',
         'plone.testing',
         'pytz',
-        'setuptools',
+        'setuptools >= 20.8.1',
         'six',
         'zope.component',
         'zope.configuration',
