@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.20.2.dev0'
+version = '2.0.0.dev0'
 maintainer = 'Jonas Baumann'
 
 extras_require = {}
@@ -28,7 +28,10 @@ setup(name='ftw.testing',
         'Framework :: Plone',
         'Framework :: Plone :: 4.3',
         'Framework :: Plone :: 5.1',
+        'Framework :: Plone :: 5.2',
         'Programming Language :: Python',
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],
 
