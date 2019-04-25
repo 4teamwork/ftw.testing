@@ -160,33 +160,6 @@ The following methods are available:
       Uses ``unittest2`` implementation of assertRaises instead of
       ``unittest`` implementation.
 
-It also fixes a problem in ``mock_tool``, where the ``getToolByName`` mock
-had assertions which is not very useful in some cases.
-
-
-Mocking vs. stubbing
---------------------
-
-A **mock** is used for testing the communication between two objects. It
-asserts *method calls*. This is used when a test should not test if
-a object has a specific state after doing something (e.g. it has it's
-attribute *xy* set to something), but if the object *does* something
-with another object. If for example an object `Foo` sends an email
-when method `bar` is called, we could mock the sendmail object and
-assert on the send-email method call.
-
-On the other hand we often have to test the state of an object (attribute
-values) after doing something. This can be done without mocks by just
-calling the method and asserting the attribute values. But then we have
-to set up an integration test and install plone, which takes very long.
-For testing an object with dependencies to other parts of plone in a
-unit test, we can use **stubs** for faking other (separately tested) parts
-of plone. Stubs work like mocks: you can "expect" a method call and
-define a result. The difference between **stubs** and **mocks** is that
-stubs do not assert the expectations, so there will be no errors if
-something expected does not happen. So when using stubs we can assert
-the state without asserting the communcation between objects.
-
 
 Component registry layer
 ------------------------
@@ -606,10 +579,41 @@ Be aware that the dependency ``zc.recipe.egg`` is required for building the
 console scripts. You may put the dependency into your ``tests`` extras require.
 
 
+Upgrading
+---------
+
+Upgrading from ftw.testing 1.x to 2.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``mocker`` has been replaced in favor of ``unittest.mock``.
+This is a `breaking` change and may require amending existing tests based on
+``MockTestCase``.
+
+With ``mocker`` expectations were recorded in `record` mode while using the
+mock in tests was done in `replay` mode. This is no longer the case with
+``unittest.mock``. Here's a simple example how expectations can be adopted:
+
+.. code:: python
+
+  # Mocking with mocker
+  mock = self.mocker.mock()  # mocker.Mock
+  self.expect(mock.lock()).result('already locked')
+  self.replay()
+  self.assertEqual(mock.lock(), 'already locked')
+
+
+.. code:: python
+
+  # Mocking with unittest.mock
+  mock = self.mock()  # unittest.mock.Mock
+  mock.lock.return_value = 'already locked'
+  self.assertEqual(mock.lock(), 'already locked')
+
+
 Compatibility
 -------------
 
-Runs with `Plone <http://www.plone.org/>`_ `4.3`.
+Runs with `Plone <http://www.plone.org/>`_ `4.3`, `5.1` and `5.2`.
 
 
 Links
