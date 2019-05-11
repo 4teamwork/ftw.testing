@@ -156,10 +156,6 @@ The following methods are available:
       ``content_type``: Defines the expected output content type of the response.
       ``status``: Defines the expected status code of the response.
 
-``self.assertRaises(*args, **kwargs)``
-      Uses ``unittest2`` implementation of assertRaises instead of
-      ``unittest`` implementation.
-
 
 Component registry layer
 ------------------------
@@ -285,7 +281,7 @@ are prefixed and counted within a scope, usually a test case:
 
   from ftw.testing import staticuid
   from plone.app.testing import PLONE_INTEGRATION_TESTING
-  from unittest2 import TestCase
+  from unittest import TestCase
 
   class MyTest(TestCase):
       layer = PLONE_INTEGRATION_TESTING
@@ -320,7 +316,7 @@ Simple example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -370,7 +366,7 @@ Full example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -513,7 +509,7 @@ Example:
 
     # ----------------------------
     # test_*.py
-    from unittest2 import TestCase
+    from unittest import TestCase
 
     class TestSomething(TestCase):
         layer = MY_PACKAGE_INTEGRATION
@@ -534,7 +530,7 @@ Usage example:
 
 .. code:: python
 
-    from unittest2 import TestCase
+    from unittest import TestCase
     from ftw.testing.layer import TEMP_DIRECTORY
 
 
@@ -565,7 +561,7 @@ Usage example:
 
     # test_*.py
     from my.package.testing import CONSOLE_SCRIPT_TESTING
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     class TestConsoleScripts(TestCase):
