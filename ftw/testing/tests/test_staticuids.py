@@ -3,7 +3,7 @@ from ftw.testing.testing import FTW_TESTING_FUNCTIONAL
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.uuid.interfaces import IUUID
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.component.hooks import getSite
 
 

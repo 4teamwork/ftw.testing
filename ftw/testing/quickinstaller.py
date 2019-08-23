@@ -76,16 +76,16 @@ class QuickInstallerSnapshots(object):
 
         self._current_version = version
         for dottedname, info in self._functions.items():
-            print 'ftw.testing PATCHING: {0} with {1}'.format(
-                dottedname, version)
-            info['function'].func_code = info[version]
+            print('ftw.testing PATCHING: {0} with {1}'.format(
+                dottedname, version))
+            info['function'].__code__ = info[version]
 
     def _prepare(self, func, replacement):
         dottedname = '.'.join((func.__module__, func.__name__))
-        original_code = func.func_code
+        original_code = func.__code__
         replacement_source = inspect.getsource(replacement)
-        exec replacement_source in func.func_globals
-        replacement_code = func.func_globals[replacement.__name__].func_code
+        exec(replacement_source, func.__globals__)
+        replacement_code = func.__globals__[replacement.__name__].__code__
 
         self._functions[dottedname] = {'original': original_code,
                                        'noop': replacement_code,

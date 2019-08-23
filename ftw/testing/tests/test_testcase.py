@@ -1,6 +1,14 @@
 from Acquisition import aq_inner, aq_parent
+from ftw.testing.testcase import BaseMockTestCase
 from ftw.testing.testcase import MockTestCase
-from unittest2 import TestResult
+from Products.CMFCore.utils import getToolByName
+from unittest import TestResult
+from zope.component import getAdapter
+from zope.component import getUtility
+from zope.component import handle
+from zope.component import subscribers
+from zope.interface import alsoProvides
+from zope.interface import directlyProvides
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
@@ -14,6 +22,57 @@ class IBar(Interface):
     pass
 
 
+class TestBaseMockTestCase(BaseMockTestCase):
+
+    def test_mock_utility(self):
+        mock = self.mock()
+        self.mock_utility(mock, IFoo)
+        self.assertEqual(getUtility(IFoo), mock)
+
+    def test_mock_named_utility(self):
+        mock = self.mock()
+        self.mock_utility(mock, IFoo, name='foo-util')
+        self.assertEqual(getUtility(IFoo, name='foo-util'), mock)
+
+    def test_mock_adapter(self):
+        factory = self.mock()
+        factory.return_value = self.mock()
+        self.mock_adapter(factory, IFoo, [IBar])
+        adaptable = self.mock()
+        alsoProvides(adaptable, IBar)
+        self.assertEqual(getAdapter(adaptable, IFoo), factory())
+
+    def test_mock_named_adapter(self):
+        factory = self.mock()
+        factory.return_value = self.mock()
+        self.mock_adapter(factory, IFoo, [IBar], name='foo-adapter')
+        adaptable = self.mock()
+        alsoProvides(adaptable, IBar)
+        self.assertEqual(
+            getAdapter(adaptable, IFoo, name='foo-adapter'), factory())
+
+    def test_mock_subscription_adapter(self):
+        factory = self.mock()
+        factory.return_value = self.mock()
+        self.mock_subscription_adapter(factory, IFoo, [IBar])
+        adaptable = self.mock()
+        alsoProvides(adaptable, IBar)
+        self.assertEqual(subscribers([adaptable], IFoo), [factory()])
+
+    def test_mock_handler(self):
+        handler = self.mock()
+        self.mock_handler(handler, [IFoo])
+        foo_event = self.mock()
+        directlyProvides(foo_event, IFoo)
+        handle(foo_event)
+        handler.assert_called()
+
+    def test_mock_tool(self):
+        tool = self.mock()
+        self.mock_tool(tool, 'portal_catalog')
+        self.assertEqual(getToolByName(None, 'portal_catalog'), tool)
+
+
 class TestMockTestCase(MockTestCase):
     """This test case may look a bit strange: we are testing the MockTestCase by
     inheriting it and just using it.
@@ -21,26 +80,20 @@ class TestMockTestCase(MockTestCase):
 
     def test_providing_mock_with_multiple_interfaces(self):
         mock = self.providing_mock([IFoo, IBar])
-        self.replay()
         self.assertTrue(IFoo.providedBy(mock))
         self.assertTrue(IBar.providedBy(mock))
 
     def test_providing_mock_with_single_interface(self):
         mock = self.providing_mock(IFoo)
-        self.replay()
         self.assertTrue(IFoo.providedBy(mock))
 
     def test_stub_does_not_count(self):
         stub = self.stub()
-        self.expect(stub.foo.bar)
-        self.replay()
         stub.foo.bar
         stub.foo.bar
 
     def test_providing_stub_with_multiple_interfaces(self):
         mock = self.providing_stub([IFoo, IBar])
-        self.expect(mock.foo.bar)
-        self.replay()
         self.assertTrue(IFoo.providedBy(mock))
         self.assertTrue(IBar.providedBy(mock))
         mock.foo.bar
@@ -48,22 +101,19 @@ class TestMockTestCase(MockTestCase):
 
     def test_providing_stub_with_single_interfaces(self):
         mock = self.providing_stub(IFoo)
-        self.expect(mock.foo.bar)
-        self.replay()
         self.assertTrue(IFoo.providedBy(mock))
         mock.foo.bar
         mock.foo.bar
 
     def test_set_parent_sets_acquisition(self):
-        parent = self.mocker.mock()
-        child = self.mocker.mock()
+        parent = self.mock()
+        child = self.mock()
         self.set_parent(child, parent)
-        self.replay()
         self.assertEqual(aq_parent(aq_inner(child)), parent)
         self.assertEqual(aq_parent(child), parent)
 
-    def test_assertRaises_from_unittest2(self):
-        # unittest2.TestCase.assertRaises has "with"-support
+    def test_assertRaises_from_unittest(self):
+        # unittest.TestCase.assertRaises has "with"-support
         with self.assertRaises(Exception):
             raise Exception()
 
@@ -72,8 +122,6 @@ class TestMockTestCase(MockTestCase):
         js_request = self.stub_request(
             content_type='text/javascript', status=401, interfaces=IFoo)
         iface_request = self.stub_request(interfaces=[IFoo, IBar])
-
-        self.replay()
 
         self.assertTrue(IDefaultBrowserLayer.providedBy(html_request))
         self.assertTrue(IBrowserRequest.providedBy(html_request))
@@ -106,8 +154,6 @@ class TestMockTestCase(MockTestCase):
         js_response = self.stub_response(
             request=temp_request, content_type='text/javascript', status=401)
 
-        self.replay()
-
         self.assertEqual(html_response.getHeader('Content-Type'), 'text/html')
         self.assertEqual(html_response.getStatus(), 200)
 
@@ -133,53 +179,44 @@ class TestInterfaceMocking(MockTestCase):
         class Test(MockTestCase):
             def runTest(self):
                 mock = self.mock_interface(ILocking)
-                self.expect(mock.crack()).result(True)
-                self.replay()
                 mock.crack()
 
         result = TestResult()
         Test().run(result=result)
         self.assertFalse(result.wasSuccessful())
         self.assertEqual(result.testsRun, 1)
-        self.assertEqual(len(result.failures), 1)
-        self.assertIn('mock.crack()\n - Method not ' + \
-                          'found in real specification',
-                      result.failures[0][1])
+        self.assertEqual(len(result.errors), 1)
+        self.assertIn("Mock object has no attribute 'crack'",
+                      result.errors[0][1])
 
     def test_mock_interface_raises_on_wrong_arguments(self):
         class Test(MockTestCase):
             def runTest(self):
                 mock = self.mock_interface(ILocking)
-                self.expect(mock.unlock(force=True)).result(True)
-                self.replay()
                 mock.unlock(force=True)
 
         result = TestResult()
         Test().run(result=result)
         self.assertFalse(result.wasSuccessful())
         self.assertEqual(result.testsRun, 1)
-        self.assertEqual(len(result.failures), 1)
-        self.assertIn('mock.unlock(force=True)\n - ' + \
-                          'Specification is unlock(all=False): unknown kwargs: force',
-                      result.failures[0][1])
+        self.assertEqual(len(result.errors), 1)
+        self.assertIn("TypeError: ",
+                      result.errors[0][1])
 
     def test_mock_interface_passes_when_defined_function_is_called(self):
         mock = self.mock_interface(ILocking)
-        self.expect(mock.lock()).result('already locked')
-        self.replay()
+        mock.lock.return_value = 'already locked'
         self.assertEqual(mock.lock(), 'already locked')
 
     def test_mock_interface_providing_addtional_interfaces(self):
         mock = self.mock_interface(ILocking, provides=[IFoo, IBar])
-        self.replay()
         self.assertTrue(ILocking.providedBy(mock))
         self.assertTrue(IFoo.providedBy(mock))
         self.assertTrue(IBar.providedBy(mock))
 
     def test_stub_interface_does_not_count(self):
         mock = self.stub_interface(ILocking)
-        self.expect(mock.lock()).result('already locked')
-        self.replay()
+        mock.lock.return_value = 'already locked'
         self.assertEqual(mock.lock(), 'already locked')
         self.assertEqual(mock.lock(), 'already locked')
         self.assertEqual(mock.lock(), 'already locked')

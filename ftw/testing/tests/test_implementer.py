@@ -1,7 +1,7 @@
 from ftw.testing.implementer import Implementer
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.interface import Interface, Attribute
-from zope.interface import implements
+from zope.interface import implementer
 import inspect
 
 
@@ -31,8 +31,8 @@ class IExample(Interface):
         """
 
 
+@implementer(IExample)
 class Example(object):
-    implements(IExample)
 
     def no_arguments(self):
         pass

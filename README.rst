@@ -78,15 +78,47 @@ layer and extending the behavior and helpers for your needs.
 MockTestCase
 ------------
 
-``ftw.testing`` provides an advanced MockTestCase which provides bases on
-the `plone.mocktestcase`_ ``MockTestCase``.
+``ftw.testing`` provides an advanced MockTestCase with support for registering
+Zope components (utilities, adapters, subscription adapters and event handlers)
+from mocks and tearing down the global component registry during test tear-down.
+Some functionality was formerly provided by plone.mocktestcase, which is no
+longer maintained. Thus it has been copied over into this package. 
 
 .. code:: python
 
     from ftw.testing import MockTestCase
 
 
-The following additional methods are available:
+The following methods are available:
+
+``self.create_dummy(**kw)``
+      Return a dummy object that is *not* a mock object, just a dumb object
+      with whatever attributes or methods you pass as keyword arguments.
+      To make a dummy method, pass a function object or a lambda, e.g.
+      self.create_dummy(id="foo", absolute_url=lambda:'http://example.org/foo')
+
+``self.mock_utility(mock, provides, name=u"")```
+      Register the given mock object as a global utility providing the given
+      interface, with the given name (defaults to the unnamed default utility).
+
+``self.mock_adapter(mock, provides, adapts, name=u"")```
+      Register the given mock object as a global adapter providing the given
+      interface and adapting the given interfaces, with the given name
+      (defaults to the unnamed default adapter).
+
+``self.mock_subscription_adapter(mock, provides, adapts)``
+      Register the given mock object as a global subscription adapter providing
+      the given interface and adapting the given interfaces.
+
+``self.mock_handler(mock, adapts)``
+      Register the given mock object as a global event subscriber for the
+      given event types.
+
+``self.mock_tool(mock, name)``
+      Create a getToolByName() mock (using 'replace' mode) and configure it so
+      that code calling getToolByName(context, name) obtains the given mock
+      object. Can be used multiple times: the getToolByName() mock is created
+      lazily the first time this method is called in any one test fixture.
 
 ``self.providing_mock(interfaces, *args, **kwargs)``
       Creates a mock which provides ``interfaces``.
@@ -123,37 +155,6 @@ The following additional methods are available:
       The other optional arguments:
       ``content_type``: Defines the expected output content type of the response.
       ``status``: Defines the expected status code of the response.
-
-``self.assertRaises(*args, **kwargs)``
-      Uses ``unittest2`` implementation of assertRaises instead of
-      ``unittest`` implementation.
-
-It also fixes a problem in ``mock_tool``, where the ``getToolByName`` mock
-had assertions which is not very useful in some cases.
-
-
-Mocking vs. stubbing
---------------------
-
-A **mock** is used for testing the communication between two objects. It
-asserts *method calls*. This is used when a test should not test if
-a object has a specific state after doing something (e.g. it has it's
-attribute *xy* set to something), but if the object *does* something
-with another object. If for example an object `Foo` sends an email
-when method `bar` is called, we could mock the sendmail object and
-assert on the send-email method call.
-
-On the other hand we often have to test the state of an object (attribute
-values) after doing something. This can be done without mocks by just
-calling the method and asserting the attribute values. But then we have
-to set up an integration test and install plone, which takes very long.
-For testing an object with dependencies to other parts of plone in a
-unit test, we can use **stubs** for faking other (separately tested) parts
-of plone. Stubs work like mocks: you can "expect" a method call and
-define a result. The difference between **stubs** and **mocks** is that
-stubs do not assert the expectations, so there will be no errors if
-something expected does not happen. So when using stubs we can assert
-the state without asserting the communcation between objects.
 
 
 Component registry layer
@@ -280,7 +281,7 @@ are prefixed and counted within a scope, usually a test case:
 
   from ftw.testing import staticuid
   from plone.app.testing import PLONE_INTEGRATION_TESTING
-  from unittest2 import TestCase
+  from unittest import TestCase
 
   class MyTest(TestCase):
       layer = PLONE_INTEGRATION_TESTING
@@ -315,7 +316,7 @@ Simple example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -365,7 +366,7 @@ Full example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -508,7 +509,7 @@ Example:
 
     # ----------------------------
     # test_*.py
-    from unittest2 import TestCase
+    from unittest import TestCase
 
     class TestSomething(TestCase):
         layer = MY_PACKAGE_INTEGRATION
@@ -529,7 +530,7 @@ Usage example:
 
 .. code:: python
 
-    from unittest2 import TestCase
+    from unittest import TestCase
     from ftw.testing.layer import TEMP_DIRECTORY
 
 
@@ -560,7 +561,7 @@ Usage example:
 
     # test_*.py
     from my.package.testing import CONSOLE_SCRIPT_TESTING
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     class TestConsoleScripts(TestCase):
@@ -574,10 +575,41 @@ Be aware that the dependency ``zc.recipe.egg`` is required for building the
 console scripts. You may put the dependency into your ``tests`` extras require.
 
 
+Upgrading
+---------
+
+Upgrading from ftw.testing 1.x to 2.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``mocker`` has been replaced in favor of ``unittest.mock``.
+This is a `breaking` change and may require amending existing tests based on
+``MockTestCase``.
+
+With ``mocker`` expectations were recorded in `record` mode while using the
+mock in tests was done in `replay` mode. This is no longer the case with
+``unittest.mock``. Here's a simple example how expectations can be adopted:
+
+.. code:: python
+
+  # Mocking with mocker
+  mock = self.mocker.mock()  # mocker.Mock
+  self.expect(mock.lock()).result('already locked')
+  self.replay()
+  self.assertEqual(mock.lock(), 'already locked')
+
+
+.. code:: python
+
+  # Mocking with unittest.mock
+  mock = self.mock()  # unittest.mock.Mock
+  mock.lock.return_value = 'already locked'
+  self.assertEqual(mock.lock(), 'already locked')
+
+
 Compatibility
 -------------
 
-Runs with `Plone <http://www.plone.org/>`_ `4.3`.
+Runs with `Plone <http://www.plone.org/>`_ `4.3`, `5.1` and `5.2`.
 
 
 Links

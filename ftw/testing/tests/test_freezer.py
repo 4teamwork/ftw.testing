@@ -1,7 +1,7 @@
 from DateTime import DateTime
 from ftw.testing import freeze
 from plone.app.testing import PLONE_FUNCTIONAL_TESTING
-from unittest2 import TestCase
+from unittest import TestCase
 import datetime
 import pytz
 import time
@@ -212,6 +212,6 @@ class TestFreezeIntegration(TestCase):
 
         thedate = self.layer['portal'].current_date
         self.assertEquals(datetime.datetime(2015, 7, 22, 11, 45, 58), thedate)
-        self.assertEquals('datetime.datetime',
+        self.assertEquals('ftw.testing.freezer.FrozenDateTime',
                           '.'.join((type(thedate).__module__,
                                     type(thedate).__name__)))

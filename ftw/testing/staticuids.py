@@ -3,7 +3,7 @@ from plone.app.testing import popGlobalRegistry
 from plone.app.testing import pushGlobalRegistry
 from plone.uuid.interfaces import IUUIDGenerator
 from zope.component import getGlobalSiteManager
-from zope.interface import implements
+from zope.interface import implementer
 from zope.site.hooks import getSite
 import re
 
@@ -45,8 +45,8 @@ class StaticUUIDActivator(object):
         return wrapper
 
 
+@implementer(IUUIDGenerator)
 class StaticUUIDGenerator(object):
-    implements(IUUIDGenerator)
 
     def __init__(self, prefix):
         self.prefix = prefix[:26]

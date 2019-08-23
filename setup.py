@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.20.2.dev0'
+version = '2.0.0.dev0'
 maintainer = 'Jonas Baumann'
 
 extras_require = {}
@@ -28,7 +28,10 @@ setup(name='ftw.testing',
         'Framework :: Plone',
         'Framework :: Plone :: 4.3',
         'Framework :: Plone :: 5.1',
+        'Framework :: Plone :: 5.2',
         'Programming Language :: Python',
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],
 
@@ -45,14 +48,13 @@ setup(name='ftw.testing',
       zip_safe=False,
 
       install_requires=[
-        'forbiddenfruit>=0.1.2',
+        'mock;python_version<"3.3"',
         'path.py',
         'plone.app.testing',
-        'plone.mocktestcase',
         'plone.testing',
         'pytz',
-        'setuptools',
-        'unittest2',
+        'setuptools >= 20.8.1',
+        'six',
         'zope.component',
         'zope.configuration',
         'zope.interface',
