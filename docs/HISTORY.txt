@@ -11,6 +11,7 @@ Changelog
   require amending existing tests based on ``MockTestCase``.
   [buchi]
 - Reimplement freezer without forbiddenfruit and mocker. [buchi]
+- Update README (use TestCase from unittest2). [busykoala]
 
 
 1.20.1 (2019-04-04)
