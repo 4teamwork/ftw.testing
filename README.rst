@@ -82,7 +82,7 @@ MockTestCase
 Zope components (utilities, adapters, subscription adapters and event handlers)
 from mocks and tearing down the global component registry during test tear-down.
 Some functionality was formerly provided by plone.mocktestcase, which is no
-longer maintained. Thus it has been copied over into this package.
+longer maintained. Thus it has been copied over into this package. 
 
 .. code:: python
 
@@ -281,7 +281,7 @@ are prefixed and counted within a scope, usually a test case:
 
   from ftw.testing import staticuid
   from plone.app.testing import PLONE_INTEGRATION_TESTING
-  from unittest2 import TestCase
+  from unittest import TestCase
 
   class MyTest(TestCase):
       layer = PLONE_INTEGRATION_TESTING
@@ -316,7 +316,7 @@ Simple example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -366,7 +366,7 @@ Full example:
 
     from ftw.testing.genericsetup import GenericSetupUninstallMixin
     from ftw.testing.genericsetup import apply_generic_setup_layer
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     @apply_generic_setup_layer
@@ -509,7 +509,7 @@ Example:
 
     # ----------------------------
     # test_*.py
-    from unittest2 import TestCase
+    from unittest import TestCase
 
     class TestSomething(TestCase):
         layer = MY_PACKAGE_INTEGRATION
@@ -530,7 +530,7 @@ Usage example:
 
 .. code:: python
 
-    from unittest2 import TestCase
+    from unittest import TestCase
     from ftw.testing.layer import TEMP_DIRECTORY
 
 
@@ -561,7 +561,7 @@ Usage example:
 
     # test_*.py
     from my.package.testing import CONSOLE_SCRIPT_TESTING
-    from unittest2 import TestCase
+    from unittest import TestCase
 
 
     class TestConsoleScripts(TestCase):
