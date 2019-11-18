@@ -5,7 +5,7 @@ Changelog
 2.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix component registry tear down in MockTestCase. [buchi]
 
 
 2.0.0 (2019-11-11)
