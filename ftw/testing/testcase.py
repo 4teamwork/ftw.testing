@@ -193,7 +193,7 @@ class MockTestCase(BaseMockTestCase):
         is called.
         """
         self._check_super_setup()
-        return super(MockTestCase, self).mock_tool()
+        return super(MockTestCase, self).mock_tool(mock, name)
 
     def stub_request(self, interfaces=[], stub_response=True,
                      content_type='text/html', status=200):
