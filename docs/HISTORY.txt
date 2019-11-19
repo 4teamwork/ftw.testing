@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.2 (unreleased)
+2.0.2 (2019-11-19)
 ------------------
 
 - Fix super call to mock_tool. [buchi]
