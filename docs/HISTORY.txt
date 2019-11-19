@@ -6,6 +6,8 @@ Changelog
 ------------------
 
 - Fix component registry tear down in MockTestCase. [buchi]
+- Rename FrozenDateTime class to FrozenDatetime to workaround poor check for
+  Zope's DateTime in plone.event. [buchi]
 
 
 2.0.0 (2019-11-11)
