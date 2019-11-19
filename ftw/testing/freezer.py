@@ -15,7 +15,7 @@ datetime_patch_count = 0
 __patch_refs__ = False
 
 
-class FrozenDateTimeMeta(type):
+class FrozenDatetimeMeta(type):
 
     @classmethod
     def __instancecheck__(self, obj):
@@ -26,7 +26,7 @@ class FrozenDateTimeMeta(type):
         return issubclass(subclass, orig_datetime)
 
 
-class FrozenDateTime(with_metaclass(FrozenDateTimeMeta, datetime.datetime)):
+class FrozenDatetime(with_metaclass(FrozenDatetimeMeta, datetime.datetime)):
 
     @classmethod
     def today(cls):
@@ -34,7 +34,7 @@ class FrozenDateTime(with_metaclass(FrozenDateTimeMeta, datetime.datetime)):
 
     @classmethod
     def fromdatetime(cls, dt):
-        return FrozenDateTime(
+        return FrozenDatetime(
             dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second,
             dt.microsecond, dt.tzinfo)
 
@@ -75,7 +75,7 @@ class FreezedClock(object):
         # easily. Thus we replace datetime.datetime with a custom class to
         # allow patching.
         if datetime_patch_count == 0:
-            patch_refs(datetime, 'datetime', FrozenDateTime)
+            patch_refs(datetime, 'datetime', FrozenDatetime)
         datetime_patch_count += 1
 
         def is_caller_ignored(frames_up):
@@ -105,23 +105,23 @@ class FreezedClock(object):
                 return self._previous_datetime_now(tz)
 
             if not tz:
-                return FrozenDateTime.fromdatetime(
+                return FrozenDatetime.fromdatetime(
                     self.new_now.replace(tzinfo=None))
 
             # Time was frozen to a naive DT, but a TZ-aware time is being requested
             # from now(). We assume the same TZ for freezing as requested by now.
             elif self.new_now.tzinfo is None:
-                return FrozenDateTime.fromdatetime(
+                return FrozenDatetime.fromdatetime(
                     self.new_now.replace(tzinfo=tz))
 
             elif self.new_now.tzinfo != tz:
-                return FrozenDateTime.fromdatetime(
+                return FrozenDatetime.fromdatetime(
                     tz.normalize(self.new_now.astimezone(tz)))
 
-            return FrozenDateTime.fromdatetime(self.new_now)
+            return FrozenDatetime.fromdatetime(self.new_now)
 
-        self._previous_datetime_now = FrozenDateTime.now
-        FrozenDateTime.now = freezed_now
+        self._previous_datetime_now = FrozenDatetime.now
+        FrozenDatetime.now = freezed_now
 
         @classmethod
         def freezed_utcnow(klass):
@@ -129,12 +129,12 @@ class FreezedClock(object):
                 return self._previous_datetime_utcnow()
 
             if self.new_now.tzinfo and self.new_now.tzinfo != pytz.UTC:
-                return FrozenDateTime.fromdatetime(
+                return FrozenDatetime.fromdatetime(
                     pytz.UTC.normalize(self.new_now.astimezone(pytz.UTC)))
-            return FrozenDateTime.fromdatetime(self.new_now)
+            return FrozenDatetime.fromdatetime(self.new_now)
 
-        self._previous_datetime_utcnow = FrozenDateTime.utcnow
-        FrozenDateTime.utcnow = freezed_utcnow
+        self._previous_datetime_utcnow = FrozenDatetime.utcnow
+        FrozenDatetime.utcnow = freezed_utcnow
 
         # Replace "time.time" function
         # datetime.timetuple does not contain any timezone information, so this
@@ -164,7 +164,7 @@ class FreezedClock(object):
     def __exit__(self, exc_type, exc_value, traceback):
         global datetime_patch_count
 
-        FrozenDateTime.now = self._previous_datetime_now
+        FrozenDatetime.now = self._previous_datetime_now
         patch_refs(datetime.datetime, 'utcnow', self._previous_datetime_utcnow)
         patch_refs(time, 'time', self._previous_time_time)
 
