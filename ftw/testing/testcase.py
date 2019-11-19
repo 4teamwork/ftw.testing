@@ -10,7 +10,6 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 import six
 import unittest
 import zope.component
-import zope.component.testing
 import zope.proxy
 
 if six.PY2:
@@ -60,7 +59,6 @@ class BaseMockTestCase(unittest.TestCase):
 
     def tearDown(self):
         super(BaseMockTestCase, self).tearDown()
-        zope.component.testing.tearDown(self)
         self._mocked_tools = {}
         patch_refs(cmf_utils, 'getToolByName', self._original_getToolByName)
 
