@@ -5,7 +5,7 @@ Changelog
 2.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix pickling of datetime while time is frozen. [buchi]
 
 
 2.0.2 (2019-11-19)

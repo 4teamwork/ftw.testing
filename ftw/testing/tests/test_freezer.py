@@ -3,6 +3,7 @@ from ftw.testing import freeze
 from plone.app.testing import PLONE_FUNCTIONAL_TESTING
 from unittest import TestCase
 import datetime
+import pickle
 import pytz
 import time
 import transaction
@@ -198,6 +199,14 @@ class TestFreeze(TestCase):
                         ignore_modules=('ftw.testing.tests.test_freezer',)):
                 self.assertEquals(dt_now, datetime.datetime.now(timezone))
                 self.assertEquals(time_now, time_function())
+
+    def test_pickling_of_datetime_while_frozen(self):
+        dt = datetime.datetime(2019, 11, 22, 13, 45, 31)
+        with freeze(datetime.datetime(2015, 7, 22, 11, 45, 58)):
+            try:
+                pickle.dumps(dt)
+            except pickle.PicklingError:
+                self.fail('Pickling of datetime failed.')
 
 
 class TestFreezeIntegration(TestCase):
