@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from datetime import timedelta
 from ftw.testing.patch import patch_refs
 from six import with_metaclass
+from six.moves import copyreg
 from time import mktime
 from time import tzname
 import datetime
@@ -37,6 +38,19 @@ class FrozenDatetime(with_metaclass(FrozenDatetimeMeta, datetime.datetime)):
         return FrozenDatetime(
             dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second,
             dt.microsecond, dt.tzinfo)
+
+
+# Customize pickling of datetime:
+# While frozen, pickling a (non-frozen) datetime instance would fail.
+# We have to ensure that datetimes are pickeled as FrozenDatetime in this case.
+def pickle_frozendatetime(dt):
+    if datetime_patch_count > 0:
+        return FrozenDatetime, dt.__reduce__()[1]
+    else:
+        return orig_datetime, dt.__reduce__()[1]
+
+
+copyreg.pickle(orig_datetime, pickle_frozendatetime)
 
 
 class FreezedClock(object):
