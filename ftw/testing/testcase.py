@@ -50,10 +50,10 @@ class BaseMockTestCase(unittest.TestCase):
     def setUp(self):
         super(BaseMockTestCase, self).setUp()
 
-        def getToolByName(context, name):
+        def getToolByName(context, name, default=cmf_utils._marker):
             if name in self._mocked_tools:
                 return self._mocked_tools[name]
-            return self._original_getToolByName(context, name)
+            return self._original_getToolByName(context, name, default)
         self._original_getToolByName = cmf_utils.getToolByName
         patch_refs(cmf_utils, 'getToolByName', getToolByName)
 

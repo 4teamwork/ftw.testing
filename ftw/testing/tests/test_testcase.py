@@ -71,6 +71,9 @@ class TestBaseMockTestCase(BaseMockTestCase):
         tool = self.mock()
         self.mock_tool(tool, 'portal_catalog')
         self.assertEqual(getToolByName(None, 'portal_catalog'), tool)
+        self.assertEquals(getToolByName(None, 'foobar', 'default'), 'default')
+        with self.assertRaises(AttributeError):
+            self.assertEquals(getToolByName(None, 'foobar'))
 
 
 class TestMockTestCase(MockTestCase):
