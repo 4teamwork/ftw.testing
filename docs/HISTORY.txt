@@ -6,6 +6,7 @@ Changelog
 ------------------
 
 - Stop quickinstall_uninstallation test from being skipped on Plone 5.1 [djowett-ftw]
+- restore diffs for uninstall tests after removing unittest2 [djowett-ftw]
 
 
 2.0.4 (2019-12-04)

@@ -156,6 +156,8 @@ class GenericSetupUninstallMixin(object):
         after = self.setup_tool._getImportContext('snapshot-' + after_id)
 
         self.maxDiff = None
+        self.longMessage = True
+
         self.assertMultiLineEqual(
             self.setup_tool.compareConfigurations(
                 before, after, skip=self.skip_files).decode('utf8'),
