@@ -142,7 +142,7 @@ class GenericSetupUninstallMixin(object):
             registry = getUtility(IRegistry)
             registry.records['plone.resources.last_legacy_import'].value = self.datetime
             registry.records['plone.bundles/plone-legacy.last_compilation'].value = self.datetime
-        
+
     def assertSnapshotsEqual(self, before_id='before-install',
                              after_id='after-uninstall',
                              msg=None):
@@ -156,13 +156,15 @@ class GenericSetupUninstallMixin(object):
         after = self.setup_tool._getImportContext('snapshot-' + after_id)
 
         self.maxDiff = None
+        self.longMessage = True
+
         self.assertMultiLineEqual(
             self.setup_tool.compareConfigurations(
                 before, after, skip=self.skip_files).decode('utf8'),
             '',
             msg=msg)
 
-    @unittest.skipIf(getFSVersionTuple() > (5, 1), 'Only for Plone < 5.2')
+    @unittest.skipIf(getFSVersionTuple() >= (5, 2), 'Only for Plone < 5.2')
     def test_quickinstall_uninstallation_removes_resets_configuration(self):
         self._install_dependencies()
 
