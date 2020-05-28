@@ -8,7 +8,6 @@ from time import tzname
 import datetime
 import inspect
 import pytz
-import six
 import time
 
 orig_datetime = datetime.datetime
@@ -101,16 +100,14 @@ class FreezedClock(object):
             handlers firing off a Dexterity ``createdInContainer`` event.
             """
             if self.ignore_modules:
-                stack = inspect.stack()
-                for i, frame in enumerate(stack):
-                    if i > frames_up:
-                        break
-                    if six.PY2:
-                        module_name = inspect.getmodule(frame[0]).__name__
-                    else:
-                        module_name = inspect.getmodule(frame.frame).__name__
+                frame = inspect.currentframe()
+                for _ in range(frames_up):
+                    frame = frame.f_back
+
+                    module_name = inspect.getmodule(frame).__name__
                     if module_name in self.ignore_modules:
                         return True
+
             return False
 
         @classmethod
