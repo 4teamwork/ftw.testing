@@ -5,7 +5,9 @@ Changelog
 1.20.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Significantly optimize freezer's "ignore_modules" by avoiding retrieving the
+  complete call stack.
+  [buchi]
 
 
 1.20.1 (2019-04-04)

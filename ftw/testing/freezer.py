@@ -48,9 +48,13 @@ class FreezedClock(object):
             handlers firing off a Dexterity ``createdInContainer`` event.
             """
             if self.ignore_modules:
-                caller_frame = inspect.stack()[frames_up][0]
-                module_name = inspect.getmodule(caller_frame).__name__
+                frame = inspect.currentframe()
+                for _ in range(frames_up):
+                    frame = frame.f_back
+
+                module_name = inspect.getmodule(frame).__name__
                 return module_name in self.ignore_modules
+
             return False
 
         self.mocker = Mocker()
