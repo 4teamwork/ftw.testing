@@ -1,4 +1,6 @@
 from Products.MailHost.interfaces import IMailHost
+from ftw.testing import IS_PLONE_5
+from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 
 
@@ -25,7 +27,18 @@ class Mailing(object):
 
         if configure:
             mockmailhost.smtp_host = 'localhost'
-            self.portal.email_from_address = 'test@localhost'
+            if IS_PLONE_5:
+                registry = getUtility(IRegistry, context=self.portal)
+
+                if not registry['plone.email_from_address']:
+                    self.portal._original_email_address = registry["plone.email_from_address"]
+                    registry['plone.email_from_address'] = 'test@localhost'
+
+                if not registry['plone.email_from_name']:
+                    self.portal._original_email_name = registry["plone.email_from_name"]
+                    registry['plone.email_from_name'] = u'Plone site'
+            else:
+                self.portal.email_from_address = 'test@localhost'
 
     def tear_down(self):
         # Do NOT move the MockMailHost import to the top!
@@ -38,6 +51,17 @@ class Mailing(object):
         mailhost = sm.getUtility(IMailHost)
         if isinstance(mailhost, MockMailHost):
             sm.unregisterUtility(component=mailhost, provided=IMailHost)
+
+        if IS_PLONE_5:
+            registry = getUtility(IRegistry, context=self.portal)
+
+            if hasattr(self.portal, "_original_email_name"):
+                registry["plone.email_from_name"] = self.portal._original_email_name
+                delattr(self.portal, "_original_email_name")
+
+            if hasattr(self.portal, "_original_email_address"):
+                registry["plone.email_from_address"] = self.portal._original_email_address  # noqa: E501
+                delattr(self.portal, "_original_email_address")
 
     def get_mailhost(self):
         mailhost = getUtility(IMailHost)
