@@ -1,5 +1,7 @@
+from contextlib import contextmanager
 from datetime import datetime
 from ftw.testing import IS_PLONE_5
+from ftw.testing import IS_PLONE_6
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import login
@@ -12,7 +14,6 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import installProduct
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import getFSVersionTuple
-from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 from zope.component import getUtility
 from zope.configuration import xmlconfig
 import unittest
@@ -40,10 +41,16 @@ class ZCMLLayer(PloneSandboxLayer):
         zcml = []
 
         if self.autoinclude:
-            zcml.append(
-                '<include package="z3c.autoinclude" file="meta.zcml" />'
-                '<includePlugins package="plone" />'
-                '<includePluginsOverrides package="plone" />')
+            if IS_PLONE_6:
+                zcml.append(
+                    '<include package="plone.autoinclude" file="meta.zcml" />'
+                    '<autoIncludePlugins target="plone" />'
+                    '<autoIncludePluginsOverrides target="plone" />')
+            else:
+                zcml.append(
+                    '<include package="z3c.autoinclude" file="meta.zcml" />'
+                    '<includePlugins package="plone" />'
+                    '<includePluginsOverrides package="plone" />')
 
         for pkg in self.additional_zcml_packages:
             zcml.append('<include package="%s" />' % pkg)
@@ -130,15 +137,34 @@ class GenericSetupUninstallMixin(object):
         self.setup_tool.runAllImportStepsFromProfile(self.uninstall_profile_id)
 
     def _create_before_snapshot(self, id_='before-install'):
-        self._prepare_registry()
-        self.setup_tool.createSnapshot(id_)
+        with self._static_theming_timestamp():
+            self._prepare_registry()
+            self.setup_tool.createSnapshot(id_)
 
     def _create_after_shapshot(self, id_='after-uninstall'):
-        self._prepare_registry()
-        self.setup_tool.createSnapshot(id_)
+        with self._static_theming_timestamp():
+            self._prepare_registry()
+            self.setup_tool.createSnapshot(id_)
+
+    @contextmanager
+    def _static_theming_timestamp(self):
+        if IS_PLONE_6:
+            from plone.app.theming import interfaces
+            original = interfaces.get_default_custom_css_timestamp
+            try:    
+                timestamp = self.datetime
+
+                def custom_timestamp():
+                    return timestamp
+                interfaces.get_default_custom_css_timestamp = custom_timestamp
+                yield
+            finally:
+                interfaces.get_default_custom_css_timestamp = original
+        else:
+            yield
 
     def _prepare_registry(self):
-        if IS_PLONE_5:
+        if IS_PLONE_5 and not IS_PLONE_6:
             registry = getUtility(IRegistry)
             registry.records['plone.resources.last_legacy_import'].value = self.datetime
             registry.records['plone.bundles/plone-legacy.last_compilation'].value = self.datetime
@@ -189,7 +215,9 @@ class GenericSetupUninstallMixin(object):
         self.assertSnapshotsEqual(
             msg='The uninstall profile seems not to uninstall everything.')
 
+    @unittest.skipIf(getFSVersionTuple() >= (6, 0), 'Only for Plone < 6.0')
     def test_uninstall_method_is_available(self):
+        from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
         product = InstalledProduct(self.package)
         self.assertIsNotNone(
             product.getUninstallMethod(),

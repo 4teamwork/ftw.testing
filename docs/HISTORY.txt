@@ -5,7 +5,7 @@ Changelog
 2.0.7 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Plone 6 compatibility. [mathias.leimgruber]
 
 
 2.0.6 (2020-05-28)

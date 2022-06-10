@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from Products.CMFQuickInstallerTool import events
+from ftw.testing import IS_PLONE_6
 import inspect
 
 
@@ -24,9 +24,11 @@ class QuickInstallerSnapshots(object):
         self._current_version = 'original'
         self._functions = {}
 
-        self._prepare(events.handleBeforeProfileImportEvent,
-                      noop_event_handler)
-        self._prepare(events.handleProfileImportedEvent, noop_event_handler)
+        if not IS_PLONE_6:
+            from Products.CMFQuickInstallerTool import events
+            self._prepare(events.handleBeforeProfileImportEvent,
+                          noop_event_handler)
+            self._prepare(events.handleProfileImportedEvent, noop_event_handler)
 
     def is_enabled(self):
         """Returns ``True`` when snapshots are
