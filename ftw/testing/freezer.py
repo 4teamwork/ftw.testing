@@ -104,9 +104,11 @@ class FreezedClock(object):
                 for _ in range(frames_up):
                     frame = frame.f_back
 
-                    module_name = inspect.getmodule(frame).__name__
-                    if module_name in self.ignore_modules:
-                        return True
+                    module = inspect.getmodule(frame)
+                    if module:
+                        module_name = module.__name__
+                        if module_name in self.ignore_modules:
+                            return True
 
             return False
 
