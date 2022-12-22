@@ -42,7 +42,7 @@ class TestMailing(TestCase):
     def test_pop_from_filled_list(self):
         self._send_test_mail()
         message = self.mailing.pop()
-        self.assertIn('info@4teamwork.ch', message)
+        self.assertIn(b'info@4teamwork.ch', message)
 
     def test_get_messages_by_recipient(self):
         self._send_test_mail()
@@ -79,21 +79,22 @@ class TestMailing(TestCase):
         self.assertEquals(
             1, len(Mailing(self.layer['portal']).get_messages()),
             'Expected exactly one email in the MockMailHost.')
-        message = Mailing(self.layer['portal']).pop().split('\n')
+
+        message = Mailing(self.layer['portal']).pop().splitlines()
         self.assertEquals(
             0, len(Mailing(self.layer['portal']).get_messages()),
             'Expected no email in the MockMailHost after popping.')
 
         # replace "Date: ..." - it changes constantly.
-        message = [line.startswith('Date:') and 'Date: ---' or line
+        message = [line.startswith(b'Date:') and b'Date: ---' or line
                    for line in message]
 
         self.assertEquals(
-            ['Subject: A test mail from ftw.testing',
-             'To: info@4teamwork.ch',
-             'From: info@4teamwork.ch',
-             'Date: ---',
-             '',
-             'Hello World'],
+            [b'Subject: A test mail from ftw.testing',
+             b'To: info@4teamwork.ch',
+             b'From: info@4teamwork.ch',
+             b'Date: ---',
+             b'',
+             b'Hello World'],
 
             message)
