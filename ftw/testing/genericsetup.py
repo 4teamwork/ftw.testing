@@ -1,5 +1,6 @@
 from datetime import datetime
 from ftw.testing import IS_PLONE_5
+from ftw.testing import PLONE_VERSION
 from ftw.testing.quickinstaller import snapshots
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import login
@@ -11,7 +12,6 @@ from plone.app.testing import TEST_USER_NAME
 from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import installProduct
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import getFSVersionTuple
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 from zope.component import getUtility
 from zope.configuration import xmlconfig
@@ -143,6 +143,11 @@ class GenericSetupUninstallMixin(object):
             registry.records['plone.resources.last_legacy_import'].value = self.datetime
             registry.records['plone.bundles/plone-legacy.last_compilation'].value = self.datetime
 
+            if PLONE_VERSION >= (5, 2, 0):
+                css_ts_record = registry.records['plone.app.theming.interfaces.IThemeSettings.custom_css_timestamp']
+                css_ts_record.value = self.datetime
+                css_ts_record.field.defaultFactory = lambda: self.datetime
+
     def assertSnapshotsEqual(self, before_id='before-install',
                              after_id='after-uninstall',
                              msg=None):
@@ -164,7 +169,7 @@ class GenericSetupUninstallMixin(object):
             '',
             msg=msg)
 
-    @unittest.skipIf(getFSVersionTuple() >= (5, 2), 'Only for Plone < 5.2')
+    @unittest.skipIf(PLONE_VERSION >= (5, 2), 'Only for Plone < 5.2')
     def test_quickinstall_uninstallation_removes_resets_configuration(self):
         self._install_dependencies()
 
