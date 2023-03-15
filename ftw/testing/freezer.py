@@ -115,6 +115,9 @@ class FreezedClock(object):
             if is_caller_ignored(3):
                 return self._previous_datetime_now(tz)
 
+            if tz is datetime.timezone.utc:
+                tz = pytz.UTC
+
             if not tz:
                 return FrozenDatetime.fromdatetime(
                     self.new_now.replace(tzinfo=None))
